@@ -1,0 +1,76 @@
+{
+  "locale": "zh",
+  "nav": {
+    "home": "首页",
+    "about": "关于我们",
+    "career": "招聘",
+    "blog": "新闻",
+    "contact": "联系我们",
+    "login": "登录"
+  },
+  "hero": {
+    "title": "BRINGING MUSIC",
+    "title2": "TO THE WORLD",
+    "subtitle": "WON Media – 越南领先的音乐发行与版权管理公司。"
+  },
+  "services": {
+    "heading": "我们的服务",
+    "items": [
+      {
+        "title": "社交媒体业务",
+        "desc": "WON Media 是越南 YouTube、Facebook 和 TikTok 的官方合作伙伴。我们为国内外艺术家和企业提供营销服务及社交媒体频道建设。"
+      },
+      {
+        "title": "音乐发行",
+        "desc": "向 Spotify、Apple Music、YouTube Music、Facebook、TikTok、Deezer、Amazon Music 等全球平台发行音乐。"
+      },
+      {
+        "title": "版权内容开发",
+        "desc": "在在线平台和电视上分发各类版权内容（电影、音乐、儿童、新闻、体育…）。"
+      },
+      {
+        "title": "版权服务",
+        "desc": "在数字环境中保护合作伙伴的内容版权，管理音乐版权。"
+      }
+    ]
+  },
+  "achievements": {
+    "heading": "成就",
+    "items": [
+      {
+        "value": 150,
+        "label": "合作伙伴"
+      },
+      {
+        "value": 25,
+        "label": "金牌按钮"
+      },
+      {
+        "value": 100,
+        "label": "银牌YouTube按钮"
+      },
+      {
+        "value": 250,
+        "label": "系统内频道"
+      }
+    ]
+  },
+  "partners": {
+    "heading": "我们的合作伙伴"
+  },
+  "posts": {
+    "heading": "文章",
+    "see_more": "查看更多",
+    "no_content": "暂无文章。"
+  },
+  "footer": {
+    "about_title": "关于我们",
+    "services_title": "服务",
+    "contact_title": "联系方式",
+    "address": "河内市巴亭区皇花探街189巷36号",
+    "phone": "0968 123 456",
+    "email": "contact@wonmedia.vn",
+    "hours": "周一至周五: 8:00 – 17:30",
+    "rights": "版权所有 WonMedia。保留所有权利。"
+  }
+}

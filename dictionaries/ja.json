@@ -1,0 +1,76 @@
+{
+  "locale": "ja",
+  "nav": {
+    "home": "ホーム",
+    "about": "会社概要",
+    "career": "採用情報",
+    "blog": "ニュース",
+    "contact": "お問い合わせ",
+    "login": "ログイン"
+  },
+  "hero": {
+    "title": "BRINGING MUSIC",
+    "title2": "TO THE WORLD",
+    "subtitle": "WON Media – ベトナムを代表する音楽配信・著作権管理会社。"
+  },
+  "services": {
+    "heading": "サービス",
+    "items": [
+      {
+        "title": "ソーシャルメディアビジネス",
+        "desc": "WON Mediaはベトナムにおける YouTube、Facebook、TikTok の公式パートナーです。国内外のアーティストや企業向けにマーケティングおよびSNSチャンネル構築サービスを提供しています。"
+      },
+      {
+        "title": "音楽配信",
+        "desc": "Spotify、Apple Music、YouTube Music、Facebook、TikTok、Deezer、Amazon Music などのグローバルプラットフォームへ音楽を配信します。"
+      },
+      {
+        "title": "著作権コンテンツ活用",
+        "desc": "映画、音楽、子ども向け、ニュース、スポーツなど様々なジャンルの著作権コンテンツをオンラインプラットフォームやテレビで配信します。"
+      },
+      {
+        "title": "著作権サービス",
+        "desc": "デジタル環境におけるパートナーのコンテンツ著作権を保護し、音楽著作権を管理します。"
+      }
+    ]
+  },
+  "achievements": {
+    "heading": "実績",
+    "items": [
+      {
+        "value": 150,
+        "label": "パートナー"
+      },
+      {
+        "value": 25,
+        "label": "ゴールドボタン"
+      },
+      {
+        "value": 100,
+        "label": "シルバーYouTubeボタン"
+      },
+      {
+        "value": 250,
+        "label": "システム内チャンネル"
+      }
+    ]
+  },
+  "partners": {
+    "heading": "パートナー"
+  },
+  "posts": {
+    "heading": "記事",
+    "see_more": "もっと見る",
+    "no_content": "記事がありません。"
+  },
+  "footer": {
+    "about_title": "会社概要",
+    "services_title": "サービス",
+    "contact_title": "連絡先",
+    "address": "ハノイ市バーディン区ホアンホアタム通り189番路地36号",
+    "phone": "0968 123 456",
+    "email": "contact@wonmedia.vn",
+    "hours": "月 – 金: 8:00 – 17:30",
+    "rights": "著作権 WonMedia。全権利保有。"
+  }
+}

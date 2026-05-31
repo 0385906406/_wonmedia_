@@ -1,0 +1,76 @@
+{
+  "locale": "en",
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "career": "Careers",
+    "blog": "News",
+    "contact": "Contact",
+    "login": "Login"
+  },
+  "hero": {
+    "title": "BRINGING MUSIC",
+    "title2": "TO THE WORLD",
+    "subtitle": "WON Media – Vietnam's leading music distribution & copyright management company."
+  },
+  "services": {
+    "heading": "OUR SERVICES",
+    "items": [
+      {
+        "title": "Social Media Business",
+        "desc": "WON Media is an official partner of YouTube, Facebook, and TikTok in Vietnam. We provide marketing services and build strong social media channels for artists, content producers, and businesses worldwide."
+      },
+      {
+        "title": "Music Distribution",
+        "desc": "Distribute music to global platforms such as Spotify, Apple Music, YouTube Music, Facebook, TikTok, Deezer, Amazon Music, and more."
+      },
+      {
+        "title": "Copyright Content Exploitation",
+        "desc": "Distribute copyrighted content across various genres (movies, music, kids, news, sports…) on online platforms and television."
+      },
+      {
+        "title": "Copyright Services",
+        "desc": "Protect digital content copyrights for partners and manage music copyright ownership in the digital environment."
+      }
+    ]
+  },
+  "achievements": {
+    "heading": "ACHIEVEMENTS",
+    "items": [
+      {
+        "value": 150,
+        "label": "Partners"
+      },
+      {
+        "value": 25,
+        "label": "Gold Buttons"
+      },
+      {
+        "value": 100,
+        "label": "Silver YouTube Buttons"
+      },
+      {
+        "value": 250,
+        "label": "Channels in System"
+      }
+    ]
+  },
+  "partners": {
+    "heading": "OUR PARTNERS"
+  },
+  "posts": {
+    "heading": "ARTICLES",
+    "see_more": "See More",
+    "no_content": "No articles found."
+  },
+  "footer": {
+    "about_title": "About Us",
+    "services_title": "Services",
+    "contact_title": "Contact",
+    "address": "No. 36, Alley 189 Hoang Hoa Tham, Ba Dinh, Hanoi",
+    "phone": "0968 123 456",
+    "email": "contact@wonmedia.vn",
+    "hours": "Mon – Fri: 8:00 – 17:30",
+    "rights": "Copyright WonMedia. All rights reserved."
+  }
+}

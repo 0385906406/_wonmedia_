@@ -1,0 +1,43 @@
+import mongoose, { Schema, Document, Model } from 'mongoose'
+
+const ML = { vi: { type: String, default: '' }, en: { type: String, default: '' }, ko: { type: String, default: '' }, ja: { type: String, default: '' }, zh: { type: String, default: '' } }
+
+export interface IFooterConfig extends Document {
+  key: string
+  companyName: Record<string, string>
+  // Nav links
+  navAbout: Record<string, string>
+  navServices: Record<string, string>
+  navCareers: Record<string, string>
+  navBlog: Record<string, string>
+  navContact: Record<string, string>
+  // Services
+  servicesHeading: Record<string, string>
+  service1: Record<string, string>
+  service2: Record<string, string>
+  service3: Record<string, string>
+  service4: Record<string, string>
+  // Location
+  locationHeading: Record<string, string>
+  locationCity: Record<string, string>
+  // Contact labels
+  phoneLabel: Record<string, string>
+  emailLabel: Record<string, string>
+  legalRepLabel: Record<string, string>
+  // Bottom
+  copyright: Record<string, string>
+}
+
+delete (mongoose.models as Record<string, unknown>).FooterConfig
+const FooterConfigSchema = new Schema<IFooterConfig>({
+  key: { type: String, default: 'global', unique: true },
+  companyName: ML,
+  navAbout: ML, navServices: ML, navCareers: ML, navBlog: ML, navContact: ML,
+  servicesHeading: ML, service1: ML, service2: ML, service3: ML, service4: ML,
+  locationHeading: ML, locationCity: ML,
+  phoneLabel: ML, emailLabel: ML, legalRepLabel: ML,
+  copyright: ML,
+}, { strict: false, timestamps: true })
+
+const FooterConfig: Model<IFooterConfig> = mongoose.model<IFooterConfig>('FooterConfig', FooterConfigSchema)
+export default FooterConfig
