@@ -13,9 +13,10 @@ interface Props {
   lang: string
   navItems: NavItem[]
   loginLabel: string
+  isLoggedIn?: boolean
 }
 
-export function NavbarClient({ lang, navItems, loginLabel }: Props) {
+export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -61,10 +62,16 @@ export function NavbarClient({ lang, navItems, loginLabel }: Props) {
             </svg>
           </a>
 
-          {/* Login */}
-          <a href="/auth/login" className="wm-login-btn">
-            {loginLabel}
-          </a>
+          {/* Login / Admin */}
+          {isLoggedIn ? (
+            <a href="/admin" className="wm-login-btn">
+              Quản trị
+            </a>
+          ) : (
+            <a href="/auth/login" className="wm-login-btn">
+              {loginLabel}
+            </a>
+          )}
 
           {/* Mobile menu button */}
           <button
