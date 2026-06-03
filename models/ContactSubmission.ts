@@ -5,7 +5,6 @@ export interface IContactSubmission extends Document {
   read: boolean; createdAt: Date
 }
 
-delete (mongoose.models as Record<string, unknown>).ContactSubmission
 const ContactSubmissionSchema = new Schema<IContactSubmission>({
   name:    { type: String, required: true },
   email:   { type: String, required: true },
@@ -15,5 +14,5 @@ const ContactSubmissionSchema = new Schema<IContactSubmission>({
 }, { timestamps: true })
 
 const ContactSubmission: Model<IContactSubmission> =
-  mongoose.model<IContactSubmission>('ContactSubmission', ContactSubmissionSchema)
+  (mongoose.models.ContactSubmission as Model<IContactSubmission>) || mongoose.model<IContactSubmission>('ContactSubmission', ContactSubmissionSchema)
 export default ContactSubmission

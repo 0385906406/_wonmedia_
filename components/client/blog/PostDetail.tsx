@@ -1,6 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState, useCallback, useEffect } from 'react'
+import { CommentSection } from './CommentSection'
 
 export interface PostDetailData {
   slug: string
@@ -11,6 +13,12 @@ export interface PostDetailData {
   title: string
   excerpt: string
   content: string
+  // Job-specific
+  urgent?: boolean
+  deadline?: string
+  jobType?: string
+  location?: string
+  salary?: string
 }
 
 interface RelatedPost {
@@ -20,14 +28,228 @@ interface RelatedPost {
 
 interface Props {
   post: PostDetailData
+  postId: string
   lang: string
   backUrl: string
   backLabel: string
   relatedPosts: RelatedPost[]
+  isLoggedIn?: boolean
+  currentUserId?: string
+  currentUserName?: string
+  likeCount?: number
+  thumbnailPosition?: string
 }
 
-export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Props) {
+const JOB_TYPE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  'full-time':  { label: 'Full-time',  color: '#1d4ed8', bg: '#dbeafe' },
+  'part-time':  { label: 'Part-time',  color: '#7c3aed', bg: '#ede9fe' },
+  'remote':     { label: 'Remote',     color: '#0f766e', bg: '#ccfbf1' },
+  'hybrid':     { label: 'Hybrid',     color: '#0369a1', bg: '#e0f2fe' },
+  'internship': { label: 'Thực tập',   color: '#b45309', bg: '#fef3c7' },
+  'freelance':  { label: 'Freelance',  color: '#be185d', bg: '#fce7f3' },
+}
+
+function getDaysLeft(deadline: string): number | null {
+  if (!deadline) return null
+  const d = new Date(deadline)
+  if (isNaN(d.getTime())) return null
+  const diff = Math.ceil((d.getTime() - Date.now()) / 86400000)
+  return diff
+}
+
+function JobInfoPanel({ post }: { post: PostDetailData }) {
+  const jt = post.jobType ? JOB_TYPE_LABELS[post.jobType] : null
+  const daysLeft = getDaysLeft(post.deadline ?? '')
+  const isExpired = daysLeft !== null && daysLeft < 0
+  const deadlineDate = post.deadline ? new Date(post.deadline).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''
+
+  const infoItems = [
+    post.location && {
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+      ),
+      label: 'Địa điểm',
+      value: post.location,
+    },
+    post.salary && {
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      ),
+      label: 'Mức lương',
+      value: post.salary,
+    },
+    post.deadline && {
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      ),
+      label: 'Hạn nộp hồ sơ',
+      value: isExpired
+        ? `${deadlineDate} (Đã hết hạn)`
+        : daysLeft === 0
+          ? `${deadlineDate} (Hôm nay!)`
+          : `${deadlineDate} (còn ${daysLeft} ngày)`,
+      valueColor: isExpired ? '#ef4444' : daysLeft !== null && daysLeft <= 7 ? '#f59e0b' : '#00A98F',
+    },
+  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string; valueColor?: string }[]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay: 0.1 }}
+      style={{ marginBottom: 40 }}
+    >
+      <div style={{
+        background: 'linear-gradient(135deg, #062340 0%, #0F4C81 60%, #1565a8 100%)',
+        borderRadius: 20,
+        padding: 'clamp(24px, 4vw, 36px)',
+        boxShadow: '0 20px 60px -12px rgba(6,35,64,0.35)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Decorative blobs */}
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(0,169,143,0.1)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: '30%', width: 140, height: 140, borderRadius: '50%', background: 'rgba(99,102,241,0.08)', pointerEvents: 'none' }} />
+
+        <div style={{ position: 'relative', display: 'flex', gap: 32, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+          {/* Left: Info grid */}
+          <div style={{ flex: 1, minWidth: 240 }}>
+            {/* Badges row */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+              {post.urgent && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '5px 14px', borderRadius: 100,
+                  background: 'rgba(239,68,68,0.15)',
+                  border: '1px solid rgba(239,68,68,0.4)',
+                  color: '#fca5a5', fontSize: 11, fontWeight: 800,
+                  letterSpacing: '1.5px', textTransform: 'uppercase',
+                }}>
+                  🔥 Tuyển gấp
+                </span>
+              )}
+              {jt && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '5px 14px', borderRadius: 100,
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: '#fff', fontSize: 11, fontWeight: 700,
+                  letterSpacing: '0.8px',
+                }}>
+                  💼 {jt.label}
+                </span>
+              )}
+            </div>
+
+            {/* Info items */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
+              {infoItems.map((item, i) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>{item.icon}</span>
+                    {item.label}
+                  </div>
+                  <div style={{ color: item.valueColor ?? '#fff', fontSize: 14, fontWeight: 700, lineHeight: 1.4 }}>
+                    {item.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: CTA */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start', flexShrink: 0 }}>
+            {!isExpired ? (
+              <a
+                href={`mailto:hr@wonmedia.com?subject=Ứng tuyển: ${encodeURIComponent(post.title)}`}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '13px 28px', borderRadius: 12,
+                  background: 'linear-gradient(135deg, #00A98F, #34D4B8)',
+                  color: '#fff', fontSize: 14, fontWeight: 800,
+                  textDecoration: 'none', letterSpacing: '0.2px',
+                  boxShadow: '0 8px 24px -6px rgba(0,169,143,0.5)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 32px -6px rgba(0,169,143,0.6)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px -6px rgba(0,169,143,0.5)' }}
+              >
+                Ứng tuyển ngay
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </a>
+            ) : (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '13px 28px', borderRadius: 12,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.4)', fontSize: 14, fontWeight: 700,
+                letterSpacing: '0.2px',
+              }}>
+                Đã đóng tuyển dụng
+              </span>
+            )}
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+              Gửi CV tới <span style={{ color: 'rgba(255,255,255,0.7)' }}>hr@wonmedia.com</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export function PostDetail({
+  post, postId, lang, backUrl, backLabel, relatedPosts,
+  isLoggedIn = false, currentUserId, currentUserName, likeCount: initLikeCount = 0,
+  thumbnailPosition = 'center center',
+}: Props) {
   const isBlog = post.type === 'blog'
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(initLikeCount)
+  const [sharing, setSharing] = useState(false)
+
+  // Fetch trạng thái like thực tế của user khi mount
+  useEffect(() => {
+    if (!isLoggedIn) return
+    fetch(`/api/posts/${postId}/like`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) { setLiked(d.liked); setLikeCount(d.count) } })
+      .catch(() => {})
+  }, [postId, isLoggedIn])
+
+  const handleLike = useCallback(async () => {
+    if (!isLoggedIn) { window.location.href = '/auth/login'; return }
+    const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST' })
+    if (!res.ok) return
+    const data = await res.json()
+    setLiked(data.liked)
+    setLikeCount(data.count)
+  }, [postId, isLoggedIn])
+
+  const handleShare = useCallback(async (platform: string) => {
+    const url = window.location.href
+    const title = post.title
+    if (platform === 'copy') {
+      await navigator.clipboard.writeText(url)
+      setSharing(true)
+      setTimeout(() => setSharing(false), 2000)
+    } else if (platform === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'width=600,height=400')
+    } else if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`, '_blank', 'width=600,height=400')
+    }
+  }, [post.title])
 
   return (
     <div style={{ background: 'var(--wm-dark)', fontFamily: 'var(--font-vi)' }}>
@@ -41,7 +263,7 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
         {post.thumbnail ? (
           <img src={post.thumbnail} alt={post.title} style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center',
+            objectFit: 'cover', objectPosition: thumbnailPosition,
             filter: 'brightness(0.55) contrast(1.05) saturate(0.9)',
           }} />
         ) : (
@@ -135,9 +357,13 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
       <div style={{ background: '#F8F9FB' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: 'clamp(32px,6vw,64px) clamp(16px,4vw,32px) clamp(48px,6vw,80px)' }}>
 
-          {/* Thumbnail featured image */}
-          {/* Reading column — max 820px centered */}
-          <div style={{ maxWidth: '820px', margin: '0 auto' }}>
+          {/* ── Job Info Panel (chỉ hiện với tuyển dụng) ── */}
+          {!isBlog && (
+            <JobInfoPanel post={post} />
+          )}
+
+          {/* Content */}
+          <div>
 
             {post.thumbnail && (
               <motion.div
@@ -147,7 +373,7 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
                 style={{ marginBottom: 52, borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(15,76,129,0.12)' }}
               >
                 <img src={post.thumbnail} alt={post.title}
-                  style={{ width: '100%', aspectRatio: '16/8', objectFit: 'cover', display: 'block' }} />
+                  style={{ width: '100%', aspectRatio: '16/8', objectFit: 'cover', objectPosition: thumbnailPosition, display: 'block' }} />
               </motion.div>
             )}
 
@@ -165,6 +391,81 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
                 Nội dung đang được cập nhật...
               </p>
             )}
+
+            {/* ── Like & Share ── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              margin: '48px 0 0', padding: '20px 0', flexWrap: 'wrap',
+              borderTop: '1px solid #E5E8ED',
+            }}>
+              {/* Like */}
+              <button
+                onClick={handleLike}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 20px', borderRadius: 100, border: 'none',
+                  background: liked ? '#EEF0FE' : '#F8F9FB',
+                  color: liked ? '#6366F1' : '#64748b',
+                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  transition: 'all 0.2s', fontFamily: 'var(--font-primary)',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24"
+                  fill={liked ? 'currentColor' : 'none'}
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                {likeCount > 0 ? `${likeCount} Thích` : 'Thích'}
+              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+                <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>Chia sẻ:</span>
+                {/* Facebook */}
+                <button onClick={() => handleShare('facebook')} title="Chia sẻ Facebook"
+                  style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#EAF1F8')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </button>
+                {/* Twitter/X */}
+                <button onClick={() => handleShare('twitter')} title="Chia sẻ X/Twitter"
+                  style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#EAF1F8')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#000">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </button>
+                {/* Copy link */}
+                <button onClick={() => handleShare('copy')} title="Sao chép link"
+                  style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: sharing ? '#DEF5EE' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', color: sharing ? '#007D69' : '#64748b' }}
+                >
+                  {sharing ? (
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Comment section */}
+            <CommentSection
+              postId={postId}
+              lang={lang}
+              isLoggedIn={isLoggedIn}
+              currentUserId={currentUserId}
+              currentUserName={currentUserName}
+            />
 
             {/* Divider */}
             <div style={{ height: 1, background: '#E5E8ED', margin: '56px 0 40px' }} />
@@ -186,7 +487,7 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
             {backLabel}
           </a>
 
-          </div>{/* end reading column */}
+          </div>
         </div>
 
         {/* ══ RELATED — dùng wm-bloom-card y chang PostsCarousel ══ */}
@@ -201,7 +502,7 @@ export function PostDetail({ post, lang, backUrl, backLabel, relatedPosts }: Pro
                   fontWeight: 800, letterSpacing: '-0.5px',
                   margin: '0 0 16px', fontFamily: 'var(--font-vi)',
                 }}>
-                  Bài viết liên quan
+                  {({'vi':'Bài viết liên quan','en':'Related Posts','ko':'관련 기사','ja':'関連記事','zh':'相关文章'} as Record<string, string>)[lang] ?? 'Bài viết liên quan'}
                 </h2>
                 <div style={{
                   width: '60px', height: '4px', margin: '0 auto', borderRadius: '2px',

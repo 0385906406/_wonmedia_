@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import HomepagePostsConfig from '@/models/HomepagePostsConfig'
+import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 
 export async function GET() {
   try {
@@ -15,11 +16,14 @@ export async function GET() {
     const data = { mode: r.mode ?? 'auto', selectedIds: r.selectedIds ?? [], limit: r.limit ?? 6 }
     return NextResponse.json({ success: true, data })
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 })
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
 
 export async function PUT(req: NextRequest) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
   try {
     await connectDB()
     const body = await req.json() as { mode?: string; selectedIds?: string[]; limit?: number }
@@ -34,6 +38,6 @@ export async function PUT(req: NextRequest) {
     )
     return NextResponse.json({ success: true, data: cfg })
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 })
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

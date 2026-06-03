@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { locales, type Locale } from '@/proxy'
 import { useState, useRef, useEffect } from 'react'
 
@@ -20,6 +20,7 @@ interface Props {
 export function LanguageSwitcher({ currentLocale, variant = 'light' }: Props) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -35,7 +36,10 @@ export function LanguageSwitcher({ currentLocale, variant = 'light' }: Props) {
     setOpen(false)
     const segments = pathname.split('/')
     segments[1] = locale
-    router.push(segments.join('/') || `/${locale}`)
+    const newPath = segments.join('/') || `/${locale}`
+    // BUG-023: giữ nguyên query params khi đổi locale (page, type, ...)
+    const qs = searchParams.toString()
+    router.push(qs ? `${newPath}?${qs}` : newPath)
   }
 
   const current = LANG_LABELS[currentLocale]

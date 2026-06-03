@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
+import type { Metadata } from 'next'
 import { hasLocale } from '../../dictionaries'
+import { sanitizeHtml } from '@/lib/sanitize-html'
 import { PostDetail, type PostDetailData } from '@/components/client/blog/PostDetail'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
@@ -8,6 +12,70 @@ import Post from '@/models/Post'
 const BACK_LABELS: Record<LocaleKey, string> = {
   vi: 'Quay lại Tin tức', en: 'Back to News',
   ko: '뉴스로 돌아가기', ja: 'ニュースに戻る', zh: '返回新闻',
+}
+
+async function getCurrentUser() {
+  try {
+    const store = await cookies()
+    const token = store.get('token')?.value
+    if (!token) return null
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload } = await jwtVerify(token, secret)
+    return payload as { id: string; name?: string }
+  } catch { return null }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>
+}): Promise<Metadata> {
+  const { lang, slug } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+
+  try { await connectDB() } catch { return {} }
+  const p = await Post.findOne({ slug, active: true, type: 'blog' }).lean().catch(() => null)
+  if (!p) return {}
+
+  const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
+
+  const title       = ml((p.seoTitle       as Record<string, string>) ?? {}) || ml(p.title    as Record<string, string>)
+  const description = ml((p.seoDescription as Record<string, string>) ?? {}) || ml(p.excerpt  as Record<string, string>)
+  const keywords    = ml((p.seoKeywords    as Record<string, string>) ?? {})
+  const ogImage     = (p as { ogImage?: string }).ogImage || p.thumbnail || ''
+  const url         = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'}/${lang}/tin-tuc/${slug}`
+
+  return {
+    title,
+    description,
+    ...(keywords ? { keywords: keywords.split(',').map(k => k.trim()) } : {}),
+    alternates: {
+      canonical: url,
+      languages: {
+        vi: `/vi/tin-tuc/${slug}`,
+        en: `/en/tin-tuc/${slug}`,
+        ko: `/ko/tin-tuc/${slug}`,
+        ja: `/ja/tin-tuc/${slug}`,
+        zh: `/zh/tin-tuc/${slug}`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'article',
+      ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630, alt: title }] } : {}),
+      siteName: 'WON Media',
+      locale: lk,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+  }
 }
 
 export default async function TinTucDetailPage({
@@ -23,6 +91,7 @@ export default async function TinTucDetailPage({
   const p = await Post.findOne({ slug, active: true, type: 'blog' }).lean()
   if (!p) notFound()
 
+  const user = await getCurrentUser()
   const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
 
   const post: PostDetailData = {
@@ -33,10 +102,9 @@ export default async function TinTucDetailPage({
     category:  ml(p.category as Record<string, string>),
     title:     ml(p.title    as Record<string, string>),
     excerpt:   ml(p.excerpt  as Record<string, string>),
-    content:   ml(p.content  as Record<string, string>),
+    content:   sanitizeHtml(ml(p.content as Record<string, string>)),
   }
 
-  // Related: latest 3 blog posts (excluding current)
   const related = await Post.find({ active: true, type: 'blog', slug: { $ne: slug } })
     .sort({ createdAt: -1 }).limit(3).lean()
 
@@ -53,10 +121,16 @@ export default async function TinTucDetailPage({
   return (
     <PostDetail
       post={post}
+      postId={(p._id as { toString(): string }).toString()}
       lang={lang}
       backUrl="tin-tuc"
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
+      isLoggedIn={!!user}
+      currentUserId={user?.id}
+      currentUserName={user?.name}
+      likeCount={(p as { likes?: string[] }).likes?.length ?? 0}
+      thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />
   )
 }

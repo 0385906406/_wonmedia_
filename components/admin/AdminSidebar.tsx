@@ -2,9 +2,10 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   LayoutDashboard, FileText, Home, LogOut,
-  Settings, Phone, Info, Users,
+  Settings, Phone, Info, Users, MessageSquare, Tag,
 } from 'lucide-react'
 
 type NavItem =
@@ -15,6 +16,8 @@ const NAV_ITEMS: NavItem[] = [
   { icon: <LayoutDashboard size={16} />, label: 'Tổng quan',   href: '/admin' },
   { divider: true, label: 'NỘI DUNG' },
   { icon: <FileText size={16} />,       label: 'Bài viết',     href: '/admin/posts' },
+  { icon: <Tag size={16} />,           label: 'Danh mục',     href: '/admin/categories' },
+  { icon: <MessageSquare size={16} />, label: 'Bình luận',    href: '/admin/comments' },
   { divider: true, label: 'TRANG WEB' },
   { icon: <Home size={16} />,           label: 'Trang chủ',    href: '/admin/homepage' },
   { icon: <Info size={16} />,           label: 'Giới thiệu',   href: '/admin/gioi-thieu' },
@@ -53,8 +56,14 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: Props) {
       <aside className={`dh-sidebar${isMobileOpen ? ' open' : ''}`}>
         {/* Brand */}
         <div className="dh-sidebar-brand">
-          <span className="dh-sidebar-brand-name">WON</span>
-          <span className="dh-sidebar-brand-sub">Media</span>
+          <Image
+            src="/logo.png"
+            alt="WonMedia"
+            width={32}
+            height={32}
+            style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+          />
+          <span className="dh-sidebar-brand-name" style={{ marginLeft: '10px' }}>WonMedia</span>
         </div>
 
         {/* Nav */}

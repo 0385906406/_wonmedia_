@@ -9,8 +9,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import {
   ImageIcon, InfoIcon, ClockIcon, HeartIcon, BriefcaseIcon,
-  SaveIcon, Loader2Icon, SparklesIcon, CheckCircle2Icon, AlertCircleIcon,
+  SaveIcon, Loader2Icon, SparklesIcon,
 } from 'lucide-react'
+import { useToast } from '@/components/admin/toast-provider'
 import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -73,14 +74,6 @@ const IC = 'h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder
 const TA = 'rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/10 text-sm resize-none'
 
 // ─── Sub: Toast ───────────────────────────────────────────────────────────────
-function Toast({ msg, type }: { msg: string; type: 'success' | 'error' }) {
-  return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-      {type === 'success' ? <CheckCircle2Icon size={16} /> : <AlertCircleIcon size={16} />}
-      {msg}
-    </div>
-  )
-}
 
 // ─── Sub: LangTabs ────────────────────────────────────────────────────────────
 function LangTabs({ active, onChange }: { active: LocaleKey; onChange: (l: LocaleKey) => void }) {
@@ -455,46 +448,48 @@ function GioiThieuAdminInner() {
   const tab          = searchParams.get('tab') ?? 'banner'
 
   const [form, setForm]   = useState<AboutForm>(defaultForm)
+  const { success: toastOk, error: toastErr } = useToast()
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [lang, setLang]       = useState<LocaleKey>('vi')
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
-
-  const showToast = useCallback((msg: string, type: 'success' | 'error') => {
-    setToast({ msg, type }); setTimeout(() => setToast(null), 3500)
-  }, [])
-
+  
   useEffect(() => {
-    fetch('/api/about').then(r => r.json()).then(r => {
-      if (r.data) {
-        setForm(prev => ({
-          ...prev,
-          ...r.data,
-          timelineMilestones: r.data.timelineMilestones?.length === 6
-            ? r.data.timelineMilestones
-            : DEFAULT_MILESTONES.map((def, i) => r.data.timelineMilestones?.[i] ?? def),
-          whyUsReasons: r.data.whyUsReasons?.length === 4
-            ? r.data.whyUsReasons
-            : DEFAULT_WHY.map((def, i) => r.data.whyUsReasons?.[i] ?? def),
-          servicesItems: r.data.servicesItems?.length === 4
-            ? r.data.servicesItems
-            : DEFAULT_SERVICES.map((def, i) => r.data.servicesItems?.[i] ?? def),
-        }))
-      }
-    }).finally(() => setLoading(false))
-  }, [])
+    fetch('/api/about')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(r => {
+        if (r.data) {
+          setForm(prev => ({
+            ...prev,
+            ...r.data,
+            timelineMilestones: r.data.timelineMilestones?.length === 6
+              ? r.data.timelineMilestones
+              : DEFAULT_MILESTONES.map((def: typeof DEFAULT_MILESTONES[0], i: number) => r.data.timelineMilestones?.[i] ?? def),
+            whyUsReasons: r.data.whyUsReasons?.length === 4
+              ? r.data.whyUsReasons
+              : DEFAULT_WHY.map((def: typeof DEFAULT_WHY[0], i: number) => r.data.whyUsReasons?.[i] ?? def),
+            servicesItems: r.data.servicesItems?.length === 4
+              ? r.data.servicesItems
+              : DEFAULT_SERVICES.map((def: typeof DEFAULT_SERVICES[0], i: number) => r.data.servicesItems?.[i] ?? def),
+          }))
+        }
+      })
+      .catch(() => toastErr('Không tải được nội dung trang Giới thiệu'))
+      .finally(() => setLoading(false))
+  }, [toastErr])
 
   async function save() {
     setSaving(true)
     try {
       const res  = await fetch('/api/about', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       const data = await res.json()
-      if (res.ok) showToast('Đã lưu trang Giới thiệu!', 'success')
-      else showToast(data.error ?? 'Lỗi lưu dữ liệu', 'error')
+      if (res.ok) toastOk('Đã lưu trang Giới thiệu!')
+      else toastErr(data.error ?? 'Lỗi lưu dữ liệu')
+    } catch { toastErr('Lỗi kết nối')
     } finally { setSaving(false) }
   }
 
-  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save, onAI: showToast }
+  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save, onAI: (m, t) => t === 'success' ? toastOk(m) : toastErr(m) }
 
   if (loading) return (
     <div className="flex items-center justify-center h-64 gap-2 text-[#64748b]">
@@ -504,7 +499,6 @@ function GioiThieuAdminInner() {
 
   return (
     <div className="p-6 max-w-12xl space-y-6">
-      {toast && <Toast msg={toast.msg} type={toast.type} />}
 
       {/* Header */}
       <div className="flex items-center gap-3">

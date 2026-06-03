@@ -28,7 +28,6 @@ export interface IFooterConfig extends Document {
   copyright: Record<string, string>
 }
 
-delete (mongoose.models as Record<string, unknown>).FooterConfig
 const FooterConfigSchema = new Schema<IFooterConfig>({
   key: { type: String, default: 'global', unique: true },
   companyName: ML,
@@ -39,5 +38,6 @@ const FooterConfigSchema = new Schema<IFooterConfig>({
   copyright: ML,
 }, { strict: false, timestamps: true })
 
-const FooterConfig: Model<IFooterConfig> = mongoose.model<IFooterConfig>('FooterConfig', FooterConfigSchema)
+const FooterConfig: Model<IFooterConfig> =
+  (mongoose.models.FooterConfig as Model<IFooterConfig>) || mongoose.model<IFooterConfig>('FooterConfig', FooterConfigSchema)
 export default FooterConfig

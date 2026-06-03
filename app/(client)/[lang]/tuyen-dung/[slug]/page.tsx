@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
+import type { Metadata } from 'next'
 import { hasLocale } from '../../dictionaries'
+import { sanitizeHtml } from '@/lib/sanitize-html'
 import { PostDetail, type PostDetailData } from '@/components/client/blog/PostDetail'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
@@ -10,6 +14,59 @@ const BACK_LABELS: Record<LocaleKey, string> = {
   ko: '채용으로 돌아가기', ja: '採用情報に戻る', zh: '返回招聘',
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>
+}): Promise<Metadata> {
+  const { lang, slug } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+
+  try { await connectDB() } catch { return {} }
+  const p = await Post.findOne({ slug, active: true, type: 'tuyen-dung' }).lean().catch(() => null)
+  if (!p) return {}
+
+  const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
+
+  const title       = ml((p.seoTitle       as Record<string, string>) ?? {}) || ml(p.title   as Record<string, string>)
+  const description = ml((p.seoDescription as Record<string, string>) ?? {}) || ml(p.excerpt as Record<string, string>)
+  const keywords    = ml((p.seoKeywords    as Record<string, string>) ?? {})
+  const ogImage     = (p as { ogImage?: string }).ogImage || p.thumbnail || ''
+  const url         = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'}/${lang}/tuyen-dung/${slug}`
+
+  return {
+    title,
+    description,
+    ...(keywords ? { keywords: keywords.split(',').map(k => k.trim()) } : {}),
+    alternates: {
+      canonical: url,
+      languages: {
+        vi: `/vi/tuyen-dung/${slug}`,
+        en: `/en/tuyen-dung/${slug}`,
+        ko: `/ko/tuyen-dung/${slug}`,
+        ja: `/ja/tuyen-dung/${slug}`,
+        zh: `/zh/tuyen-dung/${slug}`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'article',
+      ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630, alt: title }] } : {}),
+      siteName: 'WON Media',
+      locale: lk,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+  }
+}
+
 export default async function TuyenDungDetailPage({
   params,
 }: {
@@ -18,6 +75,17 @@ export default async function TuyenDungDetailPage({
   const { lang, slug } = await params
   if (!hasLocale(lang)) notFound()
   const lk = lang as LocaleKey
+
+  let currentUser: { id: string; name?: string } | null = null
+  try {
+    const store = await cookies()
+    const token = store.get('token')?.value
+    if (token) {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+      const { payload } = await jwtVerify(token, secret)
+      currentUser = payload as { id: string; name?: string }
+    }
+  } catch { /* ignore */ }
 
   await connectDB()
   const p = await Post.findOne({ slug, active: true, type: 'tuyen-dung' }).lean()
@@ -33,10 +101,14 @@ export default async function TuyenDungDetailPage({
     category:  ml(p.category as Record<string, string>),
     title:     ml(p.title    as Record<string, string>),
     excerpt:   ml(p.excerpt  as Record<string, string>),
-    content:   ml(p.content  as Record<string, string>),
+    content:   sanitizeHtml(ml(p.content  as Record<string, string>)),
+    urgent:   (p as { urgent?: boolean }).urgent   ?? false,
+    deadline: (p as { deadline?: string }).deadline ?? '',
+    jobType:  (p as { jobType?: string }).jobType  ?? '',
+    location: (p as { location?: string }).location ?? '',
+    salary:   (p as { salary?: string }).salary    ?? '',
   }
 
-  // Related: latest 3 tuyen-dung posts (excluding current)
   const related = await Post.find({ active: true, type: 'tuyen-dung', slug: { $ne: slug } })
     .sort({ createdAt: -1 }).limit(3).lean()
 
@@ -53,10 +125,16 @@ export default async function TuyenDungDetailPage({
   return (
     <PostDetail
       post={post}
+      postId={(p._id as { toString(): string }).toString()}
       lang={lang}
       backUrl="tuyen-dung"
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
+      isLoggedIn={!!currentUser}
+      currentUserId={currentUser?.id}
+      currentUserName={currentUser?.name}
+      likeCount={p.likes?.length ?? 0}
+      thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />
   )
 }

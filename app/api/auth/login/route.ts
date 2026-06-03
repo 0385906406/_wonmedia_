@@ -3,23 +3,38 @@ import bcrypt from 'bcryptjs'
 import { SignJWT } from 'jose'
 import { connectDB } from '@/lib/mongodb'
 import User from '@/models/User'
+import { checkRateLimit } from '@/lib/rate-limiter'
 
 export async function POST(req: NextRequest) {
+    // Ưu tiên x-real-ip (Vercel/Nginx set), fallback x-forwarded-for first IP
+    const ip = req.headers.get('x-real-ip')
+      ?? req.headers.get('x-forwarded-for')?.split(',')[0].trim()
+      ?? 'unknown'
+    if (!checkRateLimit(`login:${ip}`, 10, 15 * 60 * 1000)) {
+        return NextResponse.json({ error: 'Quá nhiều lần thử. Vui lòng thử lại sau 15 phút.' }, { status: 429 })
+    }
+
     try {
         await connectDB()
         const { email, password } = await req.json()
 
-        const user = await User.findOne({ email })
+        // BUG-009: validate type — chặn NoSQL injection ({ $gt: "" })
+        if (typeof email !== 'string' || typeof password !== 'string') {
+          return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase().trim() })
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
         }
 
-        // Tạo JWT
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
         const token = await new SignJWT({
             id: user._id.toString(),
+            name: user.name,
             email: user.email,
             role: user.role,
+            tokenVersion: user.tokenVersion ?? 0,
         })
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime('7d')
@@ -34,7 +49,7 @@ export async function POST(req: NextRequest) {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 7, // 7 ngày
+            maxAge: 60 * 60 * 24 * 7,
             path: '/',
         })
 

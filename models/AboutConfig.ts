@@ -33,7 +33,6 @@ export interface IAboutConfig extends Document {
 const MLArr = { title: ML, line1: ML, line2: ML }
 const MLPair = { title: ML, desc: ML }
 
-delete (mongoose.models as Record<string, unknown>).AboutConfig
 const AboutConfigSchema = new Schema<IAboutConfig>({
   key:                 { type: String, default: 'global', unique: true },
   bannerSubtitle:      ML, bannerTitle: ML,
@@ -49,6 +48,6 @@ const AboutConfigSchema = new Schema<IAboutConfig>({
 }, { timestamps: true })
 
 const AboutConfig: Model<IAboutConfig> =
-  mongoose.model<IAboutConfig>('AboutConfig', AboutConfigSchema)
+  (mongoose.models.AboutConfig as Model<IAboutConfig>) || mongoose.model<IAboutConfig>('AboutConfig', AboutConfigSchema)
 
 export default AboutConfig

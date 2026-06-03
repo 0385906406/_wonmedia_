@@ -8,6 +8,10 @@ export const locales = ['vi', 'en', 'ko', 'ja', 'zh'] as const
 export type Locale = (typeof locales)[number]
 export const defaultLocale: Locale = 'vi'
 
+if (!process.env.JWT_SECRET) {
+  console.error('[proxy] FATAL: JWT_SECRET environment variable is not set. Admin routes will reject all requests.')
+}
+
 function getLocale(request: NextRequest): Locale {
   const acceptLang = request.headers.get('accept-language') ?? 'vi'
   const headers = { 'accept-language': acceptLang }

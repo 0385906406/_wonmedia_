@@ -70,16 +70,26 @@ function PostsListInner() {
   }
 
   async function deletePost(id: string) {
-    await fetch(`/api/posts/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      alert('Xoá thất bại. Vui lòng thử lại.')
+      return
+    }
     fetch_()
   }
 
   async function toggleActive(post: Post) {
-    await fetch(`/api/posts/${post._id}`, {
+    // Optimistic update
+    setPosts(prev => prev.map(p => p._id === post._id ? { ...p, active: !p.active } : p))
+    const res = await fetch(`/api/posts/${post._id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: !post.active }),
     })
-    fetch_()
+    if (!res.ok) {
+      // Rollback
+      setPosts(prev => prev.map(p => p._id === post._id ? { ...p, active: post.active } : p))
+      alert('Cập nhật thất bại')
+    }
   }
 
   return (
@@ -95,7 +105,7 @@ function PostsListInner() {
             <p className="text-xs text-[#64748b] mt-0.5">{total} bài · Blog & Tuyển dụng</p>
           </div>
         </div>
-        <Button onClick={() => router.push('/admin/posts/new')} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+        <Button onClick={() => router.push('/admin/posts/new-post')} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
           <PlusIcon size={16} />Tạo bài viết
         </Button>
       </div>
@@ -153,7 +163,7 @@ function PostsListInner() {
           <div className="flex flex-col items-center gap-3 py-16 text-[#94a3b8]">
             <FileTextIcon size={32} strokeWidth={1.5} />
             <p className="text-sm">Chưa có bài viết nào</p>
-            <Button onClick={() => router.push('/admin/posts/new')} size="sm" className="gap-2 bg-green-600 hover:bg-green-700 text-white mt-1">
+            <Button onClick={() => router.push('/admin/posts/new-post')} size="sm" className="gap-2 bg-green-600 hover:bg-green-700 text-white mt-1">
               <PlusIcon size={14} />Tạo bài đầu tiên
             </Button>
           </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import HomepageHero from '@/models/HomepageHero'
+import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 
 const DEFAULT_HERO = {
   title:    { vi: 'BRINGING MUSIC', en: 'BRINGING MUSIC', ko: 'BRINGING MUSIC', ja: 'BRINGING MUSIC', zh: 'BRINGING MUSIC' },
@@ -28,6 +29,9 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
   try {
     await connectDB()
     const body = await req.json()

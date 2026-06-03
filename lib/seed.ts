@@ -30,6 +30,11 @@ const Post = mongoose.models.Post || mongoose.model('Post', new mongoose.Schema(
   excerpt:        MLSchema,
   content:        MLSchema,
   active:         { type: Boolean, default: true },
+  urgent:         { type: Boolean, default: false },
+  deadline:       { type: String, default: '' },
+  jobType:        { type: String, default: '' },
+  location:       { type: String, default: '' },
+  salary:         { type: String, default: '' },
 }, { timestamps: true }))
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
@@ -38,14 +43,19 @@ async function seedAdmin() {
   const exists = await User.findOne({ email: 'admin@wonmedia.com' })
   if (exists) return
 
-  const hashed = await bcrypt.hash('Admin@123456', 12)
+  const seedPassword = process.env.SEED_ADMIN_PASSWORD ?? 'Admin@123456'
+  if (!process.env.SEED_ADMIN_PASSWORD && process.env.NODE_ENV === 'production') {
+    console.warn('[seed] ⚠️  SEED_ADMIN_PASSWORD env var không được set — đang dùng mật khẩu mặc định. Đặt env var này trước khi deploy production!')
+  }
+  const hashed = await bcrypt.hash(seedPassword, 12)
   await User.create({
     name: 'Super Admin',
     email: 'admin@wonmedia.com',
     password: hashed,
     role: 'superadmin',
   })
-  console.log('[seed] Admin created: admin@wonmedia.com / Admin@123456')
+  // Không log credentials ra console — set SEED_ADMIN_PASSWORD trong .env để đổi password mặc định
+  console.log('[seed] Super admin account created: admin@wonmedia.com')
 }
 
 // ─── Posts ────────────────────────────────────────────────────────────────────
@@ -330,6 +340,146 @@ const POSTS = [
       zh: `<h2>招聘：数字营销执行</h2>
 <h3>申请方式</h3>
 <p>请将简历发送至：<strong>hr@wonmedia.com</strong></p>`,
+    },
+  },
+
+  // ── Tuyển dụng ───────────────────────────────────────────────────────────────
+  {
+    slug: 'tuyen-dung-content-creator-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=85&fit=crop',
+    date: '01/06/2025', showOnHomepage: true, active: true,
+    urgent: true, deadline: '2025-07-15', jobType: 'full-time', location: 'Hà Nội', salary: '12 – 18 triệu',
+    category: { vi: 'Nội dung', en: 'Content', ko: '콘텐츠', ja: 'コンテンツ', zh: '内容' },
+    title: {
+      vi: 'Tuyển dụng Content Creator – Sáng tạo nội dung đa nền tảng',
+      en: 'Content Creator – Multi-platform Content Creator',
+      ko: '콘텐츠 크리에이터 채용', ja: 'コンテンツクリエイター募集', zh: '招聘内容创作者',
+    },
+    excerpt: {
+      vi: 'WonMedia tìm kiếm Content Creator sáng tạo, đam mê âm nhạc và giải trí, có khả năng sản xuất nội dung hấp dẫn cho Facebook, TikTok, YouTube và các nền tảng số khác.',
+      en: 'WonMedia is looking for a creative Content Creator passionate about music and entertainment, capable of producing engaging content for Facebook, TikTok, YouTube and other digital platforms.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>Bạn sẽ trực tiếp sản xuất và quản lý nội dung trên các kênh truyền thông của WonMedia.</p><h2>Trách nhiệm chính</h2><ul><li>Lên ý tưởng và sản xuất nội dung hàng ngày cho Facebook, TikTok, YouTube, Instagram</li><li>Viết bài blog, tin tức âm nhạc, thông cáo báo chí</li><li>Theo dõi và phân tích hiệu quả nội dung</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> làm nội dung số</li><li>Đam mê âm nhạc và văn hóa giải trí</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>12 – 18 triệu VNĐ/tháng</strong> + thưởng KPI</li><li>BHXH, BHYT đầy đủ</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p>You will directly produce and manage content across WonMedia's media channels.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of experience</strong> in digital content</li><li>Passion for music and entertainment culture</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
+    },
+  },
+  {
+    slug: 'tuyen-dung-graphic-designer-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=85&fit=crop',
+    date: '03/06/2025', showOnHomepage: true, active: true,
+    urgent: false, deadline: '2025-07-31', jobType: 'hybrid', location: 'TP. Hồ Chí Minh', salary: '15 – 25 triệu',
+    category: { vi: 'Thiết kế', en: 'Design', ko: '디자인', ja: 'デザイン', zh: '设计' },
+    title: {
+      vi: 'Tuyển dụng Graphic Designer – Thiết kế sáng tạo cho ngành giải trí',
+      en: 'Graphic Designer – Creative Design for Entertainment Industry',
+      ko: '그래픽 디자이너 채용', ja: 'グラフィックデザイナー募集', zh: '招聘平面设计师',
+    },
+    excerpt: {
+      vi: 'Chúng tôi tìm kiếm Graphic Designer tài năng để tạo ra những sản phẩm trực quan ấn tượng — từ cover album, poster sự kiện đến bộ nhận diện thương hiệu nghệ sĩ.',
+      en: 'We are looking for a talented Graphic Designer to create impressive visual products — from album covers and event posters to artist brand identity packages.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>WonMedia mở rộng đội ngũ sáng tạo, tìm Graphic Designer có khiếu thẩm mỹ cao.</p><h2>Trách nhiệm</h2><ul><li>Thiết kế cover album, single artwork cho nghệ sĩ</li><li>Tạo visual identity cho các chiến dịch âm nhạc</li><li>Thiết kế banner, poster, key visual sự kiện</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> thiết kế đồ họa</li><li>Thành thạo Adobe Photoshop, Illustrator, After Effects</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 25 triệu VNĐ/tháng</strong></li><li>Hybrid: 3 ngày văn phòng, 2 ngày remote</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p>WonMedia is expanding its creative team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of graphic design experience</strong></li><li>Proficient in Adobe Photoshop, Illustrator, After Effects</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
+    },
+  },
+  {
+    slug: 'tuyen-dung-video-editor-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&q=85&fit=crop',
+    date: '04/06/2025', showOnHomepage: false, active: true,
+    urgent: true, deadline: '2025-06-30', jobType: 'full-time', location: 'Hà Nội', salary: '18 – 28 triệu',
+    category: { vi: 'Kỹ thuật', en: 'Production', ko: '프로덕션', ja: 'プロダクション', zh: '制作' },
+    title: {
+      vi: 'Tuyển dụng Video Editor – Dựng phim MV & nội dung âm nhạc',
+      en: 'Video Editor – MV & Music Content Production',
+      ko: '비디오 에디터 채용', ja: 'ビデオエディター募集', zh: '招聘视频剪辑师',
+    },
+    excerpt: {
+      vi: 'WonMedia cần Video Editor kinh nghiệm để dựng MV, lyric video, behind-the-scenes và nội dung video ngắn. Ưu tiên ứng viên có kinh nghiệm trong ngành âm nhạc.',
+      en: 'WonMedia needs an experienced Video Editor to edit MVs, lyric videos, behind-the-scenes content and short video content. Priority given to candidates with music industry experience.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>Vị trí then chốt trong đội ngũ sản xuất nội dung của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Dựng phim MV, lyric video, official audio video cho nghệ sĩ</li><li>Tạo reels, short-form video cho TikTok, YouTube Shorts</li><li>Thực hiện color grading, motion graphics</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> dựng phim chuyên nghiệp</li><li>Thành thạo Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>18 – 28 triệu VNĐ/tháng</strong> + thưởng dự án</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Key position in WonMedia's content production team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of professional video editing experience</strong></li><li>Proficient in Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
+    },
+  },
+  {
+    slug: 'tuyen-dung-digital-marketing-specialist-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=1200&q=85&fit=crop',
+    date: '05/06/2025', showOnHomepage: true, active: true,
+    urgent: false, deadline: '2025-08-15', jobType: 'remote', location: 'Remote toàn quốc', salary: '15 – 22 triệu',
+    category: { vi: 'Marketing', en: 'Marketing', ko: '마케팅', ja: 'マーケティング', zh: '营销' },
+    title: {
+      vi: 'Tuyển dụng Digital Marketing Specialist – Làm việc Remote',
+      en: 'Digital Marketing Specialist – Remote Work',
+      ko: '디지털 마케팅 스페셜리스트 채용', ja: 'デジタルマーケティングスペシャリスト募集', zh: '招聘数字营销专员',
+    },
+    excerpt: {
+      vi: 'WonMedia tìm kiếm Digital Marketing Specialist làm việc remote, phụ trách các chiến dịch quảng bá âm nhạc, tăng trưởng lượng người nghe và xây dựng cộng đồng fan trực tuyến.',
+      en: 'WonMedia is looking for a Digital Marketing Specialist to work remotely, responsible for music promotion campaigns, growing listener counts and building online fan communities.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>Vị trí <strong>100% remote</strong>, dẫn dắt chiến lược digital marketing cho danh mục nghệ sĩ của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Lên kế hoạch và thực thi chiến dịch marketing cho single/album mới</li><li>Quản lý Facebook Ads, Google Ads, TikTok Ads</li><li>Spotify editorial pitching, playlist promotion</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm digital marketing</strong></li><li>Hiểu biết sâu về các nền tảng âm nhạc số</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 22 triệu VNĐ/tháng</strong> + hoa hồng performance</li><li>100% remote — linh hoạt thời gian</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p><strong>100% remote</strong> position leading digital marketing strategies for WonMedia's artist portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of digital marketing experience</strong></li><li>Deep understanding of digital music platforms</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
+    },
+  },
+  {
+    slug: 'tuyen-dung-business-development-manager-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=85&fit=crop',
+    date: '05/06/2025', showOnHomepage: false, active: true,
+    urgent: false, deadline: '2025-08-31', jobType: 'full-time', location: 'Hà Nội hoặc TP.HCM', salary: 'Thỏa thuận',
+    category: { vi: 'Kinh doanh', en: 'Business', ko: '비즈니스', ja: 'ビジネス', zh: '商业' },
+    title: {
+      vi: 'Tuyển dụng Business Development Manager – Phát triển đối tác âm nhạc',
+      en: 'Business Development Manager – Music Partnership Development',
+      ko: '비즈니스 개발 매니저 채용', ja: 'ビジネスデベロップメントマネージャー募集', zh: '招聘商务拓展经理',
+    },
+    excerpt: {
+      vi: 'WonMedia tìm kiếm Business Development Manager giàu kinh nghiệm để xây dựng và mở rộng mạng lưới đối tác trong ngành âm nhạc, giải trí và công nghệ.',
+      en: 'WonMedia is looking for an experienced Business Development Manager to build and expand its partner network in the music, entertainment and technology industries.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>Vị trí chiến lược — cầu nối giữa WonMedia và các đối tác nhãn hàng, nền tảng công nghệ, record labels quốc tế.</p><h2>Trách nhiệm</h2><ul><li>Tìm kiếm và ký kết hợp đồng với đối tác mới trong và ngoài nước</li><li>Đàm phán và xây dựng thỏa thuận hợp tác chiến lược</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>3 năm kinh nghiệm</strong> Business Development hoặc Sales B2B</li><li>Tiếng Anh thành thạo</li></ul><h2>Quyền lợi</h2><ul><li>Lương và bonus <strong>thỏa thuận theo năng lực</strong></li><li>Phúc lợi: BHXH, bảo hiểm sức khỏe cao cấp</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Strategic position bridging WonMedia and partners — brands, tech platforms, international record labels.</p><h2>Requirements</h2><ul><li>At least <strong>3 years of experience</strong> in Business Development or B2B Sales</li><li>Fluent English</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
+    },
+  },
+  {
+    slug: 'tuyen-dung-social-media-executive-2025',
+    type: 'tuyen-dung',
+    thumbnail: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=85&fit=crop',
+    date: '06/06/2025', showOnHomepage: true, active: true,
+    urgent: false, deadline: '2025-07-20', jobType: 'full-time', location: 'TP. Hồ Chí Minh', salary: '10 – 15 triệu',
+    category: { vi: 'Truyền thông', en: 'Media', ko: '미디어', ja: 'メディア', zh: '媒体' },
+    title: {
+      vi: 'Tuyển dụng Social Media Executive – Quản lý kênh nghệ sĩ',
+      en: 'Social Media Executive – Artist Channel Management',
+      ko: '소셜 미디어 전문가 채용', ja: 'ソーシャルメディアエグゼクティブ募集', zh: '招聘社交媒体专员',
+    },
+    excerpt: {
+      vi: 'Bạn đam mê mạng xã hội và yêu âm nhạc? WonMedia cần một Social Media Executive để vận hành và phát triển các kênh Facebook, TikTok, Instagram cho nghệ sĩ của chúng tôi.',
+      en: 'Are you passionate about social media and love music? WonMedia needs a Social Media Executive to operate and grow Facebook, TikTok and Instagram channels for artists in our portfolio.',
+      ko: '', ja: '', zh: '',
+    },
+    content: {
+      vi: `<h2>Về vị trí</h2><p>Trực tiếp quản lý các trang mạng xã hội của nghệ sĩ trong danh mục WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Vận hành hàng ngày Facebook, TikTok, Instagram, YouTube của nghệ sĩ</li><li>Lên lịch và đăng nội dung theo content calendar</li><li>Tương tác với cộng đồng fan</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> quản lý mạng xã hội</li><li>Yêu âm nhạc, biết xu hướng giải trí hiện tại</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>10 – 15 triệu VNĐ/tháng</strong></li><li>Tham dự sự kiện âm nhạc, concert miễn phí</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Directly manage artists' social media pages in WonMedia's portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of social media management experience</strong></li><li>Love for music and entertainment trends</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      ko: '', ja: '', zh: '',
     },
   },
 ]

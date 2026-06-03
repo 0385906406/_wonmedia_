@@ -56,6 +56,9 @@ const INTEGRATIONS_ROWS: SettingsRow[] = [
     },
     { key: 'newsApiKey', label: 'News API Key', type: 'password', group: 'integrations' },
     { key: 'newsApiUrl', label: 'News API URL', type: 'url',      group: 'integrations', hint: 'Endpoint lấy danh sách tin tức' },
+    { key: 'resendApiKey',    label: 'Resend API Key',       type: 'password', group: 'integrations', hint: 'Lấy tại resend.com → API Keys' },
+    { key: 'resendFromEmail', label: 'Email gửi đi (From)',  type: 'email',    group: 'integrations', hint: 'VD: noreply@wonmedia.vn — phải verify domain trên Resend' },
+    { key: 'resendToEmail',   label: 'Email nhận thông báo', type: 'email',    group: 'integrations', hint: 'Email admin nhận khi có form liên hệ mới' },
 ]
 
 const FIXED_TABS = [

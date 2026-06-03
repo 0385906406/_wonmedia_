@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Post from '@/models/Post'
+import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,6 +16,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
   try {
     await connectDB()
     const { id } = await params
@@ -27,7 +31,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
   try {
     await connectDB()
     const { id } = await params

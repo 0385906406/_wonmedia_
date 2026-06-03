@@ -21,9 +21,10 @@ import { Switch } from '@/components/ui/switch'
 import {
   LayoutIcon, BriefcaseIcon, TrophyIcon, UsersIcon, FileTextIcon,
   PlusIcon, PencilIcon, Trash2Icon, SaveIcon, UploadIcon, GlobeIcon,
-  CheckCircle2Icon, AlertCircleIcon, Loader2Icon, ImageIcon,
+  CheckCircle2Icon, Loader2Icon, ImageIcon,
   ZapIcon, ListIcon, CheckSquareIcon, SquareIcon, ExternalLinkIcon,
 } from 'lucide-react'
+import { useToast } from '@/components/admin/toast-provider'
 import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -56,16 +57,6 @@ function LangTabs({ activeLang, onChange }: { activeLang: LocaleKey; onChange: (
 }
 
 // ─── Sub-component: Toast ────────────────────────────────────────────────────
-function Toast({ msg, type }: { msg: string; type: 'success' | 'error' }) {
-  return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white ${
-      type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`}>
-      {type === 'success' ? <CheckCircle2Icon size={16} /> : <AlertCircleIcon size={16} />}
-      {msg}
-    </div>
-  )
-}
 
 // ─── Sub-component: MultiLang Field ─────────────────────────────────────────
 function MLField({
@@ -138,22 +129,24 @@ function ImageUpload({ value, onChange, label }: { value: string; onChange: (url
 }
 
 // ─── HERO EDITOR ─────────────────────────────────────────────────────────────
-function HeroEditor({ showToast }: { showToast: (m: string, t: 'success' | 'error') => void }) {
+function HeroEditor() {
   const [data, setData] = useState<HeroData>({ title: emptyMultiLang(), title2: emptyMultiLang(), subtitle: emptyMultiLang() })
   const [lang, setLang] = useState<LocaleKey>('vi')
   const [saving, setSaving] = useState(false)
+  const { success: toastOk, error: toastErr } = useToast()
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/homepage/hero').then(r => r.json()).then(r => { if (r.data) setData(r.data) }).finally(() => setLoading(false))
+    fetch('/api/homepage/hero').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setData(r.data) }).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   async function save() {
     setSaving(true)
     try {
       const res = await fetch('/api/homepage/hero', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: data.title, title2: data.title2, subtitle: data.subtitle }) })
-      if (res.ok) showToast('Đã lưu banner!', 'success')
-      else showToast('Lỗi lưu banner', 'error')
+      if (res.ok) toastOk('Đã lưu banner!')
+      else toastErr('Lỗi lưu banner')
     } finally { setSaving(false) }
   }
 
@@ -193,7 +186,8 @@ function HeroEditor({ showToast }: { showToast: (m: string, t: 'success' | 'erro
 }
 
 // ─── SERVICES EDITOR ─────────────────────────────────────────────────────────
-function ServicesEditor({ showToast }: { showToast: (m: string, t: 'success' | 'error') => void }) {
+function ServicesEditor() {
+  const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<ServiceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<ServiceItem | null>(null)
@@ -205,7 +199,7 @@ function ServicesEditor({ showToast }: { showToast: (m: string, t: 'success' | '
   useEffect(() => { fetchItems() }, [])
   function fetchItems() {
     setLoading(true)
-    fetch('/api/homepage/services').then(r => r.json()).then(r => { if (r.data) setItems(r.data) }).finally(() => setLoading(false))
+    fetch('/api/homepage/services').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setItems(r.data) }).catch(() => {}).finally(() => setLoading(false))
   }
 
   function openNew() {
@@ -220,14 +214,14 @@ function ServicesEditor({ showToast }: { showToast: (m: string, t: 'success' | '
       const url = isNew ? '/api/homepage/services' : `/api/homepage/services/${editItem._id}`
       const method = isNew ? 'POST' : 'PUT'
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { showToast(isNew ? 'Đã thêm dịch vụ!' : 'Đã cập nhật!', 'success'); fetchItems(); setEditItem(null) }
-      else showToast('Lỗi lưu dữ liệu', 'error')
+      if (res.ok) { toastOk(isNew ? 'Đã thêm dịch vụ!' : 'Đã cập nhật!'); fetchItems(); setEditItem(null) }
+      else toastErr('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     const res = await fetch(`/api/homepage/services/${id}`, { method: 'DELETE' })
-    if (res.ok) { showToast('Đã xóa!', 'success'); fetchItems() }
+    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
 
   async function toggleActive(item: ServiceItem) {
@@ -321,7 +315,8 @@ function ServicesEditor({ showToast }: { showToast: (m: string, t: 'success' | '
 }
 
 // ─── ACHIEVEMENTS EDITOR ─────────────────────────────────────────────────────
-function AchievementsEditor({ showToast }: { showToast: (m: string, t: 'success' | 'error') => void }) {
+function AchievementsEditor() {
+  const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<AchievementItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<AchievementItem | null>(null)
@@ -331,7 +326,7 @@ function AchievementsEditor({ showToast }: { showToast: (m: string, t: 'success'
   useEffect(() => { fetchItems() }, [])
   function fetchItems() {
     setLoading(true)
-    fetch('/api/homepage/achievements').then(r => r.json()).then(r => { if (r.data) setItems(r.data) }).finally(() => setLoading(false))
+    fetch('/api/homepage/achievements').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setItems(r.data) }).catch(() => {}).finally(() => setLoading(false))
   }
 
   async function saveItem() {
@@ -341,14 +336,14 @@ function AchievementsEditor({ showToast }: { showToast: (m: string, t: 'success'
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/achievements' : `/api/homepage/achievements/${editItem._id}`
       const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { showToast('Đã lưu!', 'success'); fetchItems(); setEditItem(null) }
-      else showToast('Lỗi lưu dữ liệu', 'error')
+      if (res.ok) { toastOk('Đã lưu!'); fetchItems(); setEditItem(null) }
+      else toastErr('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     const res = await fetch(`/api/homepage/achievements/${id}`, { method: 'DELETE' })
-    if (res.ok) { showToast('Đã xóa!', 'success'); fetchItems() }
+    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
 
   const TONES = ['wm-stat-orange', 'wm-stat-teal', 'wm-stat-indigo', 'wm-stat-navy']
@@ -425,7 +420,8 @@ function AchievementsEditor({ showToast }: { showToast: (m: string, t: 'success'
 }
 
 // ─── PARTNERS EDITOR ─────────────────────────────────────────────────────────
-function PartnersEditor({ showToast }: { showToast: (m: string, t: 'success' | 'error') => void }) {
+function PartnersEditor() {
+  const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<PartnerItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<PartnerItem | null>(null)
@@ -434,7 +430,7 @@ function PartnersEditor({ showToast }: { showToast: (m: string, t: 'success' | '
   useEffect(() => { fetchItems() }, [])
   function fetchItems() {
     setLoading(true)
-    fetch('/api/homepage/partners').then(r => r.json()).then(r => { if (r.data) setItems(r.data) }).finally(() => setLoading(false))
+    fetch('/api/homepage/partners').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setItems(r.data) }).catch(() => {}).finally(() => setLoading(false))
   }
 
   async function saveItem() {
@@ -444,14 +440,14 @@ function PartnersEditor({ showToast }: { showToast: (m: string, t: 'success' | '
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/partners' : `/api/homepage/partners/${editItem._id}`
       const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { showToast('Đã lưu!', 'success'); fetchItems(); setEditItem(null) }
-      else showToast('Lỗi lưu dữ liệu', 'error')
+      if (res.ok) { toastOk('Đã lưu!'); fetchItems(); setEditItem(null) }
+      else toastErr('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     const res = await fetch(`/api/homepage/partners/${id}`, { method: 'DELETE' })
-    if (res.ok) { showToast('Đã xóa!', 'success'); fetchItems() }
+    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
 
   return (
@@ -528,7 +524,8 @@ function PartnersEditor({ showToast }: { showToast: (m: string, t: 'success' | '
 }
 
 // ─── POSTS EDITOR ─────────────────────────────────────────────────────────────
-function PostsEditor({ showToast }: { showToast: (m: string, t: 'success' | 'error') => void }) {
+function PostsEditor() {
+  const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems]           = useState<PostItem[]>([])
   const [loading, setLoading]       = useState(true)
   const [saving, setSaving]         = useState(false)
@@ -567,10 +564,10 @@ function PostsEditor({ showToast }: { showToast: (m: string, t: 'success' | 'err
         body: JSON.stringify({ mode, selectedIds: [...selectedIds], limit }),
       })
       const data = await res.json()
-      if (res.ok) showToast('Đã lưu cấu hình bài viết!', 'success')
-      else showToast(data?.error ?? `Lỗi lưu cấu hình (${res.status})`, 'error')
+      if (res.ok) toastOk('Đã lưu cấu hình bài viết!')
+      else toastErr(data?.error ?? `Lỗi lưu cấu hình (${res.status})`)
     } catch (err) {
-      showToast('Không kết nối được server: ' + String(err), 'error')
+      toastErr('Không kết nối được server')
     } finally { setSaving(false) }
   }
 
@@ -789,11 +786,10 @@ function HomepageAdminInner() {
   const router = useRouter()
   const tab = searchParams.get('tab') ?? 'hero'
 
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
-
+  
+  const { success: toastOk, error: toastErr } = useToast()
   function showToast(msg: string, type: 'success' | 'error') {
-    setToast({ msg, type })
-    setTimeout(() => setToast(null), 3000)
+    type === 'success' ? toastOk(msg) : toastErr(msg)
   }
 
   const TAB_ITEMS = [
@@ -806,7 +802,6 @@ function HomepageAdminInner() {
 
   return (
     <div className="p-6 max-w-12xl space-y-6">
-      {toast && <Toast msg={toast.msg} type={toast.type} />}
 
       {/* Page header */}
       <div className="flex items-center gap-3">
@@ -843,11 +838,11 @@ function HomepageAdminInner() {
 
         {/* Tab content */}
         <div className="p-6">
-          {tab === 'hero'         && <HeroEditor         showToast={showToast} />}
-          {tab === 'services'     && <ServicesEditor     showToast={showToast} />}
-          {tab === 'achievements' && <AchievementsEditor showToast={showToast} />}
-          {tab === 'partners'     && <PartnersEditor     showToast={showToast} />}
-          {tab === 'posts'        && <PostsEditor        showToast={showToast} />}
+          {tab === 'hero'         && <HeroEditor />}
+          {tab === 'services'     && <ServicesEditor />}
+          {tab === 'achievements' && <AchievementsEditor />}
+          {tab === 'partners'     && <PartnersEditor />}
+          {tab === 'posts'        && <PostsEditor />}
         </div>
       </div>
     </div>

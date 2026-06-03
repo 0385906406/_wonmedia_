@@ -100,9 +100,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/posts?page=1').then(r => r.json()),
+      fetch('/api/posts?page=1').then(r => { if (r.status === 401) { window.location.href = '/auth/login'; throw new Error('401') } return r.json() }),
       fetch('/api/homepage/partners').then(r => r.json()),
-      fetch('/api/contact/submit').then(r => r.json()),
+      fetch('/api/contact/submit').then(r => r.status === 401 ? { unread: 0, data: [] } : r.json()),
       fetch('/api/homepage/achievements').then(r => r.json()),
       fetch('/api/homepage/services').then(r => r.json()),
     ]).then(([postsRes, partnersRes, msgsRes, achRes, svcRes]) => {

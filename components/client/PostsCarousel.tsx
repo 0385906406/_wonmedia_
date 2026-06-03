@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 
 interface Post {
@@ -120,17 +120,26 @@ export function PostsCarousel({ posts, heading, seeMore, lang }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' })
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
+  const isPausedRef = useRef(false)
 
   useEffect(() => {
     if (!emblaApi) return
-    const id = setInterval(() => emblaApi.scrollNext(), 5500)
+    const id = setInterval(() => {
+      if (!isPausedRef.current) emblaApi.scrollNext()
+    }, 5500)
     return () => clearInterval(id)
   }, [emblaApi])
 
   if (!posts.length) return null
 
   return (
-    <section style={{ background: '#F8F9FB', padding: '88px 24px', overflow: 'hidden' }}>
+    <section
+      style={{ background: '#F8F9FB', padding: '88px 24px', overflow: 'hidden' }}
+      onMouseEnter={() => { isPausedRef.current = true }}
+      onMouseLeave={() => { isPausedRef.current = false }}
+      onFocus={() => { isPausedRef.current = true }}
+      onBlur={() => { isPausedRef.current = false }}
+    >
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
         {/* Heading */}
@@ -175,7 +184,7 @@ export function PostsCarousel({ posts, heading, seeMore, lang }: Props) {
 
         {/* See all link */}
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <a href={`/${lang}/bai-viet`} style={{
+          <a href={`/${lang}/tin-tuc`} style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '12px 32px', borderRadius: '100px',
             border: '1.5px solid #0b2a59', color: '#0b2a59',

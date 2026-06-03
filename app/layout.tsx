@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
+import { connectDB } from "@/lib/mongodb"
+import Setting from "@/models/Setting"
 
 const beVietnamPro = Be_Vietnam_Pro({
   weight: ["400", "500", "600", "700", "800", "900"],
@@ -23,9 +25,31 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 })
 
-export const metadata: Metadata = {
-  title: "WonMedia Portal",
-  description: "Giải pháp viễn thông toàn diện, tốc độ cao và ổn định.",
+// BUG-019: metadataBase đảm bảo hreflang alternates dùng absolute URL
+export async function generateMetadata(): Promise<Metadata> {
+  const base = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wonmedia.vn')
+  try {
+    await connectDB()
+    const s = await Setting.findOne({ key: 'global' }).lean() as {
+      general?: { portalName?: string; tagline?: string }
+      header?: { faviconUrl?: string }
+    } | null
+    const title       = s?.general?.portalName || 'WonMedia Portal'
+    const description = s?.general?.tagline    || 'Giải pháp viễn thông toàn diện, tốc độ cao và ổn định.'
+    const faviconUrl  = s?.header?.faviconUrl  || '/favicon.ico'
+    return {
+      metadataBase: base,
+      title,
+      description,
+      icons: { icon: faviconUrl, shortcut: faviconUrl },
+    }
+  } catch {
+    return {
+      metadataBase: base,
+      title: 'WonMedia Portal',
+      description: 'Giải pháp viễn thông toàn diện, tốc độ cao và ổn định.',
+    }
+  }
 }
 
 export default function RootLayout({

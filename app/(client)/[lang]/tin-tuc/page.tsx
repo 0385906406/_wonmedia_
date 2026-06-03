@@ -35,7 +35,7 @@ export default async function TinTucPage({
   if (!hasLocale(lang)) notFound()
 
   const lk   = lang as LocaleKey
-  const page = Math.max(1, parseInt(sp.page ?? '1'))
+  const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1)
   const skip = (page - 1) * PER_PAGE
 
   let posts: PostCard[] = []

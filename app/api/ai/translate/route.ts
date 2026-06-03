@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Setting from '@/models/Setting'
+import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 
 const LOCALE_NAMES: Record<string, string> = {
   en: 'English',
@@ -41,6 +42,10 @@ async function callGemini(apiKey: string, model: string, prompt: string): Promis
 }
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
+
   try {
     await connectDB()
     const setting = await Setting.findOne({ key: 'global' }).lean() as { integrations?: { geminiApiKey?: string; geminiModel?: string } } | null

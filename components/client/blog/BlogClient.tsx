@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { motion } from 'framer-motion'
 
@@ -13,6 +13,57 @@ export interface PostCard {
   category: string
   title: string
   excerpt: string
+  urgent?: boolean
+  jobType?: string
+  location?: string
+  salary?: string
+  deadline?: string
+}
+
+// ─── Job type label map ───────────────────────────────────────────────────────
+const JOB_TYPE_MAP: Record<string, string> = {
+  'full-time': 'Full-time', 'part-time': 'Part-time',
+  'remote': 'Remote', 'hybrid': 'Hybrid',
+  'internship': 'Thực tập', 'freelance': 'Freelance',
+}
+
+// ─── Job meta row (hiện dưới title trên card tuyển dụng) ─────────────────────
+function JobMeta({ post, compact = false }: { post: PostCard; compact?: boolean }) {
+  if (post.type !== 'tuyen-dung') return null
+  const items = [
+    post.jobType && JOB_TYPE_MAP[post.jobType],
+    post.location,
+    post.salary,
+  ].filter(Boolean) as string[]
+  if (!items.length && !post.urgent) return null
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: compact ? 4 : 6, alignItems: 'center' }}>
+      {post.urgent && (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 3,
+          fontSize: compact ? 9 : 10, fontWeight: 800,
+          letterSpacing: '1px', textTransform: 'uppercase',
+          padding: compact ? '2px 7px' : '3px 9px', borderRadius: 100,
+          background: '#FEE2E2', color: '#DC2626',
+          border: '1px solid rgba(220,38,38,0.2)',
+        }}>
+          🔥 Gấp
+        </span>
+      )}
+      {items.map((item, i) => (
+        <span key={i} style={{
+          fontSize: compact ? 10 : 11, color: '#475569', fontWeight: 500,
+          display: 'inline-flex', alignItems: 'center', gap: 3,
+        }}>
+          {i === 0 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>}
+          {i === 1 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>}
+          {i === 2 && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>}
+          {item}
+          {i < items.length - 1 && <span style={{ color: '#cbd5e1', marginLeft: 2 }}>·</span>}
+        </span>
+      ))}
+    </div>
+  )
 }
 
 // ─── Category badge — same style as PostsCarousel ────────────────────────────
@@ -91,12 +142,13 @@ function FeaturedCard({ post, lang, baseUrl }: { post: PostCard; lang: string; b
             {post.excerpt}
           </p>
         )}
+        <JobMeta post={post} />
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: '13px', fontWeight: 700, color: '#15803d',
           fontFamily: 'var(--font-vi)',
         }}>
-          Đọc tiếp
+          {post.type === 'tuyen-dung' ? 'Xem chi tiết' : 'Đọc tiếp'}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
       </div>
@@ -158,6 +210,7 @@ function GridCard({ post, lang, delay = 0, baseUrl }: { post: PostCard; lang: st
             {post.excerpt}
           </p>
         )}
+        <JobMeta post={post} compact />
       </div>
     </motion.a>
   )
@@ -215,15 +268,11 @@ function ListCard({ post, lang, delay = 0, baseUrl }: { post: PostCard; lang: st
 }
 
 // ─── Filter bar ───────────────────────────────────────────────────────────────
-function FilterBar({ lang, activeType, labels }: { lang: string; activeType: string; labels: Record<string, string> }) {
+function FilterBar({ lang, activeType, labels, baseUrl }: { lang: string; activeType: string; labels: Record<string, string>; baseUrl: string }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   function go(type: string) {
-    const sp = new URLSearchParams(searchParams.toString())
-    type ? sp.set('type', type) : sp.delete('type')
-    sp.delete('page')
-    router.push(`/${lang}/tin-tuc?${sp}`)
+    router.push(type ? `/${lang}/${baseUrl}?type=${type}` : `/${lang}/${baseUrl}`)
   }
 
   return (
@@ -266,17 +315,16 @@ export interface BlogClientProps {
 
 function BlogInner({ posts, lang, activeType, total, page, pages, heading, labels, hideFilter, baseUrl = 'tin-tuc' }: BlogClientProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   function goPage(p: number) {
-    const sp = new URLSearchParams(searchParams.toString())
-    sp.set('page', String(p))
-    router.push(`/${lang}/${baseUrl}?${sp}`)
+    router.push(`/${lang}/${baseUrl}?page=${p}`)
   }
 
-  const featured  = posts[0]
-  const gridPosts = posts.slice(1, 7)    // 6 grid cards
-  const listPosts = posts.slice(7)        // rest as list
+  // Featured layout chỉ áp dụng trên page 1 — page 2+ hiển thị grid đều
+  const isFirstPage = page <= 1
+  const featured  = isFirstPage ? posts[0] : undefined
+  const gridPosts = isFirstPage ? posts.slice(1, 7) : posts.slice(0, 6)
+  const listPosts = isFirstPage ? posts.slice(7)    : posts.slice(6)
 
   return (
     <div style={{ background: 'var(--wm-dark, #0f1117)', fontFamily: 'var(--font-vi)' }}>
@@ -323,7 +371,7 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
           {!hideFilter && (
             <div style={{ marginBottom: 40 }}>
               <Suspense>
-                <FilterBar lang={lang} activeType={activeType} labels={labels} />
+                <FilterBar lang={lang} activeType={activeType} labels={labels} baseUrl={baseUrl} />
               </Suspense>
             </div>
           )}
@@ -387,40 +435,80 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
 
               {/* Pagination */}
               {pages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
-                  {page > 1 && (
-                    <button onClick={() => goPage(page - 1)} style={{
-                      padding: '10px 20px', borderRadius: '10px',
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {/* Prev */}
+                  <button
+                    onClick={() => goPage(page - 1)}
+                    disabled={page <= 1}
+                    style={{
+                      padding: '9px 18px', borderRadius: '10px',
                       border: '1.5px solid #E5E8ED', background: '#fff',
-                      cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                      cursor: page <= 1 ? 'not-allowed' : 'pointer',
+                      opacity: page <= 1 ? 0.4 : 1,
+                      fontSize: '13px', fontWeight: 600,
                       fontFamily: 'var(--font-vi)', color: '#475569',
-                    }}>
-                      ← {labels.prev || 'Trước'}
-                    </button>
-                  )}
-                  {Array.from({ length: pages }, (_, i) => i + 1).map(p => (
-                    <button key={p} onClick={() => goPage(p)} style={{
-                      padding: '10px 16px', borderRadius: '10px',
-                      border: `1.5px solid ${p === page ? '#0b2a59' : '#E5E8ED'}`,
-                      background: p === page ? '#0b2a59' : '#fff',
-                      color: p === page ? '#fff' : '#475569',
-                      cursor: 'pointer', fontSize: '13px', fontWeight: 600,
-                      fontFamily: 'var(--font-vi)',
-                      transition: 'all 0.2s ease',
-                    }}>
-                      {p}
-                    </button>
-                  ))}
-                  {page < pages && (
-                    <button onClick={() => goPage(page + 1)} style={{
-                      padding: '10px 20px', borderRadius: '10px',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    ← {labels.prev || 'Trước'}
+                  </button>
+
+                  {/* Page numbers with ellipsis */}
+                  {(() => {
+                    const items: (number | 'ellipsis-start' | 'ellipsis-end')[] = []
+                    if (pages <= 7) {
+                      for (let i = 1; i <= pages; i++) items.push(i)
+                    } else {
+                      items.push(1)
+                      if (page > 4) items.push('ellipsis-start')
+                      const start = Math.max(2, page - 1)
+                      const end   = Math.min(pages - 1, page + 1)
+                      for (let i = start; i <= end; i++) items.push(i)
+                      if (page < pages - 3) items.push('ellipsis-end')
+                      items.push(pages)
+                    }
+                    return items.map((item, idx) => {
+                      if (item === 'ellipsis-start' || item === 'ellipsis-end') {
+                        return (
+                          <span key={item} style={{ padding: '9px 4px', fontSize: '13px', color: '#94a3b8', userSelect: 'none' }}>
+                            …
+                          </span>
+                        )
+                      }
+                      const isActive = item === page
+                      return (
+                        <button key={idx} onClick={() => goPage(item)} style={{
+                          padding: '9px 14px', borderRadius: '10px', minWidth: 40,
+                          border: `1.5px solid ${isActive ? '#0b2a59' : '#E5E8ED'}`,
+                          background: isActive ? '#0b2a59' : '#fff',
+                          color: isActive ? '#fff' : '#475569',
+                          cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                          fontFamily: 'var(--font-vi)',
+                          transition: 'all 0.2s ease',
+                          boxShadow: isActive ? '0 2px 8px -2px rgba(11,42,89,0.35)' : 'none',
+                        }}>
+                          {item}
+                        </button>
+                      )
+                    })
+                  })()}
+
+                  {/* Next */}
+                  <button
+                    onClick={() => goPage(page + 1)}
+                    disabled={page >= pages}
+                    style={{
+                      padding: '9px 18px', borderRadius: '10px',
                       border: '1.5px solid #E5E8ED', background: '#fff',
-                      cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                      cursor: page >= pages ? 'not-allowed' : 'pointer',
+                      opacity: page >= pages ? 0.4 : 1,
+                      fontSize: '13px', fontWeight: 600,
                       fontFamily: 'var(--font-vi)', color: '#475569',
-                    }}>
-                      {labels.next || 'Tiếp'} →
-                    </button>
-                  )}
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {labels.next || 'Tiếp'} →
+                  </button>
                 </div>
               )}
             </>

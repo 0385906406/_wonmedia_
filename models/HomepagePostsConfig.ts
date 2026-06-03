@@ -15,8 +15,7 @@ const HomepagePostsConfigSchema = new Schema<IHomepagePostsConfig>({
 }, { timestamps: true })
 
 // Xoá cache khi schema thay đổi (tránh Mongoose strict-mode bỏ qua field mới)
-delete (mongoose.models as Record<string, unknown>).HomepagePostsConfig
 const HomepagePostsConfig: Model<IHomepagePostsConfig> =
-  mongoose.model<IHomepagePostsConfig>('HomepagePostsConfig', HomepagePostsConfigSchema)
+  (mongoose.models.HomepagePostsConfig as Model<IHomepagePostsConfig>) || mongoose.model<IHomepagePostsConfig>('HomepagePostsConfig', HomepagePostsConfigSchema)
 
 export default HomepagePostsConfig

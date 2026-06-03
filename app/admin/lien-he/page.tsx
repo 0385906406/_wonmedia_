@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import {
   ImageIcon, MapPinIcon, MailIcon, SaveIcon, Loader2Icon,
-  SparklesIcon, CheckCircle2Icon, AlertCircleIcon, InboxIcon,
+  SparklesIcon, InboxIcon,
   Trash2Icon, EyeIcon, EyeOffIcon,
 } from 'lucide-react'
+import { useToast } from '@/components/admin/toast-provider'
 import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,14 +39,6 @@ function defaultForm(): ContactForm {
 }
 
 // ─── Sub components ───────────────────────────────────────────────────────────
-function Toast({ msg, type }: { msg: string; type: 'success' | 'error' }) {
-  return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-      {type === 'success' ? <CheckCircle2Icon size={16} /> : <AlertCircleIcon size={16} />}
-      {msg}
-    </div>
-  )
-}
 
 function LangTabs({ active, onChange }: { active: LocaleKey; onChange: (l: LocaleKey) => void }) {
   return (
@@ -92,11 +85,12 @@ function LienHeAdminInner() {
   const tab = searchParams.get('tab') ?? 'banner'
 
   const [form, setForm]   = useState<ContactForm>(defaultForm)
+  const { success: toastOk, error: toastErr } = useToast()
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [lang, setLang]       = useState<LocaleKey>('vi')
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
-
+  
   // Submissions
   const [subs, setSubs]     = useState<Submission[]>([])
   const [unread, setUnread] = useState(0)
@@ -104,41 +98,62 @@ function LienHeAdminInner() {
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const showToast = useCallback((msg: string, type: 'success' | 'error') => {
-    setToast({ msg, type }); setTimeout(() => setToast(null), 3500)
-  }, [])
+    type === 'success' ? toastOk(msg) : toastErr(msg)
+  }, [toastOk, toastErr])
 
   useEffect(() => {
-    fetch('/api/contact').then(r => r.json()).then(r => {
-      if (r.data) setForm(f => ({ ...f, ...r.data }))
-    }).finally(() => setLoading(false))
-  }, [])
+    fetch('/api/contact')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(r => { if (r.data) setForm(f => ({ ...f, ...r.data })) })
+      .catch(() => toastErr('Không tải được cấu hình liên hệ'))
+      .finally(() => setLoading(false))
+  }, [toastErr])
 
   useEffect(() => {
     if (tab !== 'inbox') return
     setSubLoading(true)
-    fetch('/api/contact/submit').then(r => r.json()).then(r => {
-      if (r.data) setSubs(r.data); if (r.unread !== undefined) setUnread(r.unread)
-    }).finally(() => setSubLoading(false))
-  }, [tab])
+    fetch('/api/contact/submit')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(r => { if (r.data) setSubs(r.data); if (r.unread !== undefined) setUnread(r.unread) })
+      .catch(() => toastErr('Không tải được hộp thư'))
+      .finally(() => setSubLoading(false))
+  }, [tab, toastErr])
 
   async function save() {
     setSaving(true)
     try {
       const res = await fetch('/api/contact', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       const data = await res.json()
-      if (res.ok) showToast('Đã lưu trang Liên hệ!', 'success')
-      else showToast(data.error ?? 'Lỗi lưu', 'error')
+      if (res.ok) toastOk('Đã lưu trang Liên hệ!')
+      else toastErr(data.error ?? 'Lỗi lưu')
+    } catch { toastErr('Lỗi kết nối')
     } finally { setSaving(false) }
   }
 
   async function markRead(sub: Submission) {
-    await fetch('/api/contact/submit', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: sub._id, read: !sub.read }) })
-    setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: !x.read } : x))
-    setUnread(u => sub.read ? u + 1 : Math.max(0, u - 1))
+    const newRead = !sub.read
+    // Optimistic update
+    setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: newRead } : x))
+    setUnread(u => newRead ? Math.max(0, u - 1) : u + 1)
+    const res = await fetch('/api/contact/submit', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: sub._id, read: newRead }),
+    })
+    if (!res.ok) {
+      // Rollback
+      setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: sub.read } : x))
+      setUnread(u => newRead ? u + 1 : Math.max(0, u - 1))
+      toastErr('Cập nhật thất bại')
+    }
   }
 
   async function deleteSub(id: string) {
-    await fetch('/api/contact/submit', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    if (!confirm('Xoá tin nhắn này?')) return
+    const res = await fetch('/api/contact/submit', {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (!res.ok) { toastErr('Xoá thất bại'); return }
     setSubs(s => s.filter(x => x._id !== id))
   }
 
@@ -152,7 +167,8 @@ function LienHeAdminInner() {
     onDone(data.translations)
   }
 
-  const SaveBtn = () => (
+  // Dùng element thay vì component inline để tránh remount mỗi render
+  const saveBtn = (
     <Button onClick={save} disabled={saving} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
       {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu thay đổi
     </Button>
@@ -161,10 +177,9 @@ function LienHeAdminInner() {
   if (loading) return <div className="flex items-center justify-center h-64 gap-2 text-[#64748b]"><Loader2Icon size={20} className="animate-spin" />Đang tải...</div>
 
   return (
-    <div className="p-6 max-w-6xl space-y-6">
-      {toast && <Toast msg={toast.msg} type={toast.type} />}
+    <div className="p-6 max-w-12xl space-y-6">
 
-      {/* Header */}
+      {/* Header */}  
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-600">
           <MailIcon size={20} />
@@ -213,13 +228,13 @@ function LienHeAdminInner() {
                             bannerTitle:    { ...f.bannerTitle,    ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title])) },
                             bannerSubtitle: { ...f.bannerSubtitle, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
                           }))
-                          showToast('Đã dịch Banner!', 'success')
+                          toastOk('Đã dịch Banner!', 'success')
                         })
-                      } catch (e) { showToast(String(e), 'error') }
+                      } catch (e) { toastErr(String(e)) }
                     }}>
                     <SparklesIcon size={13} />AI Dịch
                   </Button>
-                  <SaveBtn />
+                  {saveBtn}
                 </div>
               </div>
               <LangTabs active={lang} onChange={setLang} />
@@ -244,7 +259,7 @@ function LienHeAdminInner() {
                   <h3 className="font-semibold text-[#0f172a]">Thông tin liên hệ & Form</h3>
                   <p className="text-sm text-[#64748b] mt-0.5">Địa chỉ, điện thoại, email, bản đồ và nội dung form</p>
                 </div>
-                <SaveBtn />
+                {saveBtn}
               </div>
               <LangTabs active={lang} onChange={setLang} />
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Phone, Mail, MapPin, MessageCircle, ArrowUpRight, Send, User, Edit3, AlertCircle, Loader2 } from 'lucide-react'
 
 export interface ContactT {
@@ -115,7 +115,7 @@ function InfoSection({ t }: { t: ContactT }) {
           {/* Map */}
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.7 }}
             className="h-[280px] md:h-[400px] w-full rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-slate-50">
-            {t.googleMapsEmbed ? (
+            {t.googleMapsEmbed && /^https:\/\/(www\.)?google\.com\/maps\//.test(t.googleMapsEmbed) ? (
               <iframe src={t.googleMapsEmbed} className="w-full h-full border-none" allowFullScreen loading="lazy" title="map" />
             ) : (
               <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
@@ -136,6 +136,7 @@ function FormSection({ t }: { t: ContactT }) {
   const [countdown, setCountdown] = useState(0)
   const [flash, setFlash]         = useState<{ msg: string; ok: boolean } | null>(null)
   const lang = t.lang
+  const isSubmittingRef = useRef(false) // Guard đồng bộ chống double-submit
 
   useEffect(() => {
     const last = localStorage.getItem('contact_sent')
@@ -161,6 +162,8 @@ function FormSection({ t }: { t: ContactT }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (countdown > 0 || !validate()) return
+    if (isSubmittingRef.current) return // Guard đồng bộ — ngăn double-submit
+    isSubmittingRef.current = true
     setSubmit(true)
     try {
       const res  = await fetch('/api/contact/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
@@ -175,7 +178,7 @@ function FormSection({ t }: { t: ContactT }) {
         setFlash({ msg: data.error || l(lang, 'errorMsg'), ok: false })
       }
     } catch { setFlash({ msg: l(lang, 'errorMsg'), ok: false }) }
-    finally { setSubmit(false); setTimeout(() => setFlash(null), 4000) }
+    finally { isSubmittingRef.current = false; setSubmit(false); setTimeout(() => setFlash(null), 4000) }
   }
 
   const ic = (err?: string) => `w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl focus:outline-none focus:bg-white transition-all ${err ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-100 focus:border-green-500'}`

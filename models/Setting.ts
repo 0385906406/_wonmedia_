@@ -20,6 +20,9 @@ export interface ISettingIntegrations {
     geminiModel: string
     newsApiKey: string
     newsApiUrl: string
+    resendApiKey: string
+    resendFromEmail: string
+    resendToEmail: string
 }
 
 export interface ISetting extends Document {
@@ -47,10 +50,13 @@ const SettingSchema = new Schema<ISetting>(
             logoImageUrl: { type: String, default: '' },
         },
         integrations: {
-            geminiApiKey: { type: String, default: '' },
-            geminiModel: { type: String, default: 'gemini-1.5-flash' },
-            newsApiKey: { type: String, default: '' },
-            newsApiUrl: { type: String, default: '' },
+            geminiApiKey:     { type: String, default: '' },
+            geminiModel:      { type: String, default: 'gemini-1.5-flash' },
+            newsApiKey:       { type: String, default: '' },
+            newsApiUrl:       { type: String, default: '' },
+            resendApiKey:     { type: String, default: '' },
+            resendFromEmail:  { type: String, default: '' },
+            resendToEmail:    { type: String, default: '' },
         },
     },
     { timestamps: true }

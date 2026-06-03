@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { LanguageSwitcher } from '@/app/(client)/[lang]/language-switcher'
 import type { Locale } from '@/proxy'
 
@@ -14,11 +16,15 @@ interface Props {
   navItems: NavItem[]
   loginLabel: string
   isLoggedIn?: boolean
+  logoUrl?: string
+  brandName?: string
 }
 
-export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false }: Props) {
+export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false, logoUrl, brandName }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const mobileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -27,27 +33,60 @@ export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false }:
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  // Đóng mobile menu khi click ngoài
+  useEffect(() => {
+    if (!mobileOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (mobileRef.current && !mobileRef.current.contains(e.target as Node)) {
+        setMobileOpen(false)
+      }
+    }
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEsc)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEsc)
+    }
+  }, [mobileOpen])
+
   return (
-    <header className={scrolled ? 'wm-header wm-header--scrolled' : 'wm-header'}>
+    <header ref={mobileRef} className={scrolled ? 'wm-header wm-header--scrolled' : 'wm-header'}>
       <div className="wm-header__inner">
         {/* Logo */}
-        <a href={`/${lang}`} className="wm-header__brand">
-          <img src="/logo.png" alt="WON Media" className="wm-header__logo" />
-        </a>
+        <Link href={`/${lang}`} className="wm-header__brand">
+          <img src={logoUrl || '/logo.png'} alt={brandName || 'WON Media'} className="wm-header__logo" />
+          {brandName && (
+            <span style={{ fontWeight: 700, fontSize: '15px', color: '#fff', letterSpacing: '-0.2px', marginLeft: 8 }}>
+              {brandName}
+            </span>
+          )}
+        </Link>
 
-        {/* Desktop Nav - centered */}
+        {/* Desktop Nav */}
         <nav className="wm-desktop-nav">
-          {navItems.map((item) => (
-            <a key={item.href} href={item.href} className="wm-nav-link">
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`wm-nav-link${isActive ? ' wm-nav-link--active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Right */}
         <div className="wm-header__right">
-          {/* Language Switcher */}
-          <LanguageSwitcher currentLocale={lang as Locale} variant="dark" />
+          <Suspense>
+            <LanguageSwitcher currentLocale={lang as Locale} variant="dark" />
+          </Suspense>
 
           {/* Facebook */}
           <a
@@ -62,35 +101,18 @@ export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false }:
             </svg>
           </a>
 
-          {/* Login / Admin */}
-          {isLoggedIn ? (
-            <a href="/admin" className="wm-login-btn">
-              Quản trị
-            </a>
-          ) : (
-            <a href="/auth/login" className="wm-login-btn">
-              {loginLabel}
-            </a>
-          )}
-
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="wm-mobile-menu-btn"
             aria-label="Menu"
+            aria-expanded={mobileOpen}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
               {mobileOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </>
+                <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
               ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </>
+                <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
               )}
             </svg>
           </button>
@@ -100,16 +122,20 @@ export function NavbarClient({ lang, navItems, loginLabel, isLoggedIn = false }:
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="wm-mobile-nav">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className="wm-mobile-nav__link"
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`wm-mobile-nav__link${isActive ? ' active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
         </div>
       )}
     </header>

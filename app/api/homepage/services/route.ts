@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import HomepageService from '@/models/HomepageService'
+import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 
 export async function GET() {
   try {
@@ -13,6 +14,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser(req)
+  const authErr = requireAdmin(user)
+  if (authErr) return authErr
   try {
     await connectDB()
     const body = await req.json()

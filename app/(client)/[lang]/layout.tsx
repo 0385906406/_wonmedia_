@@ -9,6 +9,7 @@ import { PhoneButton } from '@/components/client/PhoneButton'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
 import ContactConfig from '@/models/ContactConfig'
+import Setting from '@/models/Setting'
 
 export function generateStaticParams() {
   return [
@@ -41,12 +42,19 @@ export default async function ClientLangLayout({
     }
   } catch { /* token invalid hoặc hết hạn */ }
 
-  // Lấy số điện thoại từ DB
+  // Lấy phone + settings song song
   let phone = ''
+  let logoUrl = ''
+  let brandName = ''
   try {
     await connectDB()
-    const cfg = await ContactConfig.findOne({ key: 'global' }).lean() as { phone?: string } | null
+    const [cfg, setting] = await Promise.all([
+      ContactConfig.findOne({ key: 'global' }).lean() as Promise<{ phone?: string } | null>,
+      Setting.findOne({ key: 'global' }).lean() as Promise<{ header?: { logoImageUrl?: string; navDisplayName?: string } } | null>,
+    ])
     phone = cfg?.phone ?? ''
+    logoUrl   = setting?.header?.logoImageUrl  ?? ''
+    brandName = setting?.header?.navDisplayName ?? ''
   } catch { /* ignore */ }
 
   const navItems = [
@@ -59,11 +67,13 @@ export default async function ClientLangLayout({
 
   return (
     <div lang={lang} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--wm-dark)' }}>
+      {/* BUG-036: root layout hardcode lang="vi" — patch html lang attr cho đúng locale */}
+      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang="${lang}"` }} />
       {/* Global scroll animation observer */}
       <AnimationObserver />
 
       {/* Sticky Navbar */}
-      <NavbarClient lang={lang} navItems={navItems} loginLabel={dict.nav.login} isLoggedIn={isLoggedIn} />
+      <NavbarClient lang={lang} navItems={navItems} loginLabel={dict.nav.login} isLoggedIn={isLoggedIn} logoUrl={logoUrl} brandName={brandName} />
 
       <main style={{ flex: 1 }}>{children}</main>
 

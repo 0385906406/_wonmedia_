@@ -35,7 +35,7 @@ export default async function TuyenDungPage({
   if (!hasLocale(lang)) notFound()
 
   const lk   = lang as LocaleKey
-  const page = Math.max(1, parseInt(sp.page ?? '1'))
+  const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1)
   const skip = (page - 1) * PER_PAGE
 
   let posts: PostCard[] = []
@@ -50,6 +50,7 @@ export default async function TuyenDungPage({
     total = count
     posts = docs.map(p => {
       const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
+      const jp = p as unknown as { urgent?: boolean; jobType?: string; location?: string; salary?: string; deadline?: string }
       return {
         _id:       (p._id as { toString(): string }).toString(),
         slug:      p.slug,
@@ -59,6 +60,11 @@ export default async function TuyenDungPage({
         category:  ml(p.category as Record<string, string>),
         title:     ml(p.title    as Record<string, string>),
         excerpt:   ml(p.excerpt  as Record<string, string>),
+        urgent:   jp.urgent   ?? false,
+        jobType:  jp.jobType  ?? '',
+        location: jp.location ?? '',
+        salary:   jp.salary   ?? '',
+        deadline: jp.deadline ?? '',
       }
     })
   } catch { /* DB unavailable */ }

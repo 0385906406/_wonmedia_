@@ -17,7 +17,6 @@ export interface IContactConfig extends Document {
   formSubtitle: Record<string, string>
 }
 
-delete (mongoose.models as Record<string, unknown>).ContactConfig
 const ContactConfigSchema = new Schema<IContactConfig>({
   key:             { type: String, default: 'global', unique: true },
   bannerSubtitle:  ML, bannerTitle: ML,
@@ -32,5 +31,6 @@ const ContactConfigSchema = new Schema<IContactConfig>({
   formSubtitle:    ML,
 }, { strict: false, timestamps: true })
 
-const ContactConfig: Model<IContactConfig> = mongoose.model<IContactConfig>('ContactConfig', ContactConfigSchema)
+const ContactConfig: Model<IContactConfig> =
+  (mongoose.models.ContactConfig as Model<IContactConfig>) || mongoose.model<IContactConfig>('ContactConfig', ContactConfigSchema)
 export default ContactConfig
