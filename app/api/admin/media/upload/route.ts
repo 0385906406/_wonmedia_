@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 import { getAuthUser, requireAdmin } from '@/lib/auth-api'
 import { verifyImageMagicBytes } from '@/lib/verify-image'
 
@@ -18,18 +16,32 @@ export async function POST(req: NextRequest) {
     if (file.size > MAX_SIZE) return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
 
     const buffer = new Uint8Array(await file.arrayBuffer())
-
-    // Verify magic bytes — không tin Content-Type từ client
     const { ok, ext } = verifyImageMagicBytes(buffer)
     if (!ok) return NextResponse.json({ error: 'File không phải ảnh hợp lệ' }, { status: 400 })
 
-    const filename = `rte-${Date.now()}.${ext}`
+    const filename = `upload-${Date.now()}.${ext}`
+
+    // Vercel Blob in production, local filesystem in dev
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const { put } = await import('@vercel/blob')
+      const mimeMap: Record<string, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' }
+      const blob = await put(`uploads/${filename}`, Buffer.from(buffer), {
+        access: 'public',
+        contentType: mimeMap[ext] ?? 'image/png',
+      })
+      return NextResponse.json({ data: { url: blob.url } })
+    }
+
+    // Dev fallback: write to public/uploads/
+    const { writeFile, mkdir } = await import('fs/promises')
+    const path = await import('path')
     const uploadDir = path.join(process.cwd(), 'public', 'uploads')
     await mkdir(uploadDir, { recursive: true })
     await writeFile(path.join(uploadDir, filename), Buffer.from(buffer))
-
     return NextResponse.json({ data: { url: `/uploads/${filename}` } })
-  } catch {
+
+  } catch (e) {
+    console.error('[media/upload]', e)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
   }
 }
