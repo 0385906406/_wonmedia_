@@ -86,12 +86,12 @@ function BannerSection({ t }: { t: ContactT }) {
         <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.7, delay: 0.1 }}
           style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <span style={{ width: 40, height: 3, background: 'var(--color-teal)', borderRadius: 2, display: 'block' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.82)', fontFamily: 'var(--font-primary)' }}>{t.bannerSubtitle}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#00A98F', fontFamily: 'var(--font-primary)' }}>{t.bannerSubtitle}</span>
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }} whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} viewport={VP}
           transition={{ duration: 0.9, delay: 0.25, ease: EASE }}
-          style={{ fontSize: 'clamp(24px, 3.5vw, 42px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-1px', fontFamily: 'var(--font-primary)', textShadow: '0 4px 32px rgba(0,0,0,0.3)', margin: 0 }}
+          style={{ fontSize: 'clamp(24px, 3.5vw, 42px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-1px', fontFamily: 'var(--font-primary)', color: '#fff', textShadow: '0 4px 32px rgba(0,0,0,0.3)', margin: 0 }}
         >
           {t.bannerTitle}
         </motion.h1>
