@@ -128,13 +128,13 @@ function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: s
       className="blog-featured-card"
     >
       {/* Image */}
-      <div style={{ position: 'relative', overflow: 'hidden', minHeight: 300 }}>
+      <div style={{ position: 'relative', overflow: 'hidden', height: 320 }}>
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                 transform: hov ? 'scale(1.05)' : 'scale(1)',
                 transition: 'transform 0.6s cubic-bezier(0.2,0.8,0.2,1)' }} />
-          : <div style={{ width: '100%', height: '100%', minHeight: 300,
+          : <div style={{ width: '100%', height: '100%',
               background: 'linear-gradient(135deg, rgba(15,76,129,0.08), rgba(0,169,143,0.12))' }} />}
         <div style={{ position: 'absolute', top: 16, left: 16 }}>
           <CatBadge type={post.type} category={post.category} labels={labels} />
