@@ -181,8 +181,8 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'center', textAlign: 'center' }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'center' }}>
+          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
+          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>
@@ -253,8 +253,8 @@ function WhyUsSection({ t, eyebrow }: { t: AboutT['whyUs']; eyebrow: string }) {
     <section style={{ background: '#fff', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'center', textAlign: 'center' }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'center' }}>
+          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
+          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>
@@ -292,8 +292,8 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)' }}>
       <div className="container">
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'center', textAlign: 'center' }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'center' }}>
+          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
+          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>

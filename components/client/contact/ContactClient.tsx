@@ -113,8 +113,8 @@ function InfoSection({ t }: { t: ContactT }) {
       <div className="container">
         {/* Heading */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: 48 }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'center' }}>
+          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
+          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{lb(t.lang, 'headquarters')}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>WON Media</h2>
           </div>
@@ -235,8 +235,8 @@ function FormSection({ t }: { t: ContactT }) {
       <div className="container">
         {/* Heading */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: 48 }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'center' }}>
+          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
+          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{lb(lang, 'support')}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.formTitle}</h2>
           </div>
