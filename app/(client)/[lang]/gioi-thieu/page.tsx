@@ -4,6 +4,35 @@ import { AboutClient, type AboutT } from '@/components/client/about/AboutClient'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
 import AboutConfig from '@/models/AboutConfig'
+import type { Metadata } from 'next'
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
+
+const SEO_ABOUT: Record<LocaleKey, { title: string; desc: string }> = {
+  vi: { title: 'Về chúng tôi – WON Media',     desc: 'Tìm hiểu về WON Media – đơn vị truyền thông sáng tạo, chuyên nghiệp hàng đầu tại Việt Nam.' },
+  en: { title: 'About Us – WON Media',          desc: 'Learn about WON Media – a leading creative and professional media company in Vietnam.' },
+  ko: { title: '회사 소개 – WON Media',          desc: 'WON Media에 대해 알아보세요 – 베트남 최고의 창의적이고 전문적인 미디어 회사.' },
+  ja: { title: '会社概要 – WON Media',            desc: 'WON Mediaについて – ベトナム有数のクリエイティブでプロのメディア会社。' },
+  zh: { title: '关于我们 – WON Media',            desc: '了解WON Media – 越南领先的创意和专业媒体公司。' },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+  const { title, desc } = SEO_ABOUT[lk]
+  const url = `${SITE}/${lang}/gioi-thieu`
+  return {
+    title,
+    description: desc,
+    alternates: {
+      canonical: url,
+      languages: { vi: `${SITE}/vi/gioi-thieu`, en: `${SITE}/en/gioi-thieu`, ko: `${SITE}/ko/gioi-thieu`, ja: `${SITE}/ja/gioi-thieu`, zh: `${SITE}/zh/gioi-thieu` },
+    },
+    openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
+    twitter: { card: 'summary_large_image', title, description: desc },
+  }
+}
 
 type Cfg = Record<string, unknown>
 

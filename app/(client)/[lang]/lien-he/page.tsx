@@ -4,6 +4,35 @@ import { ContactClient, type ContactT } from '@/components/client/contact/Contac
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
 import ContactConfig from '@/models/ContactConfig'
+import type { Metadata } from 'next'
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
+
+const SEO_CONTACT: Record<LocaleKey, { title: string; desc: string }> = {
+  vi: { title: 'Liên hệ – WON Media',   desc: 'Liên hệ với WON Media để được tư vấn và hỗ trợ dịch vụ truyền thông chuyên nghiệp.' },
+  en: { title: 'Contact – WON Media',   desc: 'Contact WON Media for consultation and professional media service support.' },
+  ko: { title: '문의하기 – WON Media',   desc: 'WON Media에 문의하여 전문 미디어 서비스 상담 및 지원을 받으세요.' },
+  ja: { title: 'お問い合わせ – WON Media', desc: 'WON Mediaにお問い合わせいただき、プロのメディアサービスの相談とサポートを受けてください。' },
+  zh: { title: '联系我们 – WON Media',   desc: '联系WON Media，获取专业媒体服务咨询和支持。' },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+  const { title, desc } = SEO_CONTACT[lk]
+  const url = `${SITE}/${lang}/lien-he`
+  return {
+    title,
+    description: desc,
+    alternates: {
+      canonical: url,
+      languages: { vi: `${SITE}/vi/lien-he`, en: `${SITE}/en/lien-he`, ko: `${SITE}/ko/lien-he`, ja: `${SITE}/ja/lien-he`, zh: `${SITE}/zh/lien-he` },
+    },
+    openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
+    twitter: { card: 'summary_large_image', title, description: desc },
+  }
+}
 
 // ─── Fallback ─────────────────────────────────────────────────────────────────
 type L = Record<string, string>

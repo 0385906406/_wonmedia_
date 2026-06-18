@@ -4,6 +4,35 @@ import { BlogClient, type PostCard } from '@/components/client/blog/BlogClient'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
 import Post from '@/models/Post'
+import type { Metadata } from 'next'
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
+
+const SEO_CAREER: Record<LocaleKey, { title: string; desc: string }> = {
+  vi: { title: 'Tuyển dụng – WON Media',   desc: 'Khám phá cơ hội việc làm hấp dẫn tại WON Media – môi trường làm việc năng động, sáng tạo.' },
+  en: { title: 'Careers – WON Media',       desc: 'Explore exciting career opportunities at WON Media – a dynamic and creative work environment.' },
+  ko: { title: '채용 – WON Media',          desc: 'WON Media의 흥미로운 취업 기회를 탐색하세요 – 역동적이고 창의적인 근무 환경.' },
+  ja: { title: '採用情報 – WON Media',       desc: 'WON Mediaでのエキサイティングなキャリアチャンスを探してください – ダイナミックでクリエイティブな職場環境。' },
+  zh: { title: '招聘 – WON Media',          desc: '探索WON Media的精彩职业机会 – 充满活力和创意的工作环境。' },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+  const { title, desc } = SEO_CAREER[lk]
+  const url = `${SITE}/${lang}/tuyen-dung`
+  return {
+    title,
+    description: desc,
+    alternates: {
+      canonical: url,
+      languages: { vi: `${SITE}/vi/tuyen-dung`, en: `${SITE}/en/tuyen-dung`, ko: `${SITE}/ko/tuyen-dung`, ja: `${SITE}/ja/tuyen-dung`, zh: `${SITE}/zh/tuyen-dung` },
+    },
+    openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
+    twitter: { card: 'summary_large_image', title, description: desc },
+  }
+}
 
 const PER_PAGE = 13
 

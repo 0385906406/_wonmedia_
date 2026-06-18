@@ -4,6 +4,35 @@ import { BlogClient, type PostCard } from '@/components/client/blog/BlogClient'
 import type { LocaleKey } from '@/types/multilang'
 import { connectDB } from '@/lib/mongodb'
 import Post from '@/models/Post'
+import type { Metadata } from 'next'
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
+
+const SEO_NEWS: Record<LocaleKey, { title: string; desc: string }> = {
+  vi: { title: 'Tin tức – WON Media',   desc: 'Cập nhật tin tức, sự kiện và bài viết mới nhất từ WON Media.' },
+  en: { title: 'News – WON Media',      desc: 'Latest news, events and articles from WON Media.' },
+  ko: { title: '뉴스 – WON Media',      desc: 'WON Media의 최신 뉴스, 이벤트 및 기사를 확인하세요.' },
+  ja: { title: 'ニュース – WON Media',   desc: 'WON Mediaからの最新ニュース、イベント、記事をご覧ください。' },
+  zh: { title: '新闻 – WON Media',      desc: '查看WON Media的最新新闻、活动和文章。' },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+  const { title, desc } = SEO_NEWS[lk]
+  const url = `${SITE}/${lang}/tin-tuc`
+  return {
+    title,
+    description: desc,
+    alternates: {
+      canonical: url,
+      languages: { vi: `${SITE}/vi/tin-tuc`, en: `${SITE}/en/tin-tuc`, ko: `${SITE}/ko/tin-tuc`, ja: `${SITE}/ja/tin-tuc`, zh: `${SITE}/zh/tin-tuc` },
+    },
+    openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
+    twitter: { card: 'summary_large_image', title, description: desc },
+  }
+}
 
 const PER_PAGE = 13
 

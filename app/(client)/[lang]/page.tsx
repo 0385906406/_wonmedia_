@@ -12,6 +12,35 @@ import HomepagePartner from '@/models/HomepagePartner'
 import Post from '@/models/Post'
 import HomepagePostsConfig from '@/models/HomepagePostsConfig'
 import type { LocaleKey } from '@/types/multilang'
+import type { Metadata } from 'next'
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
+
+const SEO_HOME: Record<LocaleKey, { title: string; desc: string }> = {
+  vi: { title: 'WON Media – Truyền thông & Giải trí chuyên nghiệp', desc: 'WON Media cung cấp dịch vụ truyền thông, quảng cáo và giải trí chuyên nghiệp tại Việt Nam.' },
+  en: { title: 'WON Media – Professional Media & Entertainment',    desc: 'WON Media provides professional media, advertising and entertainment services in Vietnam.' },
+  ko: { title: 'WON Media – 전문 미디어 & 엔터테인먼트',              desc: 'WON Media는 베트남의 전문 미디어, 광고 및 엔터테인먼트 서비스를 제공합니다.' },
+  ja: { title: 'WON Media – プロのメディア & エンターテインメント',    desc: 'WON Mediaはベトナムのプロのメディア、広告、エンターテインメントサービスを提供します。' },
+  zh: { title: 'WON Media – 专业媒体与娱乐',                          desc: 'WON Media在越南提供专业的媒体、广告和娱乐服务。' },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  if (!hasLocale(lang)) return {}
+  const lk = lang as LocaleKey
+  const { title, desc } = SEO_HOME[lk]
+  const url = `${SITE}/${lang}`
+  return {
+    title,
+    description: desc,
+    alternates: {
+      canonical: url,
+      languages: { vi: `${SITE}/vi`, en: `${SITE}/en`, ko: `${SITE}/ko`, ja: `${SITE}/ja`, zh: `${SITE}/zh` },
+    },
+    openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
+    twitter: { card: 'summary_large_image', title, description: desc },
+  }
+}
 
 // ─── Fallback defaults ────────────────────────────────────────────────────────
 const DEFAULT_HERO = {
