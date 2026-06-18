@@ -579,11 +579,10 @@ async function seedFooter() {
 // ─── About ────────────────────────────────────────────────────────────────────
 
 async function seedAbout() {
-  const exists = await AboutConfig.findOne({ key: 'global' })
-  if (exists) return
+  const exists = await AboutConfig.findOne({ key: 'global' }).lean() as { bannerTitle?: { vi?: string } } | null
+  if (exists?.bannerTitle?.vi) return  // đã có nội dung thật → không ghi đè
 
-  await AboutConfig.create({
-    key: 'global',
+  await AboutConfig.findOneAndUpdate({ key: 'global' }, { $set: {
     bannerSubtitle: { vi: 'VỀ CHÚNG TÔI', en: 'ABOUT US', ko: '회사 소개', ja: '会社概要', zh: '关于我们' },
     bannerTitle: {
       vi: 'Đơn vị truyền thông hàng đầu Việt Nam',
@@ -705,17 +704,17 @@ async function seedAbout() {
         desc:  { vi: 'Sản xuất MV, lyric video, content mạng xã hội chuyên nghiệp, sáng tạo.', en: 'Professional and creative production of MVs, lyric videos, and social media content.', ko: 'MV, 가사 비디오 및 소셜 미디어 콘텐츠의 전문적이고 창의적인 제작.', ja: 'MV、歌詞動画、ソーシャルメディアコンテンツのプロフェッショナルでクリエイティブな制作。', zh: 'MV、歌词视频和社交媒体内容的专业创意制作。' },
       },
     ],
-  })
+  } }, { upsert: true, new: true })
   console.log('[seed] About page content created')
 }
 
 // ─── Contact ──────────────────────────────────────────────────────────────────
 
 async function seedContact() {
-  const exists = await ContactConfig.findOne({ key: 'global' })
-  if (exists) return
+  const exists = await ContactConfig.findOne({ key: 'global' }).lean() as { bannerTitle?: { vi?: string } } | null
+  if (exists?.bannerTitle?.vi) return  // đã có nội dung thật → không ghi đè
 
-  await ContactConfig.create({
+  await ContactConfig.findOneAndUpdate({ key: 'global' }, { $set: {
     key: 'global',
     bannerSubtitle: { vi: 'LIÊN HỆ', en: 'CONTACT', ko: '연락처', ja: 'お問い合わせ', zh: '联系我们' },
     bannerTitle: {
@@ -752,7 +751,7 @@ async function seedContact() {
       ja: '以下のフォームにご記入ください。24時間以内にご返信します。',
       zh: '填写下面的表单，我们将在24小时内回复。',
     },
-  })
+  } }, { upsert: true, new: true })
   console.log('[seed] Contact page content created')
 }
 
