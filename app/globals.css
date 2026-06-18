@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./styles/dahee.css";
+@import "./styles/sati-tokens.css";
+@import "./styles/sati-base.css";
+@import "./styles/sati-components.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -329,10 +332,10 @@
   --nic-g3: linear-gradient(135deg, #062340 0%, #0F4C81 100%);
   --nic-g4: linear-gradient(135deg, #F0F7FF 0%, #FEEFB8 60%, #FCD34D 100%);
 
-  /* Typography – font stacks (actual font vars set in layout via next/font) */
-  --nic-font-mono-sans: 'Space Grotesk', sans-serif;
-  --nic-font-serif:     'Source Serif 4', Georgia, serif;
-  --nic-font-monospace: 'JetBrains Mono', monospace;
+  /* Typography – aliases to SATI font vars (set by next/font in layout) */
+  --nic-font-mono-sans: var(--font-mono-sans);
+  --nic-font-serif:     var(--font-serif);
+  --nic-font-monospace: var(--font-monospace);
   --nic-font-ko: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
   --nic-font-ja: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
   --nic-font-zh: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;

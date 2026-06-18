@@ -1,21 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import {
   ImageIcon, MapPinIcon, MailIcon, SaveIcon, Loader2Icon,
-  SparklesIcon, InboxIcon,
-  Trash2Icon, EyeIcon, EyeOffIcon,
+  SparklesIcon, InboxIcon, Trash2Icon, EyeIcon, EyeOffIcon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
-import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
+import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface ContactForm {
   bannerSubtitle: MultiLang; bannerTitle: MultiLang
   address: MultiLang
@@ -26,9 +19,6 @@ interface ContactForm {
 
 interface Submission { _id: string; name: string; email: string; subject: string; message: string; read: boolean; createdAt: string }
 
-const IC = 'h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/10 text-sm'
-const TA = 'rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/10 text-sm resize-none'
-
 function defaultForm(): ContactForm {
   return {
     bannerSubtitle: emptyMultiLang(), bannerTitle: emptyMultiLang(),
@@ -38,14 +28,17 @@ function defaultForm(): ContactForm {
   }
 }
 
-// ─── Sub components ───────────────────────────────────────────────────────────
-
 function LangTabs({ active, onChange }: { active: LocaleKey; onChange: (l: LocaleKey) => void }) {
   return (
-    <div className="flex gap-1 p-1 bg-[#F1F5F9] rounded-lg w-fit flex-wrap">
-      {LOCALES.map(l => (
-        <button key={l} onClick={() => onChange(l)}
-          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${active === l ? 'bg-white shadow text-[#0f172a]' : 'text-[#64748b] hover:text-[#0f172a]'}`}>
+    <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--color-gray-light)', borderRadius: 8, width: 'fit-content', flexWrap: 'wrap' }}>
+      {ADMIN_LOCALES.map(l => (
+        <button key={l} onClick={() => onChange(l)} style={{
+          padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+          border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+          background: active === l ? 'white' : 'transparent',
+          color: active === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+          boxShadow: active === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        }}>
           {LOCALE_META[l].flag} {LOCALE_META[l].short}
         </button>
       ))}
@@ -58,27 +51,35 @@ function MLField({ label, value, onChange, lang, multi, rows = 3 }: {
   lang: LocaleKey; multi?: boolean; rows?: number
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-sm font-medium text-[#374151]">
-        {label} <span className="font-mono text-xs text-[#94a3b8]">({LOCALE_META[lang].flag} {LOCALE_META[lang].short})</span>
-      </Label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label className="dh-label">
+        {label} <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#94a3b8' }}>({LOCALE_META[lang].flag} {LOCALE_META[lang].short})</span>
+      </label>
       {multi
-        ? <Textarea value={value[lang] ?? ''} onChange={e => onChange({ ...value, [lang]: e.target.value })}
-            rows={rows} className={TA + ' min-h-[80px]'} placeholder={`${label} (${LOCALE_META[lang].short})...`} />
-        : <Input value={value[lang] ?? ''} onChange={e => onChange({ ...value, [lang]: e.target.value })}
-            className={IC} placeholder={`${label} (${LOCALE_META[lang].short})...`} />}
+        ? <textarea value={value[lang] ?? ''} onChange={e => onChange({ ...value, [lang]: e.target.value })}
+            rows={rows} className="dh-input" style={{ minHeight: 80, resize: 'none' }}
+            placeholder={`${label} (${LOCALE_META[lang].short})...`} />
+        : <input value={value[lang] ?? ''} onChange={e => onChange({ ...value, [lang]: e.target.value })}
+            className="dh-input" placeholder={`${label} (${LOCALE_META[lang].short})...`} />}
     </div>
   )
 }
 
-// ─── TABS ────────────────────────────────────────────────────────────────────
 const TABS = [
-  { value: 'banner', label: 'Banner',       icon: ImageIcon  },
-  { value: 'info',   label: 'Thông tin',    icon: MapPinIcon },
-  { value: 'inbox',  label: 'Tin nhắn',     icon: InboxIcon  },
+  { value: 'banner', label: 'Banner',    icon: ImageIcon  },
+  { value: 'info',   label: 'Thông tin', icon: MapPinIcon },
+  { value: 'inbox',  label: 'Tin nhắn',  icon: InboxIcon  },
 ]
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+function SectionBox({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', padding: 16, background: 'var(--color-gray-light)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{title}</p>
+      {children}
+    </div>
+  )
+}
+
 function LienHeAdminInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -86,20 +87,13 @@ function LienHeAdminInner() {
 
   const [form, setForm]   = useState<ContactForm>(defaultForm)
   const { success: toastOk, error: toastErr } = useToast()
-
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [lang, setLang]       = useState<LocaleKey>('vi')
-  
-  // Submissions
   const [subs, setSubs]     = useState<Submission[]>([])
   const [unread, setUnread] = useState(0)
   const [subLoading, setSubLoading] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
-
-  const showToast = useCallback((msg: string, type: 'success' | 'error') => {
-    type === 'success' ? toastOk(msg) : toastErr(msg)
-  }, [toastOk, toastErr])
 
   useEffect(() => {
     fetch('/api/contact')
@@ -132,7 +126,6 @@ function LienHeAdminInner() {
 
   async function markRead(sub: Submission) {
     const newRead = !sub.read
-    // Optimistic update
     setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: newRead } : x))
     setUnread(u => newRead ? Math.max(0, u - 1) : u + 1)
     const res = await fetch('/api/contact/submit', {
@@ -140,7 +133,6 @@ function LienHeAdminInner() {
       body: JSON.stringify({ id: sub._id, read: newRead }),
     })
     if (!res.ok) {
-      // Rollback
       setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: sub.read } : x))
       setUnread(u => newRead ? u + 1 : Math.max(0, u - 1))
       toastErr('Cập nhật thất bại')
@@ -167,59 +159,69 @@ function LienHeAdminInner() {
     onDone(data.translations)
   }
 
-  // Dùng element thay vì component inline để tránh remount mỗi render
   const saveBtn = (
-    <Button onClick={save} disabled={saving} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+    <button onClick={save} disabled={saving} className="dh-btn dh-btn-primary gap-2">
       {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu thay đổi
-    </Button>
+    </button>
   )
 
-  if (loading) return <div className="flex items-center justify-center h-64 gap-2 text-[#64748b]"><Loader2Icon size={20} className="animate-spin" />Đang tải...</div>
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 256, gap: 8, color: 'var(--color-gray-text)' }}>
+      <Loader2Icon size={20} className="animate-spin" />Đang tải...
+    </div>
+  )
 
   return (
-    <div className="p-6 max-w-12xl space-y-6">
-
-      {/* Header */}  
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-600">
-          <MailIcon size={20} />
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="dh-page-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-navy-pale)', color: 'var(--color-navy)' }}>
+            <MailIcon size={20} />
+          </div>
+          <div>
+            <h1 className="dh-page-title">Trang Liên hệ</h1>
+            <p className="dh-page-desc">Quản lý nội dung &amp; tin nhắn · Đa ngôn ngữ VI/EN</p>
+          </div>
+          {unread > 0 && <span className="dh-badge" style={{ background: '#ef4444', color: 'white', marginLeft: 4 }}>{unread} mới</span>}
         </div>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">Trang Liên hệ</h1>
-          <p className="text-xs text-[#64748b] mt-0.5">Quản lý nội dung & tin nhắn · Đa ngôn ngữ VI/EN/KO/JA/ZH</p>
-        </div>
-        {unread > 0 && <Badge className="bg-red-500 text-white ml-2">{unread} mới</Badge>}
       </div>
 
       {/* Tab card */}
-      <div className="rounded-2xl bg-white border border-[#e5e8ed] shadow-sm overflow-hidden">
+      <div className="dh-card" style={{ overflow: 'hidden', padding: 0 }}>
         {/* Tab bar */}
-        <div className="flex w-full border-b border-[#e5e8ed]">
+        <div style={{ display: 'flex', width: '100%', borderBottom: '1px solid var(--color-gray-border)' }}>
           {TABS.map(({ value, label, icon: Icon }) => (
             <button key={value} onClick={() => router.push(`/admin/lien-he?tab=${value}`)}
-              className={`flex-1 relative flex items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors duration-150 hover:text-green-700 hover:bg-green-50/60 ${
-                tab === value ? 'text-green-700 font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-green-500 after:rounded-t-full' : 'text-[#64748b]'
-              }`}>
+              style={{
+                flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 6, padding: '14px 0', fontSize: 13, fontWeight: tab === value ? 600 : 500,
+                border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+                background: 'transparent',
+                color: tab === value ? 'var(--color-navy)' : 'var(--color-gray-text)',
+                borderBottom: tab === value ? '3px solid var(--color-navy)' : '3px solid transparent',
+              }}>
               <Icon size={15} />{label}
-              {value === 'inbox' && unread > 0 && <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-red-500 text-white rounded-full font-bold">{unread}</span>}
+              {value === 'inbox' && unread > 0 && (
+                <span style={{ marginLeft: 4, padding: '0 6px 1px', fontSize: 10, background: '#ef4444', color: 'white', borderRadius: 99, fontWeight: 700 }}>{unread}</span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        <div className="dh-card-body" style={{ padding: 24 }}>
 
           {/* ── BANNER ── */}
           {tab === 'banner' && (
-            <div className="space-y-5">
-              <div className="flex items-center justify-between flex-wrap gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                  <h3 className="font-semibold text-[#0f172a]">Banner trang Liên hệ</h3>
-                  <p className="text-sm text-[#64748b] mt-0.5">Ảnh nền + tiêu đề hiển thị trên cùng</p>
+                  <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Banner trang Liên hệ</h3>
+                  <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Ảnh nền + tiêu đề hiển thị trên cùng</p>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" disabled={saving}
-                    className="gap-2 border-[#E5E8ED] text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300"
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="dh-btn dh-btn-secondary dh-btn-sm gap-2"
+                    disabled={saving}
                     onClick={async () => {
                       try {
                         await aiTranslate({ title: form.bannerTitle.vi, subtitle: form.bannerSubtitle.vi }, t => {
@@ -228,24 +230,23 @@ function LienHeAdminInner() {
                             bannerTitle:    { ...f.bannerTitle,    ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title])) },
                             bannerSubtitle: { ...f.bannerSubtitle, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
                           }))
-                          toastOk('Đã dịch Banner!', 'success')
+                          toastOk('Đã dịch Banner!')
                         })
                       } catch (e) { toastErr(String(e)) }
                     }}>
                     <SparklesIcon size={13} />AI Dịch
-                  </Button>
+                  </button>
                   {saveBtn}
                 </div>
               </div>
               <LangTabs active={lang} onChange={setLang} />
               <MLField label="Dòng phụ (subtitle)" value={form.bannerSubtitle} onChange={v => setForm(f => ({ ...f, bannerSubtitle: v }))} lang={lang} />
               <MLField label="Tiêu đề chính" value={form.bannerTitle} onChange={v => setForm(f => ({ ...f, bannerTitle: v }))} lang={lang} />
-              {/* Preview */}
-              <div className="rounded-xl overflow-hidden relative h-40 bg-gradient-to-br from-slate-800 to-slate-900 flex items-end p-6">
-                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "url('/banners/banner.png')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <div className="relative z-10">
-                  <p className="text-green-400 text-sm">{form.bannerSubtitle[lang] || 'Dòng phụ...'}</p>
-                  <h1 className="text-white text-2xl font-bold uppercase">{form.bannerTitle[lang] || 'Tiêu đề...'}</h1>
+              <div style={{ borderRadius: 10, overflow: 'hidden', position: 'relative', height: 160, background: 'linear-gradient(135deg, #1e293b, #0f172a)', display: 'flex', alignItems: 'flex-end', padding: 24 }}>
+                <div style={{ position: 'absolute', inset: 0, opacity: 0.3, backgroundImage: "url('/banners/banner.png')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <p style={{ color: 'var(--color-teal)', fontSize: 13 }}>{form.bannerSubtitle[lang] || 'Dòng phụ...'}</p>
+                  <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, textTransform: 'uppercase' }}>{form.bannerTitle[lang] || 'Tiêu đề...'}</h1>
                 </div>
               </div>
             </div>
@@ -253,103 +254,107 @@ function LienHeAdminInner() {
 
           {/* ── INFO ── */}
           {tab === 'info' && (
-            <div className="space-y-5">
-              <div className="flex items-center justify-between flex-wrap gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                  <h3 className="font-semibold text-[#0f172a]">Thông tin liên hệ & Form</h3>
-                  <p className="text-sm text-[#64748b] mt-0.5">Địa chỉ, điện thoại, email, bản đồ và nội dung form</p>
+                  <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Thông tin liên hệ &amp; Form</h3>
+                  <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Địa chỉ, điện thoại, email, bản đồ và nội dung form</p>
                 </div>
                 {saveBtn}
               </div>
               <LangTabs active={lang} onChange={setLang} />
 
-              <div className="rounded-xl border border-[#E5E8ED] p-4 bg-[#F8FAFC] space-y-4">
-                <p className="text-xs font-bold text-[#64748b] uppercase tracking-wide">Địa chỉ & Bản đồ</p>
+              <SectionBox title="Địa chỉ &amp; Bản đồ">
                 <MLField label="Địa chỉ văn phòng" value={form.address} onChange={v => setForm(f => ({ ...f, address: v }))} lang={lang} multi rows={2} />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-[#374151]">Google Maps URL</Label>
-                    <Input value={form.googleMapsUrl} onChange={e => setForm(f => ({ ...f, googleMapsUrl: e.target.value }))}
-                      placeholder="https://maps.app.goo.gl/..." className={IC} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label className="dh-label">Google Maps URL</label>
+                    <input value={form.googleMapsUrl} onChange={e => setForm(f => ({ ...f, googleMapsUrl: e.target.value }))}
+                      placeholder="https://maps.app.goo.gl/..." className="dh-input" />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-[#374151]">Google Maps Embed URL</Label>
-                    <Input value={form.googleMapsEmbed} onChange={e => setForm(f => ({ ...f, googleMapsEmbed: e.target.value }))}
-                      placeholder="https://www.google.com/maps/embed?pb=..." className={IC} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label className="dh-label">Google Maps Embed URL</label>
+                    <input value={form.googleMapsEmbed} onChange={e => setForm(f => ({ ...f, googleMapsEmbed: e.target.value }))}
+                      placeholder="https://www.google.com/maps/embed?pb=..." className="dh-input" />
                   </div>
                 </div>
-              </div>
+              </SectionBox>
 
-              <div className="rounded-xl border border-[#E5E8ED] p-4 bg-[#F8FAFC] space-y-4">
-                <p className="text-xs font-bold text-[#64748b] uppercase tracking-wide">Liên lạc</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SectionBox title="Liên lạc">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   {[
                     { key: 'phone',   label: 'Số điện thoại' },
                     { key: 'hotline', label: 'Hotline' },
                     { key: 'email',   label: 'Email' },
                     { key: 'zalo',    label: 'Zalo' },
                   ].map(({ key, label }) => (
-                    <div key={key} className="space-y-1.5">
-                      <Label className="text-sm font-medium text-[#374151]">{label}</Label>
-                      <Input value={(form as unknown as Record<string, string>)[key]}
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label className="dh-label">{label}</label>
+                      <input value={(form as unknown as Record<string, string>)[key]}
                         onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                        placeholder={label} className={IC} />
+                        placeholder={label} className="dh-input" />
                     </div>
                   ))}
                 </div>
-              </div>
+              </SectionBox>
 
-              <div className="rounded-xl border border-[#E5E8ED] p-4 bg-[#F8FAFC] space-y-4">
-                <p className="text-xs font-bold text-[#64748b] uppercase tracking-wide">Nội dung Form liên hệ</p>
+              <SectionBox title="Nội dung Form liên hệ">
                 <MLField label="Tiêu đề form" value={form.formTitle} onChange={v => setForm(f => ({ ...f, formTitle: v }))} lang={lang} />
                 <MLField label="Mô tả form" value={form.formSubtitle} onChange={v => setForm(f => ({ ...f, formSubtitle: v }))} lang={lang} multi rows={3} />
-              </div>
+              </SectionBox>
             </div>
           )}
 
           {/* ── INBOX ── */}
           {tab === 'inbox' && (
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <h3 className="font-semibold text-[#0f172a]">Hộp thư đến</h3>
-                <p className="text-sm text-[#64748b] mt-0.5">{subs.length} tin nhắn{unread > 0 ? ` · ${unread} chưa đọc` : ''}</p>
+                <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Hộp thư đến</h3>
+                <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>{subs.length} tin nhắn{unread > 0 ? ` · ${unread} chưa đọc` : ''}</p>
               </div>
               {subLoading ? (
-                <div className="flex items-center gap-2 text-[#64748b] py-8"><Loader2Icon size={16} className="animate-spin" />Đang tải tin nhắn...</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-gray-text)', padding: '32px 0' }}>
+                  <Loader2Icon size={16} className="animate-spin" />Đang tải tin nhắn...
+                </div>
               ) : subs.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-16 text-[#94a3b8]">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '64px 0', color: '#94a3b8' }}>
                   <InboxIcon size={32} strokeWidth={1.5} />
-                  <p className="text-sm">Chưa có tin nhắn nào</p>
+                  <p style={{ fontSize: 13 }}>Chưa có tin nhắn nào</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {subs.map(sub => (
-                    <div key={sub._id} className={`rounded-xl border transition-colors ${sub.read ? 'border-[#E5E8ED] bg-white' : 'border-green-200 bg-green-50/40'}`}>
-                      <div className="flex items-center gap-3 px-4 py-3 cursor-pointer" onClick={() => setExpanded(expanded === sub._id ? null : sub._id)}>
-                        {!sub.read && <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`text-sm font-semibold text-[#0f172a] ${!sub.read ? '' : 'font-medium'}`}>{sub.name}</span>
-                            <span className="text-xs text-[#94a3b8]">{sub.email}</span>
-                            <Badge variant="outline" className="text-xs">{sub.subject}</Badge>
+                    <div key={sub._id} style={{
+                      borderRadius: 10, border: `1px solid ${sub.read ? 'var(--color-gray-border)' : 'var(--color-navy-pale)'}`,
+                      background: sub.read ? 'white' : 'var(--color-sky)',
+                      transition: 'all 0.15s',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer' }}
+                        onClick={() => setExpanded(expanded === sub._id ? null : sub._id)}>
+                        {!sub.read && <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-navy)', flexShrink: 0 }} />}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 13, fontWeight: sub.read ? 500 : 600, color: 'var(--color-navy-deep)' }}>{sub.name}</span>
+                            <span style={{ fontSize: 11, color: '#94a3b8' }}>{sub.email}</span>
+                            <span className="dh-badge dh-badge-gray">{sub.subject}</span>
                           </div>
-                          <p className="text-xs text-[#94a3b8] mt-0.5">{new Date(sub.createdAt).toLocaleString('vi-VN')}</p>
+                          <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{new Date(sub.createdAt).toLocaleString('vi-VN')}</p>
                         </div>
-                        <div className="flex gap-1 flex-shrink-0">
+                        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                           <button onClick={e => { e.stopPropagation(); markRead(sub) }}
-                            className="h-8 w-8 flex items-center justify-center rounded-lg text-[#64748b] hover:text-green-700 hover:bg-green-50 transition-colors"
+                            className="dh-btn-icon"
                             title={sub.read ? 'Đánh dấu chưa đọc' : 'Đánh dấu đã đọc'}>
                             {sub.read ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                           </button>
                           <button onClick={e => { e.stopPropagation(); deleteSub(sub._id) }}
-                            className="h-8 w-8 flex items-center justify-center rounded-lg text-[#64748b] hover:text-red-600 hover:bg-red-50 transition-colors">
+                            className="dh-btn-icon" style={{ color: '#ef4444' }}>
                             <Trash2Icon size={14} />
                           </button>
                         </div>
                       </div>
                       {expanded === sub._id && (
-                        <div className="px-4 pb-4 border-t border-[#F1F5F9] mt-1 pt-3">
-                          <p className="text-sm text-[#374151] leading-relaxed whitespace-pre-wrap">{sub.message}</p>
+                        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--color-gray-border)' }}>
+                          <p style={{ fontSize: 13, color: 'var(--color-gray-text)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{sub.message}</p>
                         </div>
                       )}
                     </div>

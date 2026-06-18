@@ -2,22 +2,6 @@
 
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog'
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Switch } from '@/components/ui/switch'
 import {
   LayoutIcon, BriefcaseIcon, TrophyIcon, UsersIcon, FileTextIcon,
   PlusIcon, PencilIcon, Trash2Icon, SaveIcon, UploadIcon, GlobeIcon,
@@ -25,9 +9,8 @@ import {
   ZapIcon, ListIcon, CheckSquareIcon, SquareIcon, ExternalLinkIcon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
-import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
+import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface HeroData { _id?: string; title: MultiLang; title2: MultiLang; subtitle: MultiLang }
 interface ServiceItem { _id: string; order: number; iconKey: string; title: MultiLang; desc: MultiLang; active: boolean }
 interface AchievementItem { _id: string; order: number; value: number; label: MultiLang; active: boolean }
@@ -37,18 +20,17 @@ interface PostItem {
   showOnHomepage: boolean; category: MultiLang; title: MultiLang; excerpt: MultiLang; content: MultiLang; active: boolean
 }
 
-// ─── Sub-component: Language Tabs ─────────────────────────────────────────────
 function LangTabs({ activeLang, onChange }: { activeLang: LocaleKey; onChange: (l: LocaleKey) => void }) {
   return (
-    <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
-      {LOCALES.map((l) => (
-        <button
-          key={l}
-          onClick={() => onChange(l)}
-          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-            activeLang === l ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
+    <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--color-gray-light)', borderRadius: 8, width: 'fit-content', flexWrap: 'wrap' }}>
+      {ADMIN_LOCALES.map((l) => (
+        <button key={l} onClick={() => onChange(l)} style={{
+          padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+          border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+          background: activeLang === l ? 'white' : 'transparent',
+          color: activeLang === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+          boxShadow: activeLang === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        }}>
           {LOCALE_META[l].flag} {LOCALE_META[l].short}
         </button>
       ))}
@@ -56,43 +38,25 @@ function LangTabs({ activeLang, onChange }: { activeLang: LocaleKey; onChange: (
   )
 }
 
-// ─── Sub-component: Toast ────────────────────────────────────────────────────
-
-// ─── Sub-component: MultiLang Field ─────────────────────────────────────────
-function MLField({
-  label, value, onChange, multiline = false, lang,
-}: {
-  label: string
-  value: MultiLang
-  onChange: (v: MultiLang) => void
-  multiline?: boolean
-  lang: LocaleKey
+function MLField({ label, value, onChange, multiline = false, lang }: {
+  label: string; value: MultiLang; onChange: (v: MultiLang) => void; multiline?: boolean; lang: LocaleKey
 }) {
   const handleChange = (v: string) => onChange({ ...value, [lang]: v })
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label} <span className="text-xs font-mono text-primary">({LOCALE_META[lang].flag} {LOCALE_META[lang].label})</span></Label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label className="dh-label">{label} <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#94a3b8' }}>({LOCALE_META[lang].flag} {LOCALE_META[lang].label})</span></label>
       {multiline ? (
-        <Textarea
-          value={value[lang] ?? ''}
-          onChange={(e) => handleChange(e.target.value)}
-          rows={3}
-          className="text-sm resize-none min-h-[92px] rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10"
-          placeholder={`${label} (${LOCALE_META[lang].short})...`}
-        />
+        <textarea value={value[lang] ?? ''} onChange={(e) => handleChange(e.target.value)}
+          rows={3} className="dh-input" style={{ minHeight: 92, resize: 'none' }}
+          placeholder={`${label} (${LOCALE_META[lang].short})...`} />
       ) : (
-        <Input
-          value={value[lang] ?? ''}
-          onChange={(e) => handleChange(e.target.value)}
-          className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10"
-          placeholder={`${label} (${LOCALE_META[lang].short})...`}
-        />
+        <input value={value[lang] ?? ''} onChange={(e) => handleChange(e.target.value)}
+          className="dh-input" placeholder={`${label} (${LOCALE_META[lang].short})...`} />
       )}
     </div>
   )
 }
 
-// ─── Sub-component: Image Upload ─────────────────────────────────────────────
 function ImageUpload({ value, onChange, label }: { value: string; onChange: (url: string) => void; label: string }) {
   const [uploading, setUploading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -110,32 +74,31 @@ function ImageUpload({ value, onChange, label }: { value: string; onChange: (url
   }
 
   return (
-    <div className="space-y-2">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <div className="flex gap-2 items-center">
-        <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="URL ảnh..." className="text-sm flex-1" />
-        <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <label className="dh-label">{label}</label>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="URL ảnh..."
+          className="dh-input" style={{ flex: 1 }} />
+        <button type="button" className="dh-btn dh-btn-secondary dh-btn-sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
           {uploading ? <Loader2Icon size={14} className="animate-spin" /> : <UploadIcon size={14} />}
-        </Button>
-        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
       </div>
       {value && (
-        <div className="w-16 h-12 rounded border overflow-hidden bg-muted flex items-center justify-center">
-          <img src={value} alt="" className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+        <div style={{ width: 64, height: 48, borderRadius: 6, overflow: 'hidden', border: '1px solid var(--color-gray-border)', background: 'var(--color-gray-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src={value} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
         </div>
       )}
     </div>
   )
 }
 
-// ─── HERO EDITOR ─────────────────────────────────────────────────────────────
 function HeroEditor() {
   const [data, setData] = useState<HeroData>({ title: emptyMultiLang(), title2: emptyMultiLang(), subtitle: emptyMultiLang() })
   const [lang, setLang] = useState<LocaleKey>('vi')
   const [saving, setSaving] = useState(false)
-  const { success: toastOk, error: toastErr } = useToast()
-
   const [loading, setLoading] = useState(true)
+  const { success: toastOk, error: toastErr } = useToast()
 
   useEffect(() => {
     fetch('/api/homepage/hero').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setData(r.data) }).catch(() => {}).finally(() => setLoading(false))
@@ -150,33 +113,32 @@ function HeroEditor() {
     } finally { setSaving(false) }
   }
 
-  if (loading) return <div className="flex items-center gap-2 text-muted-foreground p-8"><Loader2Icon size={16} className="animate-spin" />Đang tải...</div>
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-gray-text)', padding: 32 }}>
+      <Loader2Icon size={16} className="animate-spin" />Đang tải...
+    </div>
+  )
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 className="font-semibold">Banner trang chủ</h3>
-          <p className="text-sm text-muted-foreground">Chỉnh sửa nội dung hiển thị trên banner chính</p>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Banner trang chủ</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Chỉnh sửa nội dung hiển thị trên banner chính</p>
         </div>
-        <Button onClick={save} disabled={saving} size="sm" className="gap-2">
-          {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}
-          Lưu thay đổi
-        </Button>
+        <button onClick={save} disabled={saving} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
+          {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu thay đổi
+        </button>
       </div>
-
-      {/* Preview */}
-      <div className="rounded-xl overflow-hidden bg-gradient-to-br from-[#1a2030] to-[#2f3441] p-8 text-center space-y-2">
-        <p className="text-white font-black text-3xl tracking-tighter">{data.title[lang] || 'BRINGING MUSIC'}</p>
-        <p className="font-black text-3xl tracking-tighter" style={{ background: 'linear-gradient(90deg,#ff6900,#ffaa44)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+      <div style={{ borderRadius: 10, overflow: 'hidden', background: 'linear-gradient(135deg, #1a2030, #2f3441)', padding: 32, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <p style={{ color: 'white', fontWeight: 900, fontSize: 24, letterSpacing: '-0.03em' }}>{data.title[lang] || 'BRINGING MUSIC'}</p>
+        <p style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-0.03em', background: 'linear-gradient(90deg,#ff6900,#ffaa44)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           {data.title2[lang] || 'TO THE WORLD'}
         </p>
-        <p className="text-white/70 text-sm max-w-md mx-auto">{data.subtitle[lang] || 'Subtitle...'}</p>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, maxWidth: 400, margin: '0 auto' }}>{data.subtitle[lang] || 'Subtitle...'}</p>
       </div>
-
       <LangTabs activeLang={lang} onChange={setLang} />
-
-      <div className="grid gap-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <MLField label="Tiêu đề dòng 1 (màu trắng)" value={data.title} onChange={(v) => setData(d => ({ ...d, title: v }))} lang={lang} />
         <MLField label="Tiêu đề dòng 2 (màu cam)" value={data.title2} onChange={(v) => setData(d => ({ ...d, title2: v }))} lang={lang} />
         <MLField label="Phụ đề" value={data.subtitle} onChange={(v) => setData(d => ({ ...d, subtitle: v }))} multiline lang={lang} />
@@ -185,7 +147,6 @@ function HeroEditor() {
   )
 }
 
-// ─── SERVICES EDITOR ─────────────────────────────────────────────────────────
 function ServicesEditor() {
   const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<ServiceItem[]>([])
@@ -212,14 +173,14 @@ function ServicesEditor() {
     try {
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/services' : `/api/homepage/services/${editItem._id}`
-      const method = isNew ? 'POST' : 'PUT'
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
+      const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
       if (res.ok) { toastOk(isNew ? 'Đã thêm dịch vụ!' : 'Đã cập nhật!'); fetchItems(); setEditItem(null) }
       else toastErr('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
+    if (!confirm('Xóa dịch vụ này?')) return
     const res = await fetch(`/api/homepage/services/${id}`, { method: 'DELETE' })
     if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
@@ -230,91 +191,79 @@ function ServicesEditor() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 className="font-semibold">Dịch vụ của chúng tôi</h3>
-          <p className="text-sm text-muted-foreground">Quản lý các dịch vụ hiển thị trên trang chủ</p>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Dịch vụ của chúng tôi</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Quản lý các dịch vụ hiển thị trên trang chủ</p>
         </div>
-        <Button onClick={openNew} size="sm" className="gap-2"><PlusIcon size={14} />Thêm dịch vụ</Button>
+        <button onClick={openNew} className="dh-btn dh-btn-primary dh-btn-sm gap-2"><PlusIcon size={14} />Thêm dịch vụ</button>
       </div>
 
       {loading ? (
-        <div className="flex items-center gap-2 text-muted-foreground p-4"><Loader2Icon size={16} className="animate-spin" />Đang tải...</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-gray-text)', padding: 16 }}>
+          <Loader2Icon size={16} className="animate-spin" />Đang tải...
+        </div>
       ) : (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {items.map((item) => (
-            <div key={item._id} className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:bg-muted/30 transition-colors">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-mono text-primary">{item.order + 1}</div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{item.title.vi || '(Chưa có tiêu đề VI)'}</p>
-                <p className="text-xs text-muted-foreground truncate">{item.title.en || '(Chưa có tiêu đề EN)'}</p>
+            <div key={item._id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: '1px solid var(--color-gray-border)', borderRadius: 10, background: 'white', transition: 'background 0.15s' }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-navy-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'monospace', color: 'var(--color-navy)', fontWeight: 700 }}>{item.order + 1}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-navy-deep)' }}>{item.title.vi || '(Chưa có tiêu đề VI)'}</p>
+                <p style={{ fontSize: 11, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title.en || '(Chưa có tiêu đề EN)'}</p>
               </div>
-              <Badge variant={item.active ? 'default' : 'secondary'} className="text-xs">{item.active ? 'Hiện' : 'Ẩn'}</Badge>
-              <Switch checked={item.active} onCheckedChange={() => toggleActive(item)} />
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditItem(item); setLang('vi') }}>
-                <PencilIcon size={14} />
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive"><Trash2Icon size={14} /></Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader><AlertDialogTitle>Xóa dịch vụ?</AlertDialogTitle><AlertDialogDescription>Hành động này không thể hoàn tác.</AlertDialogDescription></AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Hủy</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => deleteItem(item._id)}>Xóa</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <span className={`dh-badge ${item.active ? 'dh-badge-green' : 'dh-badge-gray'}`}>{item.active ? 'Hiện' : 'Ẩn'}</span>
+              <button onClick={() => toggleActive(item)} className={`dh-toggle ${item.active ? 'on' : 'off'}`}><span className="dh-toggle-knob" /></button>
+              <button className="dh-btn-icon" onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={14} /></button>
+              <button className="dh-btn-icon" onClick={() => deleteItem(item._id)} style={{ color: '#ef4444' }}><Trash2Icon size={14} /></button>
             </div>
           ))}
-          {items.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Chưa có dịch vụ nào. Thêm dịch vụ đầu tiên!</p>}
+          {items.length === 0 && <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '32px 0' }}>Chưa có dịch vụ nào. Thêm dịch vụ đầu tiên!</p>}
         </div>
       )}
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border-[#E5E8ED]">
-          <DialogHeader><DialogTitle>{editItem?._id ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'}</DialogTitle></DialogHeader>
-          {editItem && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Icon</Label>
+      {editItem && (
+        <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setEditItem(null) }}>
+          <div className="dh-modal" style={{ maxWidth: 640 }}>
+            <div className="dh-modal-header">
+              <h3 className="dh-modal-title">{editItem._id ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'}</h3>
+            </div>
+            <div className="dh-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label className="dh-label">Icon</label>
                   <select value={editItem.iconKey} onChange={(e) => setEditItem(i => i ? { ...i, iconKey: e.target.value } : i)}
-                    className="w-full h-10 rounded-lg border border-[#E5E8ED] bg-white px-3 text-sm text-[#1A1F2E] focus-visible:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 transition-colors">
+                    className="dh-input">
                     {ICON_KEYS.map(k => <option key={k} value={k}>{k}</option>)}
                   </select>
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Thứ tự</Label>
-                  <Input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label className="dh-label">Thứ tự</label>
+                  <input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="dh-input" />
                 </div>
               </div>
               <LangTabs activeLang={lang} onChange={setLang} />
               <MLField label="Tên dịch vụ" value={editItem.title} onChange={(v) => setEditItem(i => i ? { ...i, title: v } : i)} lang={lang} />
               <MLField label="Mô tả" value={editItem.desc} onChange={(v) => setEditItem(i => i ? { ...i, desc: v } : i)} multiline lang={lang} />
-              <div className="flex items-center gap-2">
-                <Switch checked={editItem.active} onCheckedChange={(v) => setEditItem(i => i ? { ...i, active: v } : i)} />
-                <Label className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10">Hiển thị</Label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button onClick={() => setEditItem(i => i ? { ...i, active: !i.active } : i)} className={`dh-toggle ${editItem.active ? 'on' : 'off'}`}><span className="dh-toggle-knob" /></button>
+                <label className="dh-label" style={{ marginBottom: 0 }}>Hiển thị</label>
               </div>
             </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditItem(null)}>Hủy</Button>
-            <Button onClick={saveItem} disabled={saving} className="gap-2">
-              {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}
-              Lưu
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="dh-modal-footer">
+              <button onClick={() => setEditItem(null)} className="dh-btn dh-btn-secondary">Hủy</button>
+              <button onClick={saveItem} disabled={saving} className="dh-btn dh-btn-primary gap-2">
+                {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-// ─── ACHIEVEMENTS EDITOR ─────────────────────────────────────────────────────
 function AchievementsEditor() {
   const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<AchievementItem[]>([])
@@ -342,84 +291,79 @@ function AchievementsEditor() {
   }
 
   async function deleteItem(id: string) {
+    if (!confirm('Xóa thành tựu này?')) return
     const res = await fetch(`/api/homepage/achievements/${id}`, { method: 'DELETE' })
     if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
 
-  const TONES = ['wm-stat-orange', 'wm-stat-teal', 'wm-stat-indigo', 'wm-stat-navy']
+  const BAR_COLORS = ['#f97316', '#00A98F', 'var(--color-indigo)', 'var(--color-navy)']
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 className="font-semibold">Thành tựu</h3>
-          <p className="text-sm text-muted-foreground">Quản lý các chỉ số thành tựu</p>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Thành tựu</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Quản lý các chỉ số thành tựu</p>
         </div>
-        <Button onClick={() => setEditItem({ _id: '', order: items.length, value: 0, label: emptyMultiLang(), active: true })} size="sm" className="gap-2">
+        <button onClick={() => setEditItem({ _id: '', order: items.length, value: 0, label: emptyMultiLang(), active: true })} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
           <PlusIcon size={14} />Thêm
-        </Button>
+        </button>
       </div>
 
-      {loading ? <div className="flex items-center gap-2 text-muted-foreground p-4"><Loader2Icon size={16} className="animate-spin" />Đang tải...</div>
-        : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {items.map((item, i) => (
-              <div key={item._id} className="relative border rounded-xl p-4 bg-card text-center space-y-2 group">
-                <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${['bg-orange-500','bg-teal-500','bg-indigo-500','bg-blue-800'][i % 4]}`} />
-                <p className="text-3xl font-bold font-mono text-foreground">{item.value}<span className="text-primary text-lg">+</span></p>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">{item.label.vi}</p>
-                <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={12} /></Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive"><Trash2Icon size={12} /></Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader><AlertDialogTitle>Xóa thành tựu?</AlertDialogTitle></AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Hủy</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => deleteItem(item._id)}>Xóa</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+      {loading ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-gray-text)', padding: 16 }}>
+          <Loader2Icon size={16} className="animate-spin" />Đang tải...
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {items.map((item, i) => (
+            <div key={item._id} style={{ position: 'relative', border: '1px solid var(--color-gray-border)', borderRadius: 10, padding: 16, background: 'white', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}
+              className="group">
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: '10px 10px 0 0', background: BAR_COLORS[i % 4] }} />
+              <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'monospace', color: 'var(--color-navy-deep)' }}>{item.value}<span style={{ color: 'var(--color-navy)', fontSize: 16 }}>+</span></p>
+              <p style={{ fontSize: 10, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{item.label.vi}</p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 4, opacity: 0, transition: 'opacity 0.15s' }} className="group-hover-show">
+                <button className="dh-btn-icon" style={{ width: 24, height: 24 }} onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={12} /></button>
+                <button className="dh-btn-icon" style={{ width: 24, height: 24, color: '#ef4444' }} onClick={() => deleteItem(item._id)}><Trash2Icon size={12} /></button>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
 
-      <Dialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border-[#E5E8ED]">
-          <DialogHeader><DialogTitle>{editItem?._id ? 'Chỉnh sửa thành tựu' : 'Thêm thành tựu mới'}</DialogTitle></DialogHeader>
-          {editItem && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Số liệu</Label>
-                  <Input type="number" value={editItem.value} onChange={(e) => setEditItem(i => i ? { ...i, value: +e.target.value } : i)} className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10" />
+      {editItem && (
+        <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setEditItem(null) }}>
+          <div className="dh-modal" style={{ maxWidth: 480 }}>
+            <div className="dh-modal-header">
+              <h3 className="dh-modal-title">{editItem._id ? 'Chỉnh sửa thành tựu' : 'Thêm thành tựu mới'}</h3>
+            </div>
+            <div className="dh-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label className="dh-label">Số liệu</label>
+                  <input type="number" value={editItem.value} onChange={(e) => setEditItem(i => i ? { ...i, value: +e.target.value } : i)} className="dh-input" />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Thứ tự</Label>
-                  <Input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label className="dh-label">Thứ tự</label>
+                  <input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="dh-input" />
                 </div>
               </div>
               <LangTabs activeLang={lang} onChange={setLang} />
               <MLField label="Nhãn" value={editItem.label} onChange={(v) => setEditItem(i => i ? { ...i, label: v } : i)} lang={lang} />
             </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditItem(null)}>Hủy</Button>
-            <Button onClick={saveItem} disabled={saving} className="gap-2">
-              {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="dh-modal-footer">
+              <button onClick={() => setEditItem(null)} className="dh-btn dh-btn-secondary">Hủy</button>
+              <button onClick={saveItem} disabled={saving} className="dh-btn dh-btn-primary gap-2">
+                {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-// ─── PARTNERS EDITOR ─────────────────────────────────────────────────────────
 function PartnersEditor() {
   const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems] = useState<PartnerItem[]>([])
@@ -446,84 +390,80 @@ function PartnersEditor() {
   }
 
   async function deleteItem(id: string) {
+    if (!confirm(`Xóa đối tác "${items.find(i => i._id === id)?.name}"?`)) return
     const res = await fetch(`/api/homepage/partners/${id}`, { method: 'DELETE' })
     if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 className="font-semibold">Đối tác của chúng tôi</h3>
-          <p className="text-sm text-muted-foreground">Quản lý logo đối tác hiển thị trên trang chủ</p>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Đối tác của chúng tôi</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Quản lý logo đối tác hiển thị trên trang chủ</p>
         </div>
-        <Button onClick={() => setEditItem({ _id: '', order: items.length, name: '', logo: '', active: true })} size="sm" className="gap-2">
+        <button onClick={() => setEditItem({ _id: '', order: items.length, name: '', logo: '', active: true })} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
           <PlusIcon size={14} />Thêm đối tác
-        </Button>
+        </button>
       </div>
 
-      {loading ? <div className="flex items-center gap-2 text-muted-foreground p-4"><Loader2Icon size={16} className="animate-spin" />Đang tải...</div> : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      {loading ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-gray-text)', padding: 16 }}>
+          <Loader2Icon size={16} className="animate-spin" />Đang tải...
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
           {items.map((item) => (
-            <div key={item._id} className="relative border rounded-xl p-3 bg-card flex flex-col items-center gap-2 group hover:shadow-md transition-shadow">
-              {!item.active && <div className="absolute inset-0 bg-background/60 rounded-xl flex items-center justify-center"><Badge variant="secondary" className="text-xs">Ẩn</Badge></div>}
-              <div className="w-16 h-10 flex items-center justify-center">
-                {item.logo ? <img src={item.logo} alt={item.name} className="w-full h-full object-contain" /> : <ImageIcon size={24} className="text-muted-foreground" />}
+            <div key={item._id} style={{ position: 'relative', border: '1px solid var(--color-gray-border)', borderRadius: 10, padding: 12, background: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, transition: 'box-shadow 0.15s' }}
+              className="group">
+              {!item.active && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="dh-badge dh-badge-gray">Ẩn</span></div>}
+              <div style={{ width: 64, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {item.logo ? <img src={item.logo} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <ImageIcon size={24} style={{ color: '#94a3b8' }} />}
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium truncate w-full">{item.name || 'Chưa đặt tên'}</p>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditItem(item)}><PencilIcon size={12} /></Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive"><Trash2Icon size={12} /></Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader><AlertDialogTitle>Xóa đối tác "{item.name}"?</AlertDialogTitle></AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Hủy</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteItem(item._id)}>Xóa</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+              <p style={{ fontSize: 11, textAlign: 'center', color: 'var(--color-gray-text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{item.name || 'Chưa đặt tên'}</p>
+              <div style={{ display: 'flex', gap: 4, opacity: 0, transition: 'opacity 0.15s' }} className="group-hover-show">
+                <button className="dh-btn-icon" style={{ width: 24, height: 24 }} onClick={() => setEditItem(item)}><PencilIcon size={12} /></button>
+                <button className="dh-btn-icon" style={{ width: 24, height: 24, color: '#ef4444' }} onClick={() => deleteItem(item._id)}><Trash2Icon size={12} /></button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <Dialog open={!!editItem} onOpenChange={(o) => !o && setEditItem(null)}>
-        <DialogContent className="sm:max-w-xl rounded-2xl shadow-2xl border-[#E5E8ED]">
-          <DialogHeader><DialogTitle>{editItem?._id ? 'Chỉnh sửa đối tác' : 'Thêm đối tác mới'}</DialogTitle></DialogHeader>
-          {editItem && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Tên đối tác</Label>
-                <Input value={editItem.name} onChange={(e) => setEditItem(i => i ? { ...i, name: e.target.value } : i)} placeholder="YouTube, Facebook..." className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10" />
+      {editItem && (
+        <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setEditItem(null) }}>
+          <div className="dh-modal" style={{ maxWidth: 480 }}>
+            <div className="dh-modal-header">
+              <h3 className="dh-modal-title">{editItem._id ? 'Chỉnh sửa đối tác' : 'Thêm đối tác mới'}</h3>
+            </div>
+            <div className="dh-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label className="dh-label">Tên đối tác</label>
+                <input value={editItem.name} onChange={(e) => setEditItem(i => i ? { ...i, name: e.target.value } : i)} placeholder="YouTube, Facebook..." className="dh-input" />
               </div>
               <ImageUpload value={editItem.logo} onChange={(url) => setEditItem(i => i ? { ...i, logo: url } : i)} label="Logo" />
-              <div className="space-y-1.5">
-                <Label className="text-xs">Thứ tự</Label>
-                <Input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label className="dh-label">Thứ tự</label>
+                <input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="dh-input" />
               </div>
-              <div className="flex items-center gap-2">
-                <Switch checked={editItem.active} onCheckedChange={(v) => setEditItem(i => i ? { ...i, active: v } : i)} />
-                <Label className="text-sm h-10 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-[#6366F1] focus-visible:ring-2 focus-visible:ring-[#6366F1]/10">Hiển thị</Label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button onClick={() => setEditItem(i => i ? { ...i, active: !i.active } : i)} className={`dh-toggle ${editItem.active ? 'on' : 'off'}`}><span className="dh-toggle-knob" /></button>
+                <label className="dh-label" style={{ marginBottom: 0 }}>Hiển thị</label>
               </div>
             </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditItem(null)}>Hủy</Button>
-            <Button onClick={saveItem} disabled={saving} className="gap-2">
-              {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="dh-modal-footer">
+              <button onClick={() => setEditItem(null)} className="dh-btn dh-btn-secondary">Hủy</button>
+              <button onClick={saveItem} disabled={saving} className="dh-btn dh-btn-primary gap-2">
+                {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-// ─── POSTS EDITOR ─────────────────────────────────────────────────────────────
 function PostsEditor() {
   const { success: toastOk, error: toastErr } = useToast()
   const [items, setItems]           = useState<PostItem[]>([])
@@ -566,198 +506,142 @@ function PostsEditor() {
       const data = await res.json()
       if (res.ok) toastOk('Đã lưu cấu hình bài viết!')
       else toastErr(data?.error ?? `Lỗi lưu cấu hình (${res.status})`)
-    } catch (err) {
-      toastErr('Không kết nối được server')
+    } catch { toastErr('Không kết nối được server')
     } finally { setSaving(false) }
   }
 
-  // Auto = N bài mới nhất đang active; Manual = các bài đã chọn
   const displayedItems = mode === 'auto'
     ? items.filter(i => i.active).slice(0, limit)
     : items.filter(i => selectedIds.has(i._id))
 
   return (
-    <div className="space-y-6">
-
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h3 className="font-semibold text-[#0f172a]">Bài viết trang chủ</h3>
-          <p className="text-sm text-[#64748b] mt-0.5">Chọn cách hiển thị bài viết trên trang chủ</p>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Bài viết trang chủ</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Chọn cách hiển thị bài viết trên trang chủ</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5 border-[#E5E8ED] text-[#64748b] hover:text-green-700" asChild>
-            <a href="/admin/posts" target="_blank" rel="noreferrer">
-              <ExternalLinkIcon size={13} />Quản lý bài viết
-            </a>
-          </Button>
-          <Button onClick={saveConfig} disabled={saving || cfgLoading} size="sm" className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-            {saving ? <Loader2Icon size={13} className="animate-spin" /> : <SaveIcon size={13} />}
-            Lưu cấu hình
-          </Button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a href="/admin/posts" target="_blank" rel="noreferrer" className="dh-btn dh-btn-secondary dh-btn-sm gap-2">
+            <ExternalLinkIcon size={13} />Quản lý bài viết
+          </a>
+          <button onClick={saveConfig} disabled={saving || cfgLoading} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
+            {saving ? <Loader2Icon size={13} className="animate-spin" /> : <SaveIcon size={13} />}Lưu cấu hình
+          </button>
         </div>
       </div>
 
       {/* Mode selector */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Auto */}
-        <button
-          onClick={() => setMode('auto')}
-          className={`relative flex flex-col gap-2 rounded-xl border-2 p-4 text-left transition-all ${
-            mode === 'auto'
-              ? 'border-green-500 bg-green-50 shadow-sm'
-              : 'border-[#E5E8ED] bg-white hover:border-green-300 hover:bg-green-50/40'
-          }`}
-        >
-          {mode === 'auto' && (
-            <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
-              <CheckCircle2Icon size={12} />
-            </span>
-          )}
-          <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${mode === 'auto' ? 'bg-green-500 text-white' : 'bg-[#F1F5F9] text-[#64748b]'}`}>
-            <ZapIcon size={18} />
-          </div>
-          <div>
-            <p className={`text-sm font-semibold ${mode === 'auto' ? 'text-green-700' : 'text-[#0f172a]'}`}>Tự động</p>
-            <p className="text-xs text-[#64748b] mt-0.5 leading-relaxed">Tự động lấy <strong>N bài mới nhất</strong> đang kích hoạt để hiển thị</p>
-          </div>
-        </button>
-
-        {/* Manual */}
-        <button
-          onClick={() => setMode('manual')}
-          className={`relative flex flex-col gap-2 rounded-xl border-2 p-4 text-left transition-all ${
-            mode === 'manual'
-              ? 'border-green-500 bg-green-50 shadow-sm'
-              : 'border-[#E5E8ED] bg-white hover:border-green-300 hover:bg-green-50/40'
-          }`}
-        >
-          {mode === 'manual' && (
-            <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
-              <CheckCircle2Icon size={12} />
-            </span>
-          )}
-          <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${mode === 'manual' ? 'bg-green-500 text-white' : 'bg-[#F1F5F9] text-[#64748b]'}`}>
-            <ListIcon size={18} />
-          </div>
-          <div>
-            <p className={`text-sm font-semibold ${mode === 'manual' ? 'text-green-700' : 'text-[#0f172a]'}`}>Chọn danh sách</p>
-            <p className="text-xs text-[#64748b] mt-0.5 leading-relaxed">Tự tay chọn từng bài viết muốn hiển thị trên trang chủ</p>
-          </div>
-        </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        {[
+          { v: 'auto' as const, label: 'Tự động', desc: 'Tự động lấy N bài mới nhất đang kích hoạt để hiển thị', icon: ZapIcon },
+          { v: 'manual' as const, label: 'Chọn danh sách', desc: 'Tự tay chọn từng bài viết muốn hiển thị trên trang chủ', icon: ListIcon },
+        ].map(({ v, label, desc, icon: Icon }) => (
+          <button key={v} onClick={() => setMode(v)} style={{
+            position: 'relative', display: 'flex', flexDirection: 'column', gap: 8,
+            borderRadius: 10, border: `2px solid ${mode === v ? 'var(--color-navy)' : 'var(--color-gray-border)'}`,
+            padding: 16, textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s',
+            background: mode === v ? 'var(--color-navy-pale)' : 'white',
+          }}>
+            {mode === v && (
+              <span style={{ position: 'absolute', top: 10, right: 10, width: 20, height: 20, borderRadius: '50%', background: 'var(--color-navy)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle2Icon size={12} />
+              </span>
+            )}
+            <div style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: mode === v ? 'var(--color-navy)' : 'var(--color-gray-light)', color: mode === v ? 'white' : 'var(--color-gray-text)' }}>
+              <Icon size={18} />
+            </div>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: mode === v ? 'var(--color-navy)' : 'var(--color-navy-deep)' }}>{label}</p>
+              <p style={{ fontSize: 11, color: 'var(--color-gray-text)', marginTop: 2, lineHeight: 1.5 }}>{desc}</p>
+            </div>
+          </button>
+        ))}
       </div>
 
-      {/* Limit input — only in auto mode */}
+      {/* Limit input — auto mode only */}
       {mode === 'auto' && (
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-[#E5E8ED]">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-[#374151]">Số bài hiển thị tối đa</p>
-            <p className="text-xs text-[#94a3b8] mt-0.5">Hiển thị tối đa bao nhiêu bài trên trang chủ (1–20)</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, borderRadius: 10, background: 'white', border: '1px solid var(--color-gray-border)' }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-navy-deep)' }}>Số bài hiển thị tối đa</p>
+            <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Hiển thị tối đa bao nhiêu bài trên trang chủ (1–20)</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setLimit(l => Math.max(1, l - 1))}
-              className="h-9 w-9 rounded-lg border border-[#E5E8ED] bg-white text-[#374151] font-bold text-lg hover:border-green-400 hover:text-green-600 transition-colors flex items-center justify-center"
-            >−</button>
-            <input
-              type="number" min={1} max={20}
-              value={limit}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button onClick={() => setLimit(l => Math.max(1, l - 1))}
+              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid var(--color-gray-border)', background: 'white', color: 'var(--color-navy-deep)', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+            <input type="number" min={1} max={20} value={limit}
               onChange={e => setLimit(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
-              className="w-16 h-9 text-center rounded-lg border border-[#E5E8ED] bg-white text-[#0f172a] font-bold text-base focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/10"
-            />
-            <button
-              onClick={() => setLimit(l => Math.min(20, l + 1))}
-              className="h-9 w-9 rounded-lg border border-[#E5E8ED] bg-white text-[#374151] font-bold text-lg hover:border-green-400 hover:text-green-600 transition-colors flex items-center justify-center"
-            >+</button>
+              style={{ width: 64, height: 36, textAlign: 'center', borderRadius: 8, border: '1px solid var(--color-gray-border)', background: 'white', color: 'var(--color-navy-deep)', fontWeight: 700, fontSize: 14, outline: 'none' }} />
+            <button onClick={() => setLimit(l => Math.min(20, l + 1))}
+              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid var(--color-gray-border)', background: 'white', color: 'var(--color-navy-deep)', fontWeight: 700, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
           </div>
         </div>
       )}
 
       {/* Post list */}
       {loading ? (
-        <div className="flex items-center gap-2 text-[#94a3b8] py-6">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#94a3b8', padding: '24px 0' }}>
           <Loader2Icon size={16} className="animate-spin" />Đang tải danh sách bài viết...
         </div>
       ) : (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs font-medium text-[#64748b]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--color-gray-text)' }}>
               {mode === 'auto'
                 ? `Sẽ hiển thị ${displayedItems.length} bài mới nhất (active) đầu tiên`
                 : `Đã chọn ${selectedIds.size} / ${items.length} bài`}
             </p>
             {mode === 'manual' && items.length > 0 && (
-              <button
-                onClick={() => setSelectedIds(selectedIds.size === items.length ? new Set() : new Set(items.map(i => i._id)))}
-                className="text-xs text-green-600 hover:underline"
-              >
+              <button onClick={() => setSelectedIds(selectedIds.size === items.length ? new Set() : new Set(items.map(i => i._id)))}
+                style={{ fontSize: 11, color: 'var(--color-navy)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
                 {selectedIds.size === items.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
               </button>
             )}
           </div>
 
           {items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#E5E8ED] py-10 text-center">
-              <FileTextIcon size={28} className="text-[#94a3b8] mx-auto mb-2" strokeWidth={1.5} />
-              <p className="text-sm text-[#94a3b8]">Chưa có bài viết nào</p>
-              <a href="/admin/posts" className="text-xs text-green-600 hover:underline mt-1 inline-block">
-                → Tạo bài viết mới
-              </a>
+            <div style={{ borderRadius: 10, border: '2px dashed var(--color-gray-border)', padding: '40px 0', textAlign: 'center' }}>
+              <FileTextIcon size={28} style={{ color: '#94a3b8', margin: '0 auto 8px', display: 'block' }} strokeWidth={1.5} />
+              <p style={{ fontSize: 13, color: '#94a3b8' }}>Chưa có bài viết nào</p>
+              <a href="/admin/posts" style={{ fontSize: 11, color: 'var(--color-navy)', marginTop: 4, display: 'inline-block' }}>→ Tạo bài viết mới</a>
             </div>
           ) : (
-            <div className="rounded-xl border border-[#E5E8ED] overflow-hidden divide-y divide-[#F1F5F9]">
-              {items.map(item => {
+            <div style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', overflow: 'hidden' }}>
+              {items.map((item, idx) => {
                 const isSelected = selectedIds.has(item._id)
                 const isAutoShown = item.showOnHomepage && item.active
-
                 return (
-                  <div
-                    key={item._id}
-                    onClick={() => mode === 'manual' && toggleSelect(item._id)}
-                    className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                      mode === 'manual' ? 'cursor-pointer' : ''
-                    } ${
-                      mode === 'manual' && isSelected
-                        ? 'bg-green-50'
-                        : 'bg-white hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    {/* Checkbox / status */}
-                    <div className="flex-shrink-0">
+                  <div key={item._id} onClick={() => mode === 'manual' && toggleSelect(item._id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px',
+                      transition: 'background 0.1s',
+                      background: mode === 'manual' && isSelected ? 'var(--color-sky)' : 'white',
+                      cursor: mode === 'manual' ? 'pointer' : 'default',
+                      borderTop: idx > 0 ? '1px solid var(--color-gray-border)' : 'none',
+                    }}>
+                    <div style={{ flexShrink: 0 }}>
                       {mode === 'manual' ? (
                         isSelected
-                          ? <CheckSquareIcon size={18} className="text-green-500" />
-                          : <SquareIcon size={18} className="text-[#CBD5E1]" />
+                          ? <CheckSquareIcon size={18} style={{ color: 'var(--color-navy)' }} />
+                          : <SquareIcon size={18} style={{ color: '#CBD5E1' }} />
                       ) : (
-                        <div className={`h-2 w-2 rounded-full flex-shrink-0 ${isAutoShown ? 'bg-green-500' : 'bg-[#E2E8F0]'}`} />
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: isAutoShown ? 'var(--color-navy)' : '#E2E8F0' }} />
                       )}
                     </div>
-
-                    {/* Thumbnail */}
-                    <div className="w-11 h-9 rounded-lg overflow-hidden bg-[#F1F5F9] flex-shrink-0 flex items-center justify-center">
-                      {item.thumbnail
-                        ? <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
-                        : <ImageIcon size={14} className="text-[#94a3b8]" />}
+                    <div style={{ width: 44, height: 36, borderRadius: 8, overflow: 'hidden', background: 'var(--color-gray-light)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {item.thumbnail ? <img src={item.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={14} style={{ color: '#94a3b8' }} />}
                     </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#0f172a] truncate">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-navy-deep)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {item.title?.vi || '(Chưa có tiêu đề)'}
                       </p>
-                      <p className="text-xs text-[#94a3b8] font-mono truncate">{item.slug} · {item.date}</p>
+                      <p style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.slug} · {item.date}</p>
                     </div>
-
-                    {/* Badge */}
-                    <Badge
-                      variant="outline"
-                      className={`text-xs flex-shrink-0 ${item.type === 'blog' ? 'border-blue-200 text-blue-600 bg-blue-50' : 'border-orange-200 text-orange-600 bg-orange-50'}`}
-                    >
+                    <span className={`dh-badge ${item.type === 'blog' ? 'dh-badge-indigo' : 'dh-badge-yellow'}`} style={{ flexShrink: 0 }}>
                       {item.type === 'blog' ? 'Blog' : 'Tuyển dụng'}
-                    </Badge>
-
+                    </span>
                     {mode === 'auto' && (
-                      <span className={`text-xs font-medium flex-shrink-0 ${isAutoShown ? 'text-green-600' : 'text-[#94a3b8]'}`}>
+                      <span style={{ fontSize: 11, fontWeight: 500, flexShrink: 0, color: isAutoShown ? 'var(--color-teal-dark)' : '#94a3b8' }}>
                         {isAutoShown ? '✓ Hiển thị' : '— Ẩn'}
                       </span>
                     )}
@@ -769,9 +653,8 @@ function PostsEditor() {
         </div>
       )}
 
-      {/* Preview count */}
       {!loading && displayedItems.length > 0 && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F0FDF4] border border-green-100 text-sm text-green-700">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderRadius: 10, background: 'var(--color-navy-pale)', border: '1px solid rgba(15,76,129,0.15)', fontSize: 13, color: 'var(--color-navy)' }}>
           <CheckCircle2Icon size={15} />
           <span>Trang chủ sẽ hiển thị <strong>{displayedItems.length}</strong> bài viết</span>
         </div>
@@ -780,64 +663,49 @@ function PostsEditor() {
   )
 }
 
-// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 function HomepageAdminInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const tab = searchParams.get('tab') ?? 'hero'
 
-  
-  const { success: toastOk, error: toastErr } = useToast()
-  function showToast(msg: string, type: 'success' | 'error') {
-    type === 'success' ? toastOk(msg) : toastErr(msg)
-  }
-
   const TAB_ITEMS = [
-    { value: 'hero',         label: 'Banner',    icon: LayoutIcon },
+    { value: 'hero',         label: 'Banner',    icon: LayoutIcon    },
     { value: 'services',     label: 'Dịch vụ',   icon: BriefcaseIcon },
-    { value: 'achievements', label: 'Thành tựu', icon: TrophyIcon },
-    { value: 'partners',     label: 'Đối tác',   icon: UsersIcon },
-    { value: 'posts',        label: 'Bài viết',  icon: FileTextIcon },
+    { value: 'achievements', label: 'Thành tựu', icon: TrophyIcon    },
+    { value: 'partners',     label: 'Đối tác',   icon: UsersIcon     },
+    { value: 'posts',        label: 'Bài viết',  icon: FileTextIcon  },
   ]
 
   return (
-    <div className="p-6 max-w-12xl space-y-6">
-
-      {/* Page header */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-600">
-          <GlobeIcon size={20} />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">Nội dung trang chủ</h1>
-          <p className="text-xs text-[#64748b] mt-0.5">Đa ngôn ngữ · VI / EN / KO / JA / ZH</p>
+    <div className="p-6 space-y-6">
+      <div className="dh-page-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-navy-pale)', color: 'var(--color-navy)' }}>
+            <GlobeIcon size={20} />
+          </div>
+          <div>
+            <h1 className="dh-page-title">Nội dung trang chủ</h1>
+            <p className="dh-page-desc">Đa ngôn ngữ · VI / EN</p>
+          </div>
         </div>
       </div>
 
-      {/* Tab card */}
-      <div className="rounded-2xl bg-white border border-[#e5e8ed] shadow-sm overflow-hidden">
-
-        {/* Tab bar — pure div, guaranteed full width */}
-        <div className="flex w-full border-b border-[#e5e8ed]">
+      <div className="dh-card" style={{ overflow: 'hidden', padding: 0 }}>
+        <div style={{ display: 'flex', width: '100%', borderBottom: '1px solid var(--color-gray-border)' }}>
           {TAB_ITEMS.map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              onClick={() => router.push(`/admin/homepage?tab=${value}`)}
-              className={[
-                'flex-1 relative flex items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors duration-150',
-                'hover:text-green-700 hover:bg-green-50/60',
-                tab === value
-                  ? 'text-green-700 font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-green-500 after:rounded-t-full'
-                  : 'text-[#64748b]',
-              ].join(' ')}
-            >
+            <button key={value} onClick={() => router.push(`/admin/homepage?tab=${value}`)}
+              style={{
+                flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 6, padding: '14px 0', fontSize: 13, fontWeight: tab === value ? 600 : 500,
+                border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: 'transparent',
+                color: tab === value ? 'var(--color-navy)' : 'var(--color-gray-text)',
+                borderBottom: tab === value ? '3px solid var(--color-navy)' : '3px solid transparent',
+              }}>
               <Icon size={15} />{label}
             </button>
           ))}
         </div>
-
-        {/* Tab content */}
-        <div className="p-6">
+        <div style={{ padding: 24 }}>
           {tab === 'hero'         && <HeroEditor />}
           {tab === 'services'     && <ServicesEditor />}
           {tab === 'achievements' && <AchievementsEditor />}
@@ -845,14 +713,14 @@ function HomepageAdminInner() {
           {tab === 'posts'        && <PostsEditor />}
         </div>
       </div>
+
+      <style>{`
+        .group:hover .group-hover-show { opacity: 1 !important; }
+      `}</style>
     </div>
   )
 }
 
 export default function HomepageAdminPage() {
-  return (
-    <Suspense>
-      <HomepageAdminInner />
-    </Suspense>
-  )
+  return <Suspense><HomepageAdminInner /></Suspense>
 }

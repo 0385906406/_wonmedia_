@@ -1,7 +1,4 @@
 import { Resend } from 'resend'
-import { connectDB } from './mongodb'
-import Setting from '@/models/Setting'
-import ContactConfig from '@/models/ContactConfig'
 
 function escapeHtml(str: string): string {
   return str
@@ -19,22 +16,9 @@ export async function sendContactNotification(data: {
   message: string
 }) {
   try {
-    await connectDB()
-
-    const [setting, contact] = await Promise.all([
-      Setting.findOne({ key: 'global' }).lean() as Promise<{
-        integrations?: { resendApiKey?: string; resendFromEmail?: string; resendToEmail?: string }
-      } | null>,
-      ContactConfig.findOne({ key: 'global' }).lean() as Promise<{
-        email?: string
-      } | null>,
-    ])
-
-    const apiKey        = setting?.integrations?.resendApiKey?.trim()
-    const fromEmail     = setting?.integrations?.resendFromEmail?.trim() || 'onboarding@resend.dev'
-    const toEmail       = setting?.integrations?.resendToEmail?.trim()
-                        || contact?.email?.trim()
-                        || 'contact@wonmedia.vn'
+    const apiKey    = process.env.RESEND_API_KEY?.trim()
+    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'onboarding@resend.dev'
+    const toEmail   = process.env.RESEND_TO_EMAIL?.trim() || 'contact@wonmedia.vn'
 
     if (!apiKey) return { ok: false, reason: 'no_api_key' }
 

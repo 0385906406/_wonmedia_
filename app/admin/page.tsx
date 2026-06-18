@@ -39,32 +39,19 @@ function StatCard({
 }) {
   const router = useRouter()
   return (
-    <button
-      onClick={() => router.push(href)}
-      style={{
-        display: 'flex', flexDirection: 'column', gap: 16,
-        background: '#fff', borderRadius: 16, padding: '24px 24px 20px',
-        border: '1px solid #E5E8ED', textAlign: 'left', cursor: 'pointer',
-        boxShadow: '0 2px 8px rgba(15,76,129,0.06)',
-        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
-        width: '100%',
-      }}
-      className="stat-card"
+    <button onClick={() => router.push(href)} className="dh-stat-card stat-card"
+      style={{ display: 'flex', flexDirection: 'column', gap: 14, textAlign: 'left', cursor: 'pointer', width: '100%', border: '1px solid var(--color-gray-border)', boxShadow: '0 1px 4px rgba(15,76,129,0.05)', transition: 'transform 0.2s, box-shadow 0.2s' }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: color,
-        }}>
-          <Icon size={22} />
+        <div style={{ width: 42, height: 42, borderRadius: 11, background: color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', color }}>
+          <Icon size={20} />
         </div>
-        <ArrowRightIcon size={16} style={{ color: '#94a3b8', marginTop: 4 }} />
+        <ArrowRightIcon size={14} style={{ color: 'var(--color-gray-text)', marginTop: 4, opacity: 0.5 }} />
       </div>
       <div>
-        <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 6px', fontWeight: 500 }}>{label}</p>
-        <p style={{ fontSize: 32, fontWeight: 800, color: '#0b2a59', margin: 0, lineHeight: 1 }}>{value}</p>
-        {sub && <p style={{ fontSize: 12, color: '#94a3b8', margin: '6px 0 0', fontWeight: 500 }}>{sub}</p>}
+        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '0 0 5px', fontWeight: 500 }}>{label}</p>
+        <p className="dh-stat-value">{value}</p>
+        {sub && <p style={{ fontSize: 11, color: '#94a3b8', margin: '5px 0 0', fontWeight: 500 }}>{sub}</p>}
       </div>
     </button>
   )
@@ -74,17 +61,10 @@ function StatCard({
 function QuickAction({ label, icon: Icon, color, href }: { label: string; icon: React.ElementType; color: string; href: string }) {
   const router = useRouter()
   return (
-    <button onClick={() => router.push(href)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '12px 16px', borderRadius: 10,
-        border: '1.5px solid #E5E8ED', background: '#fff',
-        cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151',
-        transition: 'all 0.2s ease', width: '100%',
-      }}
-      className="quick-action"
+    <button onClick={() => router.push(href)} className="dh-btn dh-btn-secondary quick-action"
+      style={{ justifyContent: 'flex-start', width: '100%', gap: 10 }}
     >
-      <span style={{ color, flexShrink: 0 }}><Icon size={16} /></span>
+      <span style={{ color, flexShrink: 0 }}><Icon size={15} /></span>
       {label}
     </button>
   )
@@ -139,14 +119,14 @@ export default function DashboardPage() {
   )
 
   return (
-    <div style={{ padding: '24px', width: '100%', fontFamily: 'var(--font-vi, system-ui)' }}>
+    <div style={{ padding: '28px 24px', width: '100%' }}>
 
-      {/* ── Header ── */}
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0b2a59', margin: '0 0 4px', letterSpacing: '-0.4px' }}>
-          Bảng điều khiển
-        </h1>
-        <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>{today} · WON Media CMS</p>
+      {/* ── Page header ── */}
+      <div className="dh-page-header" style={{ marginBottom: 28 }}>
+        <div>
+          <h1 className="dh-page-title">Bảng điều khiển</h1>
+          <p className="dh-page-desc">{today} · WON Media CMS</p>
+        </div>
       </div>
 
       {/* ── Stats grid ── */}
@@ -161,16 +141,14 @@ export default function DashboardPage() {
       <div className="dash-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20 }}>
 
         {/* Left — Recent posts */}
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E8ED', overflow: 'hidden', boxShadow: '0 2px 8px rgba(15,76,129,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #F1F5F9' }}>
+        <div className="dh-card">
+          <div className="dh-card-header">
             <div>
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0b2a59', margin: 0 }}>Bài viết gần đây</h2>
-              <p style={{ fontSize: 12, color: '#94a3b8', margin: '2px 0 0' }}>Blog & Tuyển dụng</p>
+              <h2 className="dh-card-title">Bài viết gần đây</h2>
+              <p style={{ fontSize: 11, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>Blog & Tuyển dụng</p>
             </div>
-            <button onClick={() => router.push('/admin/posts')}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#15803d', background: 'none', border: 'none', cursor: 'pointer', padding: '6px 12px', borderRadius: 8, transition: 'background 0.2s' }}
-              className="view-all-btn">
-              Xem tất cả <ArrowRightIcon size={13} />
+            <button onClick={() => router.push('/admin/posts')} className="dh-btn dh-btn-sm dh-btn-secondary view-all-btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              Xem tất cả <ArrowRightIcon size={12} />
             </button>
           </div>
 
@@ -226,9 +204,9 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Quick actions */}
-          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E8ED', padding: '20px 20px', boxShadow: '0 2px 8px rgba(15,76,129,0.05)' }}>
-            <h2 style={{ fontSize: 14, fontWeight: 700, color: '#0b2a59', margin: '0 0 14px' }}>Thao tác nhanh</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="dh-card">
+            <div className="dh-card-header"><h2 className="dh-card-title">Thao tác nhanh</h2></div>
+            <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <QuickAction label="Tạo bài viết mới"     icon={PlusIcon}       color="#15803d" href="/admin/posts/new-post" />
               <QuickAction label="Quản lý trang chủ"    icon={GlobeIcon}      color="#0b2a59" href="/admin/homepage" />
               <QuickAction label="Trang giới thiệu"     icon={UsersIcon}      color="#7c3aed" href="/admin/gioi-thieu" />
@@ -238,11 +216,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent messages */}
-          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E5E8ED', overflow: 'hidden', boxShadow: '0 2px 8px rgba(15,76,129,0.05)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '1px solid #F1F5F9' }}>
-              <h2 style={{ fontSize: 14, fontWeight: 700, color: '#0b2a59', margin: 0 }}>Tin nhắn gần đây</h2>
-              <button onClick={() => router.push('/admin/lien-he?tab=inbox')}
-                style={{ fontSize: 11, fontWeight: 600, color: '#15803d', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <div className="dh-card">
+            <div className="dh-card-header">
+              <h2 className="dh-card-title">Tin nhắn gần đây</h2>
+              <button onClick={() => router.push('/admin/lien-he?tab=inbox')} className="dh-btn dh-btn-sm dh-btn-secondary">
                 Xem tất cả
               </button>
             </div>
@@ -306,11 +283,10 @@ export default function DashboardPage() {
       </div>
 
       <style>{`
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(15,76,129,0.12) !important; }
-        .quick-action:hover { border-color: #22c55e !important; background: #f0fdf4 !important; color: #15803d !important; }
-        .view-all-btn:hover { background: #f0fdf4; }
-        .post-row:hover { background: #F8FAFC; }
-        .msg-row:hover { background: #F8FAFC !important; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,76,129,0.1) !important; }
+        .quick-action:hover { border-color: var(--color-teal) !important; background: var(--color-teal-pale) !important; color: var(--color-teal-dark) !important; }
+        .post-row:hover { background: var(--color-sky); }
+        .msg-row:hover { background: var(--color-sky) !important; }
         .manage-btn:hover { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
         @media (max-width: 1100px) {
           .dash-stats-grid { grid-template-columns: repeat(2,1fr) !important; }

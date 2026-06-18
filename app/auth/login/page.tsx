@@ -297,11 +297,12 @@ export default function LoginPage() {
                     </svg>
 
                     {/* ── Brand corner ── */}
-                    <div style={{ position: 'absolute', top: '28px', right: '38px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 20 }}>
+                    <a href="/" style={{ position: 'absolute', top: '22px', right: '32px', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 20, textDecoration: 'none' }}>
+                        <img src="/logo.png" alt="WON Media" style={{ width: 120, height: 'auto', objectFit: 'contain' }} />
                         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.05rem', fontWeight: 700, color: '#1a4d2e', letterSpacing: '.02em' }}>
                             Won Media
                         </span>
-                    </div>
+                    </a>
 
                     {/* ── Form panel ── */}
                     <div style={{

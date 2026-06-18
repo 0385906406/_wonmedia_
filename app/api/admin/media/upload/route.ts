@@ -9,39 +9,39 @@ export async function POST(req: NextRequest) {
   const authErr = requireAdmin(user)
   if (authErr) return authErr
 
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return NextResponse.json({ error: 'Chưa cấu hình Cloudinary trong biến môi trường.' }, { status: 503 })
+  }
+
   try {
     const formData = await req.formData()
     const file = formData.get('file') as File | null
     if (!file) return NextResponse.json({ error: 'No file' }, { status: 400 })
-    if (file.size > MAX_SIZE) return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
+    if (file.size > MAX_SIZE) return NextResponse.json({ error: 'File quá lớn (tối đa 10MB)' }, { status: 400 })
 
     const buffer = new Uint8Array(await file.arrayBuffer())
-    const { ok, ext } = verifyImageMagicBytes(buffer)
+    const { ok } = verifyImageMagicBytes(buffer)
     if (!ok) return NextResponse.json({ error: 'File không phải ảnh hợp lệ' }, { status: 400 })
 
-    const filename = `upload-${Date.now()}.${ext}`
+    const cloudinary = (await import('cloudinary')).v2
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key:    process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    })
 
-    // Vercel Blob in production, local filesystem in dev
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const { put } = await import('@vercel/blob')
-      const mimeMap: Record<string, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' }
-      const blob = await put(`uploads/${filename}`, Buffer.from(buffer), {
-        access: 'public',
-        contentType: mimeMap[ext] ?? 'image/png',
-      })
-      return NextResponse.json({ data: { url: blob.url } })
-    }
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'wonmedia', resource_type: 'image' },
+        (err, res) => err ? reject(err) : resolve(res as { secure_url: string })
+      )
+      stream.end(Buffer.from(buffer))
+    })
 
-    // Dev fallback: write to public/uploads/
-    const { writeFile, mkdir } = await import('fs/promises')
-    const path = await import('path')
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    await mkdir(uploadDir, { recursive: true })
-    await writeFile(path.join(uploadDir, filename), Buffer.from(buffer))
-    return NextResponse.json({ data: { url: `/uploads/${filename}` } })
+    return NextResponse.json({ data: { url: result.secure_url } })
 
   } catch (e) {
     console.error('[media/upload]', e)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Upload thất bại' }, { status: 500 })
   }
 }

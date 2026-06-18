@@ -16,11 +16,11 @@ const HEADINGS: Record<LocaleKey, string> = {
 }
 
 const LABELS: Record<LocaleKey, Record<string, string>> = {
-  vi: { articles: 'bài viết', empty: 'Chưa có tin tức nào.', prev: 'Trước', next: 'Tiếp', latest: 'Bài viết mới nhất' },
-  en: { articles: 'articles',  empty: 'No news yet.',         prev: 'Prev',   next: 'Next', latest: 'Latest News' },
-  ko: { articles: '개 글',    empty: '뉴스가 없습니다.',       prev: '이전',   next: '다음', latest: '최신 뉴스' },
-  ja: { articles: '件',        empty: 'ニュースがありません。', prev: '前へ',   next: '次へ', latest: '最新ニュース' },
-  zh: { articles: '篇文章',   empty: '暂无新闻。',             prev: '上一页', next: '下一页', latest: '最新新闻' },
+  vi: { articles: 'bài viết', empty: 'Chưa có tin tức nào.',      prev: 'Trước',  next: 'Tiếp',   latest: 'Bài viết mới nhất', readMore: 'Đọc tiếp',    blogLabel: 'Blog', careerLabel: 'Tuyển dụng', loading: 'Đang tải...' },
+  en: { articles: 'articles',  empty: 'No news yet.',              prev: 'Prev',   next: 'Next',   latest: 'Latest News',       readMore: 'Read more',   blogLabel: 'Blog', careerLabel: 'Career',     loading: 'Loading...' },
+  ko: { articles: '개 글',    empty: '뉴스가 없습니다.',            prev: '이전',   next: '다음',   latest: '최신 뉴스',          readMore: '더 읽기',     blogLabel: '블로그', careerLabel: '채용',      loading: '로딩 중...' },
+  ja: { articles: '件',        empty: 'ニュースがありません。',      prev: '前へ',   next: '次へ',   latest: '最新ニュース',        readMore: '続きを読む', blogLabel: 'ブログ', careerLabel: '採用',       loading: '読み込み中...' },
+  zh: { articles: '篇文章',   empty: '暂无新闻。',                  prev: '上一页', next: '下一页', latest: '最新新闻',            readMore: '阅读更多',   blogLabel: '博客', careerLabel: '招聘',        loading: '加载中...' },
 }
 
 export default async function TinTucPage({

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { FocalPointPicker } from '@/components/admin/FocalPointPicker'
 import { useToast } from '@/components/admin/toast-provider'
-import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
+import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
 const RichTextEditor = dynamic(
   () => import('@/components/admin/RichTextEditor').then(m => m.RichTextEditor),
@@ -57,7 +57,7 @@ const TA = 'rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text
 function LangTabs({ active, onChange, form }: { active: LocaleKey; onChange: (l: LocaleKey) => void; form?: PostForm }) {
   return (
     <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light, #F8F9FB)', borderRadius: 10, width: 'fit-content' }}>
-      {LOCALES.map(l => {
+      {ADMIN_LOCALES.map(l => {
         const hasContent = form ? !!(form.title[l] && form.content[l]) : false
         const isActive = active === l
         return (
@@ -178,7 +178,7 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
           <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Xem trước</span>
           <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.12)' }} />
           <div style={{ display: 'flex', gap: 2, padding: 3, background: 'rgba(255,255,255,0.07)', borderRadius: 8 }}>
-            {LOCALES.map(l => (
+            {ADMIN_LOCALES.map(l => (
               <button key={l} type="button" onClick={() => setPreviewLang(l)}
                 style={{
                   padding: '4px 10px', borderRadius: 6, border: 'none', cursor: 'pointer',
@@ -870,7 +870,7 @@ function PostEditorInner() {
 
           {/* Trạng thái dịch */}
           <SidebarCard title="Trạng thái dịch">
-            {LOCALES.map(l => {
+            {ADMIN_LOCALES.map(l => {
               const done = !!(form.title[l] && form.content[l])
               const hasTitle = !!form.title[l]
               return (

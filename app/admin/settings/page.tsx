@@ -1,16 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-    GlobeIcon, LayoutIcon, KeyRoundIcon, PlusIcon, DatabaseIcon,
-    XIcon, LockIcon, StarIcon, MoreVerticalIcon, PencilIcon, Trash2Icon,
-    FootprintsIcon, SaveIcon, Loader2Icon, SparklesIcon,
+    GlobeIcon, LayoutIcon, PlusIcon, DatabaseIcon,
+    LockIcon, StarIcon, MoreVerticalIcon, PencilIcon, Trash2Icon,
+    FootprintsIcon, SaveIcon, Loader2Icon, SettingsIcon,
 } from 'lucide-react'
-import { LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
+import {
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+    DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 import {
     CollectionTable, CreateCollectionDialog, RenameDialog, PasswordModal,
     SettingsTable, type Collection, type SettingsRow,
@@ -20,59 +20,30 @@ import { useToast } from '@/components/admin/toast-provider'
 // ─── Settings row definitions ─────────────────────────────────────────────────
 
 const GENERAL_ROWS: SettingsRow[] = [
-    { key: 'portalName',  label: 'Tên portal',       type: 'text',  group: 'general', hint: 'Hiển thị trong tab trình duyệt' },
-    { key: 'tagline',     label: 'Tagline',           type: 'text',  group: 'general', hint: 'Dòng mô tả ngắn bên dưới tên portal' },
-    { key: 'publicDomain',label: 'Domain public',     type: 'url',   group: 'general', hint: 'URL đầy đủ, bao gồm https://' },
-    { key: 'systemEmail', label: 'Email hệ thống',    type: 'email', group: 'general', hint: 'Địa chỉ gửi email thông báo tự động' },
+    { key: 'portalName',   label: 'Tên portal',      type: 'text',  group: 'general',      hint: 'Hiển thị trong tab trình duyệt' },
+    { key: 'tagline',      label: 'Tagline',          type: 'text',  group: 'general',      hint: 'Dòng mô tả ngắn bên dưới tên portal' },
+    { key: 'publicDomain', label: 'Domain public',    type: 'url',   group: 'general',      hint: 'URL đầy đủ, bao gồm https://' },
+    { key: 'systemEmail',  label: 'Email hệ thống',   type: 'email', group: 'general',      hint: 'Địa chỉ gửi email thông báo tự động' },
 ]
 
 const HEADER_ROWS: SettingsRow[] = [
     { key: 'navDisplayName', label: 'Tên hiển thị trên nav',  type: 'text',  group: 'header' },
     { key: 'logoEn',         label: 'Logo (dòng tiếng Anh)',  type: 'text',  group: 'header' },
     { key: 'logoVi',         label: 'Logo (dòng tiếng Việt)', type: 'text',  group: 'header' },
-    {
-        key: 'faviconUrl', label: 'Favicon', type: 'image', group: 'header',
-        hint: 'ICO / PNG / SVG — 32×32px hoặc 64×64px. Để trống để dùng mặc định.',
-        imageAccept: '.ico,.png,.svg',
-    },
-    {
-        key: 'logoImageUrl', label: 'Logo hình ảnh', type: 'image', group: 'header',
-        hint: 'PNG / SVG / WebP, nên dùng nền trong suốt. Tối đa 2MB.',
-        imageAccept: '.png,.svg,.jpg,.jpeg,.webp',
-    },
-]
-
-const INTEGRATIONS_ROWS: SettingsRow[] = [
-    { key: 'geminiApiKey', label: 'Gemini API Key', type: 'password', group: 'integrations', hint: 'Lấy tại aistudio.google.com' },
-    {
-        key: 'geminiModel', label: 'Gemini Model', type: 'select', group: 'integrations',
-        options: [
-            { value: 'gemini-2.5-pro',   label: 'Gemini 2.5 Pro' },
-            { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-            { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-            { value: 'gemini-1.5-pro',   label: 'Gemini 1.5 Pro' },
-            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-        ],
-    },
-    { key: 'newsApiKey', label: 'News API Key', type: 'password', group: 'integrations' },
-    { key: 'newsApiUrl', label: 'News API URL', type: 'url',      group: 'integrations', hint: 'Endpoint lấy danh sách tin tức' },
-    { key: 'resendApiKey',    label: 'Resend API Key',       type: 'password', group: 'integrations', hint: 'Lấy tại resend.com → API Keys' },
-    { key: 'resendFromEmail', label: 'Email gửi đi (From)',  type: 'email',    group: 'integrations', hint: 'VD: noreply@wonmedia.vn — phải verify domain trên Resend' },
-    { key: 'resendToEmail',   label: 'Email nhận thông báo', type: 'email',    group: 'integrations', hint: 'Email admin nhận khi có form liên hệ mới' },
+    { key: 'faviconUrl',     label: 'Favicon',                type: 'image', group: 'header', hint: 'ICO / PNG / SVG — 32×32px', imageAccept: '.ico,.png,.svg' },
+    { key: 'logoImageUrl',   label: 'Logo hình ảnh',          type: 'image', group: 'header', hint: 'PNG / SVG / WebP, nền trong suốt. Tối đa 2MB.', imageAccept: '.png,.svg,.jpg,.jpeg,.webp' },
 ]
 
 const FIXED_TABS = [
-    { id: 'general',      label: 'Thông tin cơ bản', icon: GlobeIcon,       rows: GENERAL_ROWS },
-    { id: 'header',       label: 'Header & Logo',     icon: LayoutIcon,      rows: HEADER_ROWS },
-    { id: 'integrations', label: 'Tích hợp & API',    icon: KeyRoundIcon,    rows: INTEGRATIONS_ROWS },
+    { id: 'general', label: 'Thông tin cơ bản', icon: GlobeIcon,  rows: GENERAL_ROWS, desc: 'Cấu hình cơ bản của hệ thống' },
+    { id: 'header',  label: 'Header & Logo',    icon: LayoutIcon, rows: HEADER_ROWS,  desc: 'Logo, favicon và tên hiển thị trên nav' },
 ] as const
-
-const FOOTER_TAB = { id: 'footer', label: 'Footer', icon: FootprintsIcon }
 
 type FixedId = typeof FIXED_TABS[number]['id']
 const FIXED_IDS = [...FIXED_TABS.map((t) => t.id), 'footer'] as string[]
 
 // ─── Footer form types ─────────────────────────────────────────────────────────
+
 interface FooterForm {
     companyName: MultiLang
     navAbout: MultiLang; navServices: MultiLang; navCareers: MultiLang; navBlog: MultiLang; navContact: MultiLang
@@ -84,18 +55,59 @@ interface FooterForm {
 function emptyFooter(): FooterForm {
     return {
         companyName: emptyMultiLang(),
-        navAbout: emptyMultiLang(), navServices: emptyMultiLang(), navCareers: emptyMultiLang(), navBlog: emptyMultiLang(), navContact: emptyMultiLang(),
-        servicesHeading: emptyMultiLang(), service1: emptyMultiLang(), service2: emptyMultiLang(), service3: emptyMultiLang(), service4: emptyMultiLang(),
+        navAbout: emptyMultiLang(), navServices: emptyMultiLang(), navCareers: emptyMultiLang(),
+        navBlog: emptyMultiLang(), navContact: emptyMultiLang(),
+        servicesHeading: emptyMultiLang(), service1: emptyMultiLang(), service2: emptyMultiLang(),
+        service3: emptyMultiLang(), service4: emptyMultiLang(),
         locationHeading: emptyMultiLang(), locationCity: emptyMultiLang(),
         phoneLabel: emptyMultiLang(), emailLabel: emptyMultiLang(), legalRepLabel: emptyMultiLang(),
         copyright: emptyMultiLang(),
     }
 }
 
-interface SettingsData {
-    general:      Record<string, string>
-    header:       Record<string, string>
-    integrations: Record<string, string>
+interface SettingsData { general: Record<string, string>; header: Record<string, string> }
+
+// ─── Nav item component ───────────────────────────────────────────────────────
+
+function NavGroup({ title }: { title: string }) {
+    return (
+        <div style={{ padding: '16px 16px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-gray-text)', opacity: 0.6 }}>
+            {title}
+        </div>
+    )
+}
+
+function NavItem({
+    label, icon: Icon, active, onClick, badge, warning, extra,
+}: {
+    label: string; icon?: React.ElementType; active: boolean; onClick: () => void
+    badge?: string; warning?: boolean; extra?: React.ReactNode
+}) {
+    return (
+        <button onClick={onClick}
+            style={{
+                display: 'flex', alignItems: 'center', gap: 9,
+                width: '100%', padding: '9px 14px', borderRadius: 8,
+                border: 'none', cursor: 'pointer', textAlign: 'left',
+                fontSize: 13, fontWeight: active ? 600 : 500,
+                background: active ? 'rgba(99,102,241,0.1)' : 'transparent',
+                color: active ? 'var(--color-indigo)' : 'var(--color-gray-text)',
+                transition: 'all 0.15s',
+                borderLeft: `3px solid ${active ? 'var(--color-indigo)' : 'transparent'}`,
+            }}
+            className="settings-nav-item"
+        >
+            {Icon && <Icon size={15} style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }} />}
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+            {warning && <LockIcon size={12} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+            {badge && (
+                <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 100, background: active ? 'var(--color-indigo-pale)' : 'var(--color-gray-light)', color: active ? 'var(--color-indigo)' : 'var(--color-gray-text)' }}>
+                    {badge}
+                </span>
+            )}
+            {extra}
+        </button>
+    )
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -103,7 +115,7 @@ interface SettingsData {
 export default function SettingsPage() {
     const toast = useToast()
     const [activeTab, setActiveTab]   = useState<string>('general')
-    const [data, setData]             = useState<SettingsData>({ general: {}, header: {}, integrations: {} })
+    const [data, setData]             = useState<SettingsData>({ general: {}, header: {} })
     const [collections, setCollections] = useState<Collection[]>([])
     const [loading, setLoading]       = useState(true)
 
@@ -115,27 +127,18 @@ export default function SettingsPage() {
     // Dialogs
     const [showCreate, setShowCreate] = useState(false)
     const [renameCol, setRenameCol]   = useState<Collection | null>(null)
-
-    // Password protection
     const [pwModal, setPwModal]       = useState<{ col: Collection; onSuccess: () => void } | null>(null)
     const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set())
 
     const tabClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    // Load
     useEffect(() => {
         Promise.all([
             fetch('/api/settings').then((r) => r.json()),
             fetch('/api/collections').then((r) => r.json()),
             fetch('/api/footer').then((r) => r.json()),
         ]).then(([sRes, cRes, fRes]) => {
-            if (sRes.data) {
-                setData({
-                    general:      sRes.data.general      ?? {},
-                    header:       sRes.data.header       ?? {},
-                    integrations: sRes.data.integrations ?? {},
-                })
-            }
+            if (sRes.data) setData({ general: sRes.data.general ?? {}, header: sRes.data.header ?? {} })
             if (cRes.data) setCollections(cRes.data)
             if (fRes.data) setFooterForm(f => ({ ...f, ...fRes.data }))
         }).finally(() => setLoading(false))
@@ -146,44 +149,32 @@ export default function SettingsPage() {
         toast.success('Đã lưu')
     }
 
-    // ── Collection tab interactions ──
-
     function handleColTabClick(id: string) {
         if (tabClickTimer.current) clearTimeout(tabClickTimer.current)
-        tabClickTimer.current = setTimeout(() => setActiveTab(id), 220)
+        tabClickTimer.current = setTimeout(() => setActiveTab(id), 200)
     }
     function handleColTabDblClick(col: Collection) {
         if (tabClickTimer.current) clearTimeout(tabClickTimer.current)
         requirePassword(col, () => setRenameCol(col))
     }
-
     function requirePassword(col: Collection, onSuccess: () => void) {
         if (!col.important || unlockedIds.has(col._id)) { onSuccess(); return }
         setPwModal({ col, onSuccess })
     }
-
     function unlockAndRun(col: Collection, action: () => void) {
         setUnlockedIds((s) => new Set([...s, col._id]))
-        action()
-        setPwModal(null)
+        action(); setPwModal(null)
     }
-
     async function toggleImportant(col: Collection) {
         const next = !col.important
-        const res  = await fetch(`/api/collections/${col._id}`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ important: next }),
-        })
+        const res  = await fetch(`/api/collections/${col._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ important: next }) })
         const json = await res.json()
         if (json.success) {
             setCollections((p) => p.map((c) => c._id === col._id ? { ...c, important: next } : c))
-            // Remove from unlocked if marked important again
             if (next) setUnlockedIds((s) => { const n = new Set(s); n.delete(col._id); return n })
         }
     }
-
-    async function deleteCollection(col: Collection, e: React.MouseEvent) {
-        e.stopPropagation()
+    async function deleteCollection(col: Collection) {
         requirePassword(col, async () => {
             if (!confirm(`Xóa danh mục "${col.name}"? Tất cả dữ liệu sẽ bị xóa.`)) return
             await fetch(`/api/collections/${col._id}`, { method: 'DELETE' })
@@ -199,313 +190,299 @@ export default function SettingsPage() {
     const isFixed     = FIXED_IDS.includes(activeTab)
     const activeFixed = FIXED_TABS.find((t) => t.id === activeTab)
 
+    // ── Footer save / AI translate ──
+    async function saveFooter() {
+        setFooterSaving(true)
+        try {
+            const res = await fetch('/api/footer', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(footerForm) })
+            if (res.ok) toast.success('Đã lưu Footer!')
+            else toast.error('Lỗi lưu Footer')
+        } finally { setFooterSaving(false) }
+    }
     if (loading) return (
-        <div className="p-8 flex items-center justify-center min-h-[400px]">
-            <p className="text-sm text-gray-400">Đang tải cài đặt...</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 10, color: 'var(--color-gray-text)' }}>
+            <Loader2Icon size={18} className="animate-spin" />
+            <span style={{ fontSize: 14 }}>Đang tải cài đặt...</span>
         </div>
     )
 
     return (
-        <div className="p-6 w-full">
-            <h1 className="text-2xl font-bold mb-6" style={{ color: 'var(--nic-text)' }}>Cài đặt</h1>
+        <div style={{ padding: '28px 24px' }}>
 
-            {/* ── Unified tab bar ── */}
-            <div className="flex items-end gap-0 border-b border-gray-200 mb-8 overflow-x-auto">
-
-                {/* Fixed tabs */}
-                {FIXED_TABS.map(({ id, label, icon: Icon }) => {
-                    const active = activeTab === id
-                    return (
-                        <button key={id} onClick={() => setActiveTab(id)}
-                            className="relative flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0"
-                            style={{ color: active ? 'var(--nic-indigo)' : 'var(--nic-gray-text)' }}>
-                            <Icon className="size-4" />
-                            {label}
-                            {active && <span className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full" style={{ background: 'var(--nic-indigo)' }} />}
-                        </button>
-                    )
-                })}
-
-                {/* Footer tab */}
-                {(() => {
-                    const active = activeTab === FOOTER_TAB.id
-                    return (
-                        <button key={FOOTER_TAB.id} onClick={() => setActiveTab(FOOTER_TAB.id)}
-                            className="relative flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0"
-                            style={{ color: active ? 'var(--nic-indigo)' : 'var(--nic-gray-text)' }}>
-                            <FootprintsIcon className="size-4" />
-                            {FOOTER_TAB.label}
-                            {active && <span className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full" style={{ background: 'var(--nic-indigo)' }} />}
-                        </button>
-                    )
-                })()}
-
-                {/* Separator */}
-                {collections.length > 0 && <div className="self-center h-5 w-px bg-gray-200 mx-3 flex-shrink-0" />}
-
-                {/* Collection tabs */}
-                {collections.map((col) => {
-                    const active = activeTab === col._id
-                    return (
-                        <div key={col._id} className="relative flex items-center group flex-shrink-0">
-                            {/* Tab button */}
-                            <button
-                                className="flex items-center gap-1.5 pl-3 pr-1 py-3 text-sm font-medium transition-colors whitespace-nowrap"
-                                style={{ color: active ? 'var(--nic-indigo)' : 'var(--nic-gray-text)' }}
-                                onClick={() => handleColTabClick(col._id)}
-                                onDoubleClick={() => handleColTabDblClick(col)}
-                                title="Nhấp đúp để đổi tên">
-                                {col.important
-                                    ? <LockIcon className="size-3.5 flex-shrink-0 text-amber-500" />
-                                    : <DatabaseIcon className="size-3.5 flex-shrink-0" />
-                                }
-                                {col.name}
-                            </button>
-
-                            {/* 3-dot menu */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        className="p-1 mx-0.5 rounded text-gray-300 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
-                                        title="Tùy chọn"
-                                        onClick={(e) => e.stopPropagation()}>
-                                        <MoreVerticalIcon className="size-3.5" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-52">
-                                    <DropdownMenuItem onClick={() => {
-                                        handleColTabClick(col._id)
-                                        requirePassword(col, () => setRenameCol(col))
-                                    }}>
-                                        <PencilIcon className="size-4 mr-2" />
-                                        Đổi tên
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => toggleImportant(col)}>
-                                        {col.important
-                                            ? <><LockIcon className="size-4 mr-2 text-amber-500" /><span>Bỏ quan trọng</span></>
-                                            : <><StarIcon className="size-4 mr-2" /><span>Đánh dấu quan trọng</span></>
-                                        }
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                                        onClick={(e) => deleteCollection(col, e)}>
-                                        <Trash2Icon className="size-4 mr-2" />
-                                        Xóa danh mục
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            {/* Active underline */}
-                            {active && <span className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full" style={{ background: 'var(--nic-indigo)' }} />}
-                        </div>
-                    )
-                })}
-
-                {/* Add collection button */}
-                <button onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-1.5 px-3 py-3 text-sm font-medium transition-colors rounded-t-lg flex-shrink-0 ml-1 whitespace-nowrap hover:bg-muted"
-                    style={{ color: 'var(--nic-indigo)' }}>
-                    <PlusIcon className="size-4" />
-                    Thêm danh mục
-                </button>
+            {/* Page header */}
+            <div className="dh-page-header" style={{ marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <SettingsIcon size={19} style={{ color: 'var(--color-indigo)' }} />
+                    </div>
+                    <div>
+                        <h1 className="dh-page-title">Cài đặt</h1>
+                        <p className="dh-page-desc">Quản lý cấu hình hệ thống và tích hợp</p>
+                    </div>
+                </div>
             </div>
 
-            {/* ── Fixed tab content: SettingsTable ── */}
-            {isFixed && activeFixed && (
-                <div>
-                    <div className="mb-4">
-                        <h2 className="text-base font-semibold" style={{ color: 'var(--nic-text)' }}>{activeFixed.label}</h2>
-                        <p className="text-sm mt-0.5 text-xs" style={{ color: 'var(--nic-gray-text)' }}>
-                            Nhấp đúp vào một hàng để chỉnh sửa trực tiếp.
-                        </p>
-                    </div>
-                    <SettingsTable
-                        rows={activeFixed.rows}
-                        values={data[activeFixed.id as FixedId]}
-                        onRowSaved={(key, val) => handleRowSaved(activeFixed.id as FixedId, key, val)}
-                    />
-                </div>
-            )}
+            {/* Main grid: left nav + right content */}
+            <div className="settings-layout">
 
-            {/* ── Footer tab content ── */}
-            {activeTab === 'footer' && (() => {
-                const IC = 'w-full h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
-                const TA = 'w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none'
-                const FF = footerForm
-                const setFF = setFooterForm
+                {/* ── Left navigation panel ── */}
+                <div className="dh-card settings-nav-panel">
 
-                function MLInput({ label, fKey, multi = false }: { label: string; fKey: keyof FooterForm; multi?: boolean }) {
-                    const val = FF[fKey] as MultiLang
-                    return (
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-gray-500">
-                                {label} <span className="font-mono text-gray-400">({LOCALE_META[footerLang].flag} {LOCALE_META[footerLang].short})</span>
-                            </label>
-                            {multi
-                                ? <textarea value={val[footerLang] ?? ''} rows={2} className={TA}
-                                    onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />
-                                : <input value={val[footerLang] ?? ''} className={IC}
-                                    onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />}
-                        </div>
-                    )
-                }
+                    <NavGroup title="Hệ thống" />
+                    {FIXED_TABS.map(({ id, label, icon }) => (
+                        <NavItem key={id} label={label} icon={icon} active={activeTab === id} onClick={() => setActiveTab(id)} />
+                    ))}
+                    <NavItem label="Footer" icon={FootprintsIcon} active={activeTab === 'footer'} onClick={() => setActiveTab('footer')} />
 
-                async function saveFooter() {
-                    setFooterSaving(true)
-                    try {
-                        const res = await fetch('/api/footer', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(FF) })
-                        if (res.ok) toast.success('Đã lưu Footer!')
-                        else toast.error('Lỗi lưu Footer')
-                    } finally { setFooterSaving(false) }
-                }
-
-                async function aiTranslate() {
-                    setFooterSaving(true)
-                    try {
-                        const res = await fetch('/api/ai/translate', {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                fields: { title: FF.companyName.vi, excerpt: FF.copyright.vi },
-                                targetLocales: ['en', 'ko', 'ja', 'zh'],
-                            })
-                        })
-                        const data = await res.json()
-                        if (res.ok && data.translations) {
-                            const t = data.translations as Record<string, { title?: string; excerpt?: string }>
-                            setFF(f => ({
-                                ...f,
-                                companyName: { ...f.companyName, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title ?? ''])) },
-                                copyright:   { ...f.copyright,   ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt ?? ''])) },
-                            }))
-                            toast.success('Đã dịch tên công ty & copyright!')
-                        }
-                    } catch { toast.error('Lỗi AI') } finally { setFooterSaving(false) }
-                }
-
-                return (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between flex-wrap gap-3">
-                            <div>
-                                <h2 className="text-base font-semibold" style={{ color: 'var(--nic-text)' }}>Quản lý Footer</h2>
-                                <p className="text-xs mt-0.5" style={{ color: 'var(--nic-gray-text)' }}>Chỉnh sửa nội dung footer hiển thị trên tất cả trang</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <button onClick={aiTranslate} disabled={footerSaving}
-                                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
-                                    {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SparklesIcon size={12} />}AI Dịch
-                                </button>
-                                <button onClick={saveFooter} disabled={footerSaving}
-                                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
-                                    {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}Lưu Footer
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Lang tabs */}
-                        <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
-                            {LOCALES.map(l => (
-                                <button key={l} onClick={() => setFooterLang(l)}
-                                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${footerLang === l ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
-                                    {LOCALE_META[l].flag} {LOCALE_META[l].short}
-                                </button>
+                    {collections.length > 0 && (
+                        <>
+                            <div style={{ margin: '8px 14px', borderTop: '1px solid var(--color-gray-border)' }} />
+                            <NavGroup title="Danh mục" />
+                            {collections.map((col) => (
+                                <div key={col._id} style={{ position: 'relative', display: 'flex', alignItems: 'center', paddingRight: 4 }}>
+                                    <NavItem
+                                        label={col.name}
+                                        icon={col.important ? LockIcon : DatabaseIcon}
+                                        active={activeTab === col._id}
+                                        onClick={() => handleColTabClick(col._id)}
+                                        warning={col.important}
+                                    />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{ position: 'absolute', right: 8, padding: 4, borderRadius: 6, border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-gray-text)', opacity: 0, transition: 'opacity 0.15s' }}
+                                                className="col-menu-btn"
+                                            >
+                                                <MoreVerticalIcon size={13} />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-48">
+                                            <DropdownMenuItem onClick={() => { handleColTabClick(col._id); requirePassword(col, () => setRenameCol(col)) }}>
+                                                <PencilIcon className="size-4 mr-2" />Đổi tên
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => toggleImportant(col)}>
+                                                {col.important
+                                                    ? <><LockIcon className="size-4 mr-2 text-amber-500" />Bỏ bảo vệ</>
+                                                    : <><StarIcon className="size-4 mr-2" />Đánh dấu quan trọng</>}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => deleteCollection(col)}>
+                                                <Trash2Icon className="size-4 mr-2" />Xóa danh mục
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             ))}
-                        </div>
+                        </>
+                    )}
 
-                        <div className="grid grid-cols-1 gap-6">
-                            {/* Brand */}
-                            <div className="rounded-xl border border-gray-200 p-5 bg-gray-50 space-y-4">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Thương hiệu</p>
-                                <MLInput label="Tên công ty" fKey="companyName" />
-                                <MLInput label="Bản quyền (Copyright)" fKey="copyright" />
-                            </div>
-
-                            {/* Navigation */}
-                            <div className="rounded-xl border border-gray-200 p-5 bg-gray-50 space-y-4">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Nhãn điều hướng</p>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <MLInput label="Giới thiệu"  fKey="navAbout"    />
-                                    <MLInput label="Dịch vụ"     fKey="navServices" />
-                                    <MLInput label="Tuyển dụng"  fKey="navCareers"  />
-                                    <MLInput label="Blog"        fKey="navBlog"     />
-                                    <MLInput label="Liên hệ"     fKey="navContact"  />
-                                </div>
-                            </div>
-
-                            {/* Services */}
-                            <div className="rounded-xl border border-gray-200 p-5 bg-gray-50 space-y-4">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Dịch vụ</p>
-                                <MLInput label="Tiêu đề cột dịch vụ" fKey="servicesHeading" />
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <MLInput label="Dịch vụ 1" fKey="service1" />
-                                    <MLInput label="Dịch vụ 2" fKey="service2" />
-                                    <MLInput label="Dịch vụ 3" fKey="service3" />
-                                    <MLInput label="Dịch vụ 4" fKey="service4" />
-                                </div>
-                            </div>
-
-                            {/* Location */}
-                            <div className="rounded-xl border border-gray-200 p-5 bg-gray-50 space-y-4">
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Địa điểm & Nhãn liên hệ</p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <MLInput label="Nhãn trụ sở (VD: Trụ sở:)" fKey="locationHeading" />
-                                    <MLInput label="Thành phố (VD: HÀ NỘI, VIỆT NAM)" fKey="locationCity" />
-                                    <MLInput label="Nhãn Điện thoại" fKey="phoneLabel" />
-                                    <MLInput label="Nhãn Email" fKey="emailLabel" />
-                                    <MLInput label="Nhãn Người đại diện" fKey="legalRepLabel" />
-                                </div>
-                            </div>
-                        </div>
+                    <div style={{ margin: '8px 14px 12px', borderTop: '1px solid var(--color-gray-border)' }} />
+                    <div style={{ padding: '0 10px 12px' }}>
+                        <button onClick={() => setShowCreate(true)}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', borderRadius: 8, border: '1.5px dashed var(--color-gray-border)', background: 'transparent', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--color-indigo)', transition: 'all 0.15s' }}
+                            className="add-col-btn">
+                            <PlusIcon size={14} />Thêm danh mục
+                        </button>
                     </div>
-                )
-            })()}
-
-            {/* ── Collection tab content ── */}
-            {activeCol && (
-                <div>
-                    <div className="mb-4 flex items-center gap-3">
-                        <div>
-                            <h2 className="text-base font-semibold flex items-center gap-2" style={{ color: 'var(--nic-text)' }}>
-                                {activeCol.important && <LockIcon className="size-4 text-amber-500" />}
-                                {activeCol.name}
-                                {activeCol.important && (
-                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700">
-                                        Quan trọng
-                                    </span>
-                                )}
-                            </h2>
-                            {activeCol.description && (
-                                <p className="text-sm mt-0.5" style={{ color: 'var(--nic-gray-text)' }}>{activeCol.description}</p>
-                            )}
-                        </div>
-                    </div>
-                    <CollectionTable
-                        col={activeCol}
-                        isUnlocked={unlockedIds.has(activeCol._id)}
-                        onRequirePassword={(onSuccess) => requirePassword(activeCol, onSuccess)}
-                    />
                 </div>
-            )}
+
+                {/* ── Right content panel ── */}
+                <div className="settings-content">
+
+                    {/* Fixed settings tabs */}
+                    {isFixed && activeFixed && (
+                        <div className="dh-card">
+                            <div className="dh-card-header">
+                                <div>
+                                    <h2 className="dh-card-title">{activeFixed.label}</h2>
+                                    <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>{activeFixed.desc}</p>
+                                </div>
+                                <span style={{ fontSize: 11, color: 'var(--color-gray-text)', display: 'flex', alignItems: 'center', gap: 4, opacity: 0.6 }}>
+                                    Nhấp đúp để chỉnh sửa
+                                </span>
+                            </div>
+                            <SettingsTable
+                                rows={activeFixed.rows}
+                                values={data[activeFixed.id as FixedId]}
+                                onRowSaved={(key, val) => handleRowSaved(activeFixed.id as FixedId, key, val)}
+                            />
+                        </div>
+                    )}
+
+                    {/* Footer tab */}
+                    {activeTab === 'footer' && (() => {
+                        const IC = 'w-full h-9 rounded-lg border border-[#E5E8ED] bg-white px-3 text-sm focus:outline-none focus:border-[var(--color-indigo)] focus:ring-2 focus:ring-[var(--color-indigo)]/10'
+                        const FF = footerForm
+                        const setFF = setFooterForm
+
+                        function MLInput({ label, fKey, multi = false }: { label: string; fKey: keyof FooterForm; multi?: boolean }) {
+                            const val = FF[fKey] as MultiLang
+                            return (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                    <label className="dh-label" style={{ fontSize: 12 }}>
+                                        {label}
+                                        <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--color-gray-text)', marginLeft: 6, opacity: 0.6 }}>
+                                            {LOCALE_META[footerLang].flag} {LOCALE_META[footerLang].short}
+                                        </span>
+                                    </label>
+                                    {multi
+                                        ? <textarea value={val[footerLang] ?? ''} rows={2}
+                                            className={IC.replace('h-9', '') + ' py-2 resize-none'}
+                                            onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />
+                                        : <input value={val[footerLang] ?? ''} className={IC}
+                                            onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />}
+                                </div>
+                            )
+                        }
+
+                        return (
+                            <div className="dh-card">
+                                {/* Card header */}
+                                <div className="dh-card-header">
+                                    <div>
+                                        <h2 className="dh-card-title">Footer</h2>
+                                        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>Nội dung footer hiển thị trên tất cả trang</p>
+                                    </div>
+                                    <button onClick={saveFooter} disabled={footerSaving} className="dh-btn dh-btn-sm dh-btn-primary">
+                                        {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}Lưu Footer
+                                    </button>
+                                </div>
+
+                                <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                    {/* Lang tabs */}
+                                    <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
+                                        {ADMIN_LOCALES.map(l => (
+                                            <button key={l} type="button" onClick={() => setFooterLang(l)}
+                                                style={{
+                                                    padding: '5px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
+                                                    fontSize: 12, fontWeight: 700,
+                                                    background: footerLang === l ? '#fff' : 'transparent',
+                                                    color: footerLang === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+                                                    boxShadow: footerLang === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                                                    transition: 'all 0.12s',
+                                                }}>
+                                                {LOCALE_META[l].flag} {LOCALE_META[l].short}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Sections */}
+                                    <FooterSection title="Thương hiệu">
+                                        <MLInput label="Tên công ty" fKey="companyName" />
+                                        <MLInput label="Bản quyền (Copyright)" fKey="copyright" />
+                                    </FooterSection>
+
+                                    <FooterSection title="Nhãn điều hướng">
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 12 }}>
+                                            <MLInput label="Giới thiệu"  fKey="navAbout"    />
+                                            <MLInput label="Dịch vụ"     fKey="navServices" />
+                                            <MLInput label="Tuyển dụng"  fKey="navCareers"  />
+                                            <MLInput label="Blog"        fKey="navBlog"     />
+                                            <MLInput label="Liên hệ"     fKey="navContact"  />
+                                        </div>
+                                    </FooterSection>
+
+                                    <FooterSection title="Dịch vụ">
+                                        <MLInput label="Tiêu đề cột dịch vụ" fKey="servicesHeading" />
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                            <MLInput label="Dịch vụ 1" fKey="service1" />
+                                            <MLInput label="Dịch vụ 2" fKey="service2" />
+                                            <MLInput label="Dịch vụ 3" fKey="service3" />
+                                            <MLInput label="Dịch vụ 4" fKey="service4" />
+                                        </div>
+                                    </FooterSection>
+
+                                    <FooterSection title="Địa điểm & Nhãn liên hệ">
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
+                                            <MLInput label="Nhãn trụ sở"          fKey="locationHeading" />
+                                            <MLInput label="Thành phố"             fKey="locationCity"    />
+                                            <MLInput label="Nhãn Điện thoại"       fKey="phoneLabel"      />
+                                            <MLInput label="Nhãn Email"            fKey="emailLabel"      />
+                                            <MLInput label="Nhãn Người đại diện"   fKey="legalRepLabel"   />
+                                        </div>
+                                    </FooterSection>
+                                </div>
+                            </div>
+                        )
+                    })()}
+
+                    {/* Collection tab */}
+                    {activeCol && (
+                        <div className="dh-card">
+                            <div className="dh-card-header">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    {activeCol.important
+                                        ? <LockIcon size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
+                                        : <DatabaseIcon size={16} style={{ color: 'var(--color-indigo)', flexShrink: 0 }} />}
+                                    <div>
+                                        <h2 className="dh-card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            {activeCol.name}
+                                            {activeCol.important && (
+                                                <span className="dh-badge dh-badge-yellow" style={{ fontSize: 10 }}>Quan trọng</span>
+                                            )}
+                                        </h2>
+                                        {activeCol.description && (
+                                            <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>{activeCol.description}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <button onClick={() => requirePassword(activeCol, () => setRenameCol(activeCol))} className="dh-btn dh-btn-sm dh-btn-secondary">
+                                    <PencilIcon size={13} />Sửa danh mục
+                                </button>
+                            </div>
+                            <div className="dh-card-body">
+                                <CollectionTable
+                                    col={activeCol}
+                                    isUnlocked={unlockedIds.has(activeCol._id)}
+                                    onRequirePassword={(onSuccess) => requirePassword(activeCol, onSuccess)}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Dialogs */}
             <CreateCollectionDialog open={showCreate} onOpenChange={setShowCreate}
                 onCreated={(col) => { setCollections((p) => [...p, col]); setActiveTab(col._id) }} />
-
             {renameCol && (
                 <RenameDialog col={renameCol} open={!!renameCol}
                     onOpenChange={(v) => { if (!v) setRenameCol(null) }}
                     onRenamed={(updated) => setCollections((p) => p.map((c) => c._id === updated._id ? updated : c))} />
             )}
-
             {pwModal && (
-                <PasswordModal
-                    open={!!pwModal}
-                    onOpenChange={(v) => { if (!v) setPwModal(null) }}
+                <PasswordModal open={!!pwModal} onOpenChange={(v) => { if (!v) setPwModal(null) }}
                     collectionName={pwModal.col.name}
-                    onSuccess={() => unlockAndRun(pwModal.col, pwModal.onSuccess)}
-                />
+                    onSuccess={() => unlockAndRun(pwModal.col, pwModal.onSuccess)} />
             )}
 
+            <style>{`
+                .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
+                .settings-nav-panel { padding: 10px 6px; }
+                .settings-nav-item:hover { background: var(--color-gray-light) !important; color: var(--color-navy-deep) !important; }
+                .col-menu-btn { position: absolute; right: 8px; }
+                .settings-nav-panel:hover .col-menu-btn { opacity: 0.5 !important; }
+                .col-menu-btn:hover { opacity: 1 !important; background: var(--color-gray-light); }
+                .add-col-btn:hover { border-color: var(--color-indigo) !important; background: var(--color-indigo-pale) !important; }
+                @media (max-width: 860px) { .settings-layout { grid-template-columns: 1fr; } .settings-nav-panel { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; } }
+            `}</style>
+        </div>
+    )
+}
+
+// ─── Footer section wrapper ────────────────────────────────────────────────────
+
+function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
+    return (
+        <div style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', overflow: 'hidden' }}>
+            <div style={{ padding: '10px 16px', background: 'var(--color-gray-light)', borderBottom: '1px solid var(--color-gray-border)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>{title}</p>
+            </div>
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {children}
+            </div>
         </div>
     )
 }

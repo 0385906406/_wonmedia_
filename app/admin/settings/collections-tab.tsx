@@ -219,7 +219,7 @@ export function CreateCollectionDialog({
                 </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="outline">Hủy</Button></DialogClose>
-                    <Button onClick={submit} disabled={saving} style={{ background: 'var(--nic-indigo)', color: '#fff' }} className="hover:opacity-90">
+                    <Button onClick={submit} disabled={saving} style={{ background: 'var(--color-indigo)', color: '#fff' }} className="hover:opacity-90">
                         {saving ? 'Đang tạo...' : 'Tạo danh mục'}
                     </Button>
                 </DialogFooter>
@@ -265,7 +265,7 @@ export function RenameDialog({
                 </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="outline">Hủy</Button></DialogClose>
-                    <Button onClick={save} disabled={saving} style={{ background: 'var(--nic-indigo)', color: '#fff' }} className="hover:opacity-90">
+                    <Button onClick={save} disabled={saving} style={{ background: 'var(--color-indigo)', color: '#fff' }} className="hover:opacity-90">
                         {saving ? 'Đang lưu...' : 'Lưu'}
                     </Button>
                 </DialogFooter>
@@ -356,35 +356,35 @@ export function CollectionTable({
         if (json.success) { setItems((p) => [json.data, ...p]); setAddingNew(false) }
     }
 
-    const td = 'px-4 py-2.5 text-sm border-b border-gray-100 align-middle'
+    const td = 'px-4 py-2.5 text-sm border-b border-[var(--color-gray-border)] align-middle'
 
     if (col.fields.length === 0) {
-        return <div className="flex flex-col items-center gap-3 py-16 text-gray-400"><DatabaseIcon className="size-10 opacity-30" /><p className="text-sm">Danh mục chưa có trường nào.</p></div>
+        return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 24px', color: 'var(--color-gray-text)' }}><DatabaseIcon size={36} style={{ opacity: 0.25 }} /><p style={{ fontSize: 13 }}>Danh mục chưa có trường nào.</p></div>
     }
 
     return (
-        <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400">{loading ? 'Đang tải...' : `${items.length} mục`}</p>
-                <Button size="sm" onClick={startAdd} disabled={addingNew} style={{ background: 'var(--nic-indigo)', color: '#fff' }} className="hover:opacity-90">
-                    <PlusIcon className="size-3.5" />Thêm mục
-                </Button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ fontSize: 12, color: 'var(--color-gray-text)' }}>{loading ? 'Đang tải...' : `${items.length} mục`}</p>
+                <button onClick={startAdd} disabled={addingNew} className="dh-btn dh-btn-sm dh-btn-primary">
+                    <PlusIcon size={13} />Thêm mục
+                </button>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-gray-200">
-                <table className="w-full text-sm">
+            <div className="overflow-x-auto" style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', overflow: 'hidden' }}>
+                <table className="dh-table w-full">
                     <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
+                        <tr>
                             {col.fields.map((f) => (
-                                <th key={f.key} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
-                                    {f.label}{f.required && <span className="ml-0.5 text-red-400">*</span>}
+                                <th key={f.key}>
+                                    {f.label}{f.required && <span style={{ marginLeft: 2, color: '#ef4444' }}>*</span>}
                                 </th>
                             ))}
-                            <th className="px-4 py-3 w-14" />
+                            <th style={{ width: 56 }} />
                         </tr>
                     </thead>
                     <tbody>
                         {addingNew && (
-                            <tr className="bg-indigo-50/40">
+                            <tr style={{ background: 'var(--color-indigo-pale)' }}>
                                 {col.fields.map((f) => (
                                     <td key={f.key} className={td}>
                                         <Input autoFocus={col.fields[0].key === f.key} value={newData[f.key] ?? ''}
@@ -396,7 +396,7 @@ export function CollectionTable({
                                 ))}
                                 <td className={`${td} whitespace-nowrap`}>
                                     <div className="flex gap-1">
-                                        <button onClick={confirmAdd} className="p-1 rounded text-green-600 hover:bg-green-50"><CheckIcon className="size-4" /></button>
+                                        <button onClick={confirmAdd} className="p-1 rounded" style={{ color: 'var(--color-teal-dark)' }} onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-teal-pale)')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}><CheckIcon className="size-4" /></button>
                                         <button onClick={() => setAddingNew(false)} className="p-1 rounded text-gray-400 hover:bg-gray-100"><XIcon className="size-4" /></button>
                                     </div>
                                 </td>
@@ -411,7 +411,8 @@ export function CollectionTable({
                             const isEditing = editingId === item._id
                             return (
                                 <tr key={item._id} onClick={() => handleRowClick(item._id)} onDoubleClick={() => handleRowDblClick(item)}
-                                    className={`group transition-colors ${isEditing ? 'bg-indigo-50/40' : 'hover:bg-gray-50 cursor-pointer'}`}
+                                    style={{ background: isEditing ? 'var(--color-indigo-pale)' : undefined, cursor: isEditing ? 'default' : 'pointer' }}
+                                    className="group transition-colors"
                                     title={isEditing ? '' : 'Nhấp đúp để chỉnh sửa'}>
                                     {col.fields.map((f) => (
                                         <td key={f.key} className={td}>
@@ -431,7 +432,7 @@ export function CollectionTable({
                                     <td className={`${td} whitespace-nowrap`}>
                                         {isEditing ? (
                                             <div className="flex gap-1">
-                                                <button onClick={() => saveEdit(item)} className="p-1 rounded text-green-600 hover:bg-green-50" title="Lưu (Enter)"><CheckIcon className="size-4" /></button>
+                                                <button onClick={() => saveEdit(item)} className="p-1 rounded" style={{ color: 'var(--color-teal-dark)' }} onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-teal-pale)')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')} title="Lưu (Enter)"><CheckIcon className="size-4" /></button>
                                                 <button onClick={() => setEditingId(null)} className="p-1 rounded text-gray-400 hover:bg-gray-100" title="Hủy (Esc)"><XIcon className="size-4" /></button>
                                             </div>
                                         ) : (
@@ -447,10 +448,8 @@ export function CollectionTable({
                     </tbody>
                 </table>
             </div>
-            <p className="text-xs text-gray-400">
-                💡 Nhấp đúp vào hàng để chỉnh sửa ·{' '}
-                <kbd className="px-1 py-0.5 rounded border text-gray-400 font-mono text-[10px]">Enter</kbd> lưu ·{' '}
-                <kbd className="px-1 py-0.5 rounded border text-gray-400 font-mono text-[10px]">Esc</kbd> hủy
+            <p style={{ fontSize: 11, color: 'var(--color-gray-text)', opacity: 0.6 }}>
+                Nhấp đúp để chỉnh sửa · <kbd style={{ padding: '1px 5px', borderRadius: 4, border: '1px solid var(--color-gray-border)', fontFamily: 'monospace', fontSize: 10 }}>Enter</kbd> lưu · <kbd style={{ padding: '1px 5px', borderRadius: 4, border: '1px solid var(--color-gray-border)', fontFamily: 'monospace', fontSize: 10 }}>Esc</kbd> hủy
             </p>
         </div>
     )
@@ -536,10 +535,10 @@ export function SettingsTable({
         } finally { setUploading(false) }
     }
 
-    const td = 'px-4 py-3.5 text-sm border-b border-gray-100 align-middle'
+    const td = 'px-4 py-3.5 text-sm border-b border-[var(--color-gray-border)] align-middle'
 
     return (
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <div className="overflow-x-auto">
             <input ref={fileInputRef} type="file" className="hidden"
                 onChange={(e) => {
                     const f = e.target.files?.[0]
@@ -547,12 +546,12 @@ export function SettingsTable({
                     e.target.value = ''
                 }} />
 
-            <table className="w-full text-sm">
+            <table className="dh-table w-full">
                 <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide w-56">Cài đặt</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Giá trị</th>
-                        <th className="px-4 py-3 w-20" />
+                    <tr>
+                        <th style={{ width: 220 }}>Cài đặt</th>
+                        <th>Giá trị</th>
+                        <th style={{ width: 80 }} />
                     </tr>
                 </thead>
                 <tbody>
@@ -566,13 +565,13 @@ export function SettingsTable({
                             <tr key={row.key}
                                 onClick={() => handleRowClick(row.key)}
                                 onDoubleClick={() => !isImage && handleRowDblClick(row)}
-                                className={`group transition-colors ${isEditing ? 'bg-indigo-50/40' : isImage ? '' : 'hover:bg-gray-50 cursor-pointer'}`}
+                                style={{ background: isEditing ? 'var(--color-indigo-pale)' : undefined, cursor: isEditing || isImage ? 'default' : 'pointer' }}
                                 title={isEditing || isImage ? '' : 'Nhấp đúp để chỉnh sửa'}>
 
                                 {/* Label column */}
-                                <td className={`${td} font-medium`} style={{ color: 'var(--nic-gray-text)' }}>
+                                <td className={`${td} font-medium`} style={{ color: 'var(--color-navy-deep)' }}>
                                     <div>{row.label}</div>
-                                    {row.hint && <div className="text-xs text-gray-400 font-normal mt-0.5">{row.hint}</div>}
+                                    {row.hint && <div style={{ fontSize: 11, color: 'var(--color-gray-text)', fontWeight: 400, marginTop: 2, opacity: 0.7 }}>{row.hint}</div>}
                                 </td>
 
                                 {/* Value column */}
@@ -678,7 +677,7 @@ export function SettingsTable({
                                     {isEditing ? (
                                         <div className="flex gap-1">
                                             <button onClick={() => saveRow(row)} disabled={saving}
-                                                className="p-1 rounded text-green-600 hover:bg-green-50" title="Lưu (Enter)">
+                                                style={{ color: 'var(--color-teal-dark)' }} className="p-1 rounded" onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-teal-pale)')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')} title="Lưu (Enter)">
                                                 <CheckIcon className="size-4" />
                                             </button>
                                             <button onClick={() => { setEditingKey(null); setEditVal('') }}

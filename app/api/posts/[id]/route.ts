@@ -14,7 +14,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     await connectDB()
     const { id } = await params
-    const post = await Post.findById(id).lean()
+    const isObjectId = /^[a-f\d]{24}$/i.test(id)
+    const post = isObjectId
+      ? await Post.findById(id).lean()
+      : await Post.findOne({ slug: id }).lean()
     if (!post) return NextResponse.json({ error: 'Không tìm thấy bài viết' }, { status: 404 })
     // Public không thấy bài inactive
     if (!isAdmin && !(post as { active?: boolean }).active) {

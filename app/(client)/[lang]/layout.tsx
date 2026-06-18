@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose'
 import { hasLocale, type Locale, getDictionary } from './dictionaries'
 import { NavbarClient } from '@/components/client/NavbarClient'
 import { AnimationObserver } from '@/components/client/AnimationObserver'
+import { HtmlLang } from '@/components/client/HtmlLang'
 import { Footer } from '@/components/client/Footer'
 import { PhoneButton } from '@/components/client/PhoneButton'
 import type { LocaleKey } from '@/types/multilang'
@@ -66,16 +67,15 @@ export default async function ClientLangLayout({
   ]
 
   return (
-    <div lang={lang} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--wm-dark)' }}>
-      {/* BUG-036: root layout hardcode lang="vi" — patch html lang attr cho đúng locale */}
-      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang="${lang}"` }} />
+    <div lang={lang} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-gray-light)' }}>
+      <HtmlLang lang={lang} />
       {/* Global scroll animation observer */}
       <AnimationObserver />
 
       {/* Sticky Navbar */}
       <NavbarClient lang={lang} navItems={navItems} loginLabel={dict.nav.login} isLoggedIn={isLoggedIn} logoUrl={logoUrl} brandName={brandName} />
 
-      <main style={{ flex: 1 }}>{children}</main>
+      <main style={{ flex: 1, paddingTop: 'var(--topbar-height)' }}>{children}</main>
 
       <Footer lang={lang as LocaleKey} />
       <PhoneButton phone={phone} lang={lang} />

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono } from "next/font/google"
+import { Be_Vietnam_Pro, Space_Grotesk, JetBrains_Mono, Source_Serif_4 } from "next/font/google"
 import "./globals.css"
 import { connectDB } from "@/lib/mongodb"
 import Setting from "@/models/Setting"
@@ -7,25 +7,31 @@ import Setting from "@/models/Setting"
 const beVietnamPro = Be_Vietnam_Pro({
   weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["vietnamese", "latin"],
-  variable: "--font-primary",
+  variable: "--font-be-vietnam-pro",
   display: "swap",
 })
 
 const spaceGrotesk = Space_Grotesk({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--nic-font-mono-sans",
+  variable: "--font-space-grotesk",
   display: "swap",
 })
 
 const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "700"],
   subsets: ["latin"],
-  variable: "--nic-font-monospace",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 })
 
-// BUG-019: metadataBase đảm bảo hreflang alternates dùng absolute URL
+const sourceSerif = Source_Serif_4({
+  weight: ["400", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  display: "swap",
+})
+
 export async function generateMetadata(): Promise<Metadata> {
   const base = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wonmedia.vn')
   try {
@@ -58,7 +64,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${beVietnamPro.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full`}
+      className={`${beVietnamPro.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${sourceSerif.variable} h-full`}
     >
       <body
         className="min-h-full flex flex-col antialiased"

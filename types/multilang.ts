@@ -1,4 +1,5 @@
 export const LOCALES = ['vi', 'en', 'ko', 'ja', 'zh'] as const
+export const ADMIN_LOCALES: readonly LocaleKey[] = ['vi', 'en']
 export type LocaleKey = typeof LOCALES[number]
 export type MultiLang = Record<LocaleKey, string>
 

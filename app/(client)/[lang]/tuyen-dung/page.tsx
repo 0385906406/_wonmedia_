@@ -16,11 +16,11 @@ const HEADINGS: Record<LocaleKey, string> = {
 }
 
 const LABELS: Record<LocaleKey, Record<string, string>> = {
-  vi: { articles: 'vị trí',  empty: 'Hiện chưa có vị trí tuyển dụng.',     prev: 'Trước', next: 'Tiếp', latest: 'Vị trí đang tuyển' },
-  en: { articles: 'openings', empty: 'No open positions at the moment.',     prev: 'Prev',   next: 'Next', latest: 'Open Positions' },
-  ko: { articles: '개 채용',  empty: '현재 채용 중인 포지션이 없습니다.',    prev: '이전',   next: '다음', latest: '채용 중인 포지션' },
-  ja: { articles: '件',        empty: '現在募集中のポジションはありません。', prev: '前へ',   next: '次へ', latest: '募集中のポジション' },
-  zh: { articles: '个职位',   empty: '暂无招聘职位。',                        prev: '上一页', next: '下一页', latest: '招聘职位' },
+  vi: { articles: 'vị trí',   empty: 'Hiện chưa có vị trí tuyển dụng.',     prev: 'Trước',  next: 'Tiếp',   latest: 'Vị trí đang tuyển',      viewDetail: 'Xem chi tiết', urgent: 'Gấp',    deadline: 'Hạn nộp', blogLabel: 'Blog', careerLabel: 'Tuyển dụng', loading: 'Đang tải...' },
+  en: { articles: 'openings',  empty: 'No open positions at the moment.',     prev: 'Prev',   next: 'Next',   latest: 'Open Positions',          viewDetail: 'View Details', urgent: 'Urgent', deadline: 'Deadline', blogLabel: 'Blog', careerLabel: 'Career',     loading: 'Loading...' },
+  ko: { articles: '개 채용',   empty: '현재 채용 중인 포지션이 없습니다.',    prev: '이전',   next: '다음',   latest: '채용 중인 포지션',          viewDetail: '자세히 보기',  urgent: '긴급',   deadline: '마감일',  blogLabel: '블로그', careerLabel: '채용',      loading: '로딩 중...' },
+  ja: { articles: '件',         empty: '現在募集中のポジションはありません。', prev: '前へ',   next: '次へ',   latest: '募集中のポジション',          viewDetail: '詳細を見る',   urgent: '緊急',   deadline: '締切',    blogLabel: 'ブログ', careerLabel: '採用',       loading: '読み込み中...' },
+  zh: { articles: '个职位',    empty: '暂无招聘职位。',                        prev: '上一页', next: '下一页', latest: '招聘职位',                 viewDetail: '查看详情',    urgent: '紧急',   deadline: '截止日期', blogLabel: '博客', careerLabel: '招聘',        loading: '加载中...' },
 }
 
 export default async function TuyenDungPage({

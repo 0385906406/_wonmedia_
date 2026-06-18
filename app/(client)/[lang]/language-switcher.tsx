@@ -4,12 +4,12 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { locales, type Locale } from '@/proxy'
 import { useState, useRef, useEffect } from 'react'
 
-const LANG_LABELS: Record<Locale, { label: string; short: string; flag: string }> = {
-  vi: { label: 'Tiếng Việt', short: 'VI', flag: '🇻🇳' },
-  en: { label: 'English',    short: 'EN', flag: '🇺🇸' },
-  ko: { label: '한국어',       short: 'KO', flag: '🇰🇷' },
-  ja: { label: '日本語',       short: 'JA', flag: '🇯🇵' },
-  zh: { label: '中文',        short: 'ZH', flag: '🇨🇳' },
+const LANG_LABELS: Record<Locale, { label: string; short: string; flagUrl: string }> = {
+  vi: { label: 'Tiếng Việt', short: 'VI', flagUrl: 'https://flagcdn.com/w20/vn.png' },
+  en: { label: 'English',    short: 'EN', flagUrl: 'https://flagcdn.com/w20/us.png' },
+  ko: { label: '한국어',       short: 'KO', flagUrl: 'https://flagcdn.com/w20/kr.png' },
+  ja: { label: '日本語',       short: 'JA', flagUrl: 'https://flagcdn.com/w20/jp.png' },
+  zh: { label: '中文',        short: 'ZH', flagUrl: 'https://flagcdn.com/w20/cn.png' },
 }
 
 interface Props {
@@ -69,7 +69,7 @@ export function LanguageSwitcher({ currentLocale, variant = 'light' }: Props) {
         }}
         className="wm-lang-btn"
       >
-        <span style={{ fontSize: '15px' }}>{current.flag}</span>
+        <img src={current.flagUrl} width={20} height={14} alt={current.label} style={{ borderRadius: 2, objectFit: 'cover' }} />
         <span>{current.short}</span>
         <svg
           width="11"
@@ -111,7 +111,7 @@ export function LanguageSwitcher({ currentLocale, variant = 'light' }: Props) {
             backdropFilter: isDark ? 'blur(12px)' : 'none',
           }}
         >
-          {locales.map((locale) => {
+          {locales.filter(l => l === 'vi' || l === 'en').map((locale) => {
             const item = LANG_LABELS[locale]
             const isActive = locale === currentLocale
             return (
@@ -150,7 +150,7 @@ export function LanguageSwitcher({ currentLocale, variant = 'light' }: Props) {
                     if (!isActive) (e.currentTarget as HTMLElement).style.background = 'transparent'
                   }}
                 >
-                  <span style={{ fontSize: '16px' }}>{item.flag}</span>
+                  <img src={item.flagUrl} width={20} height={14} alt={item.label} style={{ borderRadius: 2, objectFit: 'cover' }} />
                   <span>{item.label}</span>
                   {isActive && (
                     <svg

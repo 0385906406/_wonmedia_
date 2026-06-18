@@ -6,11 +6,13 @@ import useEmblaCarousel from 'embla-carousel-react'
 interface ServiceItem {
   title: string
   desc: string
+  iconKey?: string
 }
 
 interface Props {
   items: ServiceItem[]
   heading: string
+  lang: string
 }
 
 const SERVICE_ICONS = [
@@ -57,14 +59,14 @@ export function ServicesCarousel({ items, heading }: Props) {
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative' }}>
         {/* Heading */}
-        <div className="wm-animate" style={{ textAlign: 'center', marginBottom: '60px' }}>  
+        <div className="wm-animate" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{
             color: '#fff',
-            fontSize: 'clamp(26px, 4vw, 44px)',
+            fontSize: 'clamp(22px, 3vw, 34px)',
             fontWeight: 800,
             letterSpacing: '-0.5px',
             margin: '0 0 20px',
-            fontFamily: 'var(--font-vi)',
+            fontFamily: 'var(--font-primary)',
           }}>
             {heading}
           </h2>
@@ -87,10 +89,7 @@ export function ServicesCarousel({ items, heading }: Props) {
           <div ref={emblaRef} style={{ overflow: 'hidden', padding: '8px 4px 16px' }}>
             <div className="wm-carousel-track">
               {items.map((item, i) => (
-                <div
-                  key={i}
-                  className={`wm-carousel-slide wm-service-slide-4`}
-                >
+                <div key={i} className="wm-carousel-slide wm-service-slide-4">
                   <div className="wm-mesh-card">
                     {/* Animated gradient border */}
                     <span className="wm-mesh-border" />
@@ -106,7 +105,7 @@ export function ServicesCarousel({ items, heading }: Props) {
                         flexShrink: 0,
                         transition: 'background 0.4s ease, transform 0.4s ease',
                       }}>
-                        {SERVICE_ICONS[i]}
+                        {SERVICE_ICONS[i % SERVICE_ICONS.length]}
                       </div>
 
                       {/* Title */}
@@ -114,7 +113,7 @@ export function ServicesCarousel({ items, heading }: Props) {
                         fontSize: '18px', fontWeight: 700,
                         color: '#fff', margin: 0, lineHeight: 1.3,
                         letterSpacing: '-0.3px',
-                        fontFamily: 'var(--font-vi)',
+                        fontFamily: 'var(--font-primary)',
                       }}>
                         {item.title}
                       </h3>
@@ -123,17 +122,17 @@ export function ServicesCarousel({ items, heading }: Props) {
                       <p style={{
                         fontSize: '13.5px', lineHeight: 1.7,
                         color: 'rgba(255,255,255,0.7)', margin: 0,
-                        fontFamily: 'var(--font-vi)',
+                        fontFamily: 'var(--font-primary)',
                         flex: 1,
                       }}>
                         {item.desc}
                       </p>
 
-                      {/* Arrow link */}
+                      {/* Arrow */}
                       <div style={{
                         display: 'flex', alignItems: 'center', gap: '6px',
                         color: 'var(--color-teal-light)', fontSize: '13px', fontWeight: 600,
-                        marginTop: '4px', fontFamily: 'var(--font-vi)',
+                        marginTop: '4px', fontFamily: 'var(--font-primary)',
                       }}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>

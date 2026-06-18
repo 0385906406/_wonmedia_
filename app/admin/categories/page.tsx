@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { PlusIcon, Trash2Icon, PencilIcon, GlobeIcon } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
-import { LOCALES, LOCALE_META, type LocaleKey } from '@/types/multilang'
+import { ADMIN_LOCALES, LOCALE_META, type LocaleKey } from '@/types/multilang'
 
 interface Category {
   _id: string
@@ -210,7 +210,7 @@ export default function CategoriesPage() {
 
               {/* Lang tabs */}
               <div style={{ display: 'flex', gap: 2, padding: 3, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
-                {LOCALES.map(l => (
+                {ADMIN_LOCALES.map(l => (
                   <button key={l} type="button" onClick={() => setLang(l)}
                     style={{ padding: '5px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700,
                       background: lang === l ? '#fff' : 'transparent',
