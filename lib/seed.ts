@@ -18,6 +18,14 @@ const Setting = mongoose.models.Setting || mongoose.model('Setting', new mongoos
   header: { navDisplayName: String, faviconUrl: String, logoEn: String, logoVi: String, logoImageUrl: String },
 }, { strict: false, timestamps: true }))
 
+const AboutConfig = mongoose.models.AboutConfig || mongoose.model('AboutConfig', new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+}, { strict: false, timestamps: true }))
+
+const ContactConfig = mongoose.models.ContactConfig || mongoose.model('ContactConfig', new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+}, { strict: false, timestamps: true }))
+
 const FooterConfig = mongoose.models.FooterConfig || mongoose.model('FooterConfig', new mongoose.Schema({
   key: { type: String, unique: true, default: 'global' },
   companyName: MLSchema, navAbout: MLSchema, navServices: MLSchema, navCareers: MLSchema,
@@ -568,6 +576,186 @@ async function seedFooter() {
   console.log('[seed] Footer created')
 }
 
+// ─── About ────────────────────────────────────────────────────────────────────
+
+async function seedAbout() {
+  const exists = await AboutConfig.findOne({ key: 'global' })
+  if (exists) return
+
+  await AboutConfig.create({
+    key: 'global',
+    bannerSubtitle: { vi: 'VỀ CHÚNG TÔI', en: 'ABOUT US', ko: '회사 소개', ja: '会社概要', zh: '关于我们' },
+    bannerTitle: {
+      vi: 'Đơn vị truyền thông hàng đầu Việt Nam',
+      en: 'Vietnam\'s Leading Media Company',
+      ko: '베트남 최고의 미디어 기업',
+      ja: 'ベトナム最大手のメディア企業',
+      zh: '越南领先的媒体公司',
+    },
+    aboutLabel: { vi: 'VỀ WON MEDIA', en: 'ABOUT WON MEDIA', ko: 'WON MEDIA 소개', ja: 'WON MEDIAについて', zh: '关于WON MEDIA' },
+    aboutTitleLine1: {
+      vi: 'Sứ mệnh đưa âm nhạc',
+      en: 'Our mission to bring music',
+      ko: '음악을 세계로',
+      ja: '音楽を世界へ',
+      zh: '将音乐带向世界',
+    },
+    aboutTitleHighlight: {
+      vi: 'Việt Nam ra thế giới',
+      en: 'from Vietnam to the world',
+      ko: '베트남에서 세계로',
+      ja: 'ベトナムから世界へ',
+      zh: '从越南走向世界',
+    },
+    aboutDesc1Prefix: { vi: 'Được thành lập từ năm', en: 'Founded in', ko: '설립 연도:', ja: '設立年:', zh: '成立于' },
+    aboutDesc1Year:   { vi: '2020', en: '2020', ko: '2020', ja: '2020', zh: '2020' },
+    aboutDesc1Suffix: {
+      vi: ', WON Media đã trở thành đơn vị tiên phong trong lĩnh vực phân phối âm nhạc số và quản lý bản quyền tại Việt Nam.',
+      en: ', WON Media has become a pioneer in digital music distribution and copyright management in Vietnam.',
+      ko: ', WON Media는 베트남의 디지털 음악 배급 및 저작권 관리 분야의 선구자가 되었습니다.',
+      ja: ', WON Mediaはベトナムのデジタルâmusic配信と著作権管理のパイオニアとなりました。',
+      zh: ', WON Media已成为越南数字音乐发行和版权管理领域的先驱。',
+    },
+    aboutDesc2: {
+      vi: 'Với đội ngũ hơn 50 chuyên gia giàu kinh nghiệm, chúng tôi đã hợp tác cùng hàng trăm nghệ sĩ và nhãn hàng, mang âm nhạc Việt Nam đến với khán giả toàn cầu trên hơn 150 nền tảng streaming quốc tế.',
+      en: 'With a team of over 50 experienced professionals, we have partnered with hundreds of artists and brands, bringing Vietnamese music to global audiences on over 150 international streaming platforms.',
+      ko: '50명 이상의 경험 있는 전문가 팀을 보유하여 수백 명의 아티스트 및 브랜드와 협력하여 150개 이상의 국제 스트리밍 플랫폼에서 전 세계 관객에게 베트남 음악을 전달합니다.',
+      ja: '50人以上の経験豊富な専門家チームを擁し、数百のアーティストやブランドと提携し、150以上の国際ストリーミングプラットフォームで世界中の視聴者にベトナムの音楽を届けています。',
+      zh: '拥有50余名经验丰富的专业人士团队，我们与数百位艺术家和品牌合作，在150多个国际流媒体平台上将越南音乐带给全球观众。',
+    },
+    aboutExpValue: { vi: '5+', en: '5+', ko: '5+', ja: '5+', zh: '5+' },
+    aboutExpText:  { vi: 'Năm kinh nghiệm', en: 'Years of experience', ko: '년 경험', ja: '年の経験', zh: '年经验' },
+    aboutButton:   { vi: 'Liên hệ với chúng tôi', en: 'Contact Us', ko: '문의하기', ja: 'お問い合わせ', zh: '联系我们' },
+    timelineHeading: { vi: 'Hành trình phát triển', en: 'Our Journey', ko: '성장 여정', ja: '成長の歩み', zh: '发展历程' },
+    timelineMilestones: [
+      {
+        title: { vi: 'Thành lập WON Media', en: 'WON Media Founded', ko: 'WON Media 설립', ja: 'WON Media 設立', zh: 'WON Media 成立' },
+        line1: { vi: 'Ra mắt với đội ngũ 5 thành viên', en: 'Launched with a team of 5 members', ko: '5명의 팀으로 출발', ja: '5人のチームで始動', zh: '以5人团队起步' },
+        line2: { vi: 'Tập trung vào phân phối âm nhạc', en: 'Focused on music distribution', ko: '음악 배급에 집중', ja: '音楽配信に注力', zh: '专注于音乐发行' },
+      },
+      {
+        title: { vi: 'Đạt 100 nghệ sĩ đối tác', en: 'Reached 100 partner artists', ko: '파트너 아티스트 100명 달성', ja: 'パートナーアーティスト100名達成', zh: '达成100位合作艺术家' },
+        line1: { vi: 'Mở rộng lên 50 nền tảng streaming', en: 'Expanded to 50 streaming platforms', ko: '50개 스트리밍 플랫폼으로 확장', ja: '50ストリーミングプラットフォームに拡大', zh: '扩展至50个流媒体平台' },
+        line2: { vi: 'Ra mắt dịch vụ quản lý bản quyền', en: 'Launched copyright management service', ko: '저작권 관리 서비스 출시', ja: '著作権管理サービス開始', zh: '推出版权管理服务' },
+      },
+      {
+        title: { vi: 'Hợp tác quốc tế đầu tiên', en: 'First International Partnership', ko: '첫 국제 파트너십', ja: '初の国際パートナーシップ', zh: '首次国际合作' },
+        line1: { vi: 'Ký kết với các label Hàn Quốc, Nhật Bản', en: 'Signed with Korean and Japanese labels', ko: '한국 및 일본 레이블과 계약', ja: '韓国・日本のレーベルと契約', zh: '与韩日唱片公司签约' },
+        line2: { vi: 'Phân phối lên 100+ nền tảng toàn cầu', en: 'Distribution across 100+ global platforms', ko: '100개 이상 글로벌 플랫폼 배급', ja: '100以上のグローバルプラットフォームへ配信', zh: '发行至100多个全球平台' },
+      },
+      {
+        title: { vi: 'Ra mắt dịch vụ Marketing âm nhạc', en: 'Music Marketing Service Launch', ko: '음악 마케팅 서비스 출시', ja: '音楽マーケティングサービス開始', zh: '音乐营销服务上线' },
+        line1: { vi: 'Chiến dịch đa kênh cho 200+ nghệ sĩ', en: 'Multi-channel campaigns for 200+ artists', ko: '200+ 아티스트 대상 멀티채널 캠페인', ja: '200+アーティスト向けマルチチャネルキャンペーン', zh: '为200+艺术家开展多渠道营销' },
+        line2: { vi: 'Hợp tác với VTV, VTVcab, HTV', en: 'Partnership with VTV, VTVcab, HTV', ko: 'VTV, VTVcab, HTV와 파트너십', ja: 'VTV、VTVcab、HTVとのパートナーシップ', zh: '与VTV、VTVcab、HTV合作' },
+      },
+      {
+        title: { vi: 'Nền tảng phân phối thế hệ mới', en: 'Next-Gen Distribution Platform', ko: '차세대 배급 플랫폼', ja: '次世代配信プラットフォーム', zh: '新一代发行平台' },
+        line1: { vi: 'Ra mắt hệ thống phân tích doanh thu AI', en: 'Launched AI revenue analytics system', ko: 'AI 수익 분석 시스템 출시', ja: 'AI収益分析システム開始', zh: '推出AI收益分析系统' },
+        line2: { vi: 'Phủ sóng 150+ nền tảng toàn cầu', en: 'Coverage across 150+ global platforms', ko: '150개 이상 플랫폼 글로벌 커버리지', ja: '150以上のプラットフォームをカバー', zh: '覆盖150+全球平台' },
+      },
+      {
+        title: { vi: 'Mở rộng khu vực Đông Nam Á', en: 'Southeast Asia Expansion', ko: '동남아시아 확장', ja: '東南アジアへの拡大', zh: '东南亚业务扩展' },
+        line1: { vi: 'Văn phòng tại Thái Lan, Indonesia', en: 'Offices in Thailand, Indonesia', ko: '태국, 인도네시아 사무소', ja: 'タイ・インドネシアにオフィス開設', zh: '泰国、印度尼西亚设立办事处' },
+        line2: { vi: 'Đội ngũ 50+ chuyên gia đa quốc gia', en: '50+ multinational expert team', ko: '50명 이상 다국적 전문가 팀', ja: '50名以上の多国籍専門家チーム', zh: '50+多国籍专家团队' },
+      },
+    ],
+    whyUsHeading: { vi: 'Tại sao chọn WON Media?', en: 'Why Choose WON Media?', ko: '왜 WON Media인가?', ja: 'なぜWON Mediaを選ぶのか？', zh: '为什么选择WON Media？' },
+    whyUsReasons: [
+      {
+        title: { vi: 'Đội ngũ chuyên gia', en: 'Expert Team', ko: '전문가 팀', ja: '専門家チーム', zh: '专业团队' },
+        desc:  { vi: 'Hơn 50 chuyên gia với kinh nghiệm sâu về âm nhạc số và bản quyền quốc tế.', en: 'Over 50 experts with deep experience in digital music and international copyright.', ko: '디지털 음악과 국제 저작권에 깊은 경험을 가진 50명 이상의 전문가.', ja: 'デジタル音楽と国際著作権に深い経験を持つ50名以上の専門家。', zh: '50余名在数字音乐和国际版权方面拥有深厚经验的专家。' },
+      },
+      {
+        title: { vi: 'Mạng lưới toàn cầu', en: 'Global Network', ko: '글로벌 네트워크', ja: 'グローバルネットワーク', zh: '全球网络' },
+        desc:  { vi: 'Kết nối với 150+ nền tảng streaming và hàng nghìn đối tác trên toàn thế giới.', en: 'Connected to 150+ streaming platforms and thousands of partners worldwide.', ko: '150개 이상의 스트리밍 플랫폼과 전 세계 수천 개의 파트너와 연결.', ja: '150以上のストリーミングプラットフォームと世界中の何千ものパートナーと接続。', zh: '与150+流媒体平台和全球数千个合作伙伴相连。' },
+      },
+      {
+        title: { vi: 'Công nghệ hiện đại', en: 'Modern Technology', ko: '현대적인 기술', ja: '最新技術', zh: '现代技术' },
+        desc:  { vi: 'Ứng dụng AI và big data để tối ưu hóa chiến lược phân phối và marketing âm nhạc.', en: 'Applying AI and big data to optimize music distribution and marketing strategies.', ko: 'AI와 빅데이터를 적용하여 음악 배급 및 마케팅 전략을 최적화.', ja: 'AIとビッグデータを活用して音楽配信とマーケティング戦略を最適化。', zh: '应用AI和大数据优化音乐发行和营销策略。' },
+      },
+      {
+        title: { vi: 'Hỗ trợ toàn diện', en: 'Comprehensive Support', ko: '종합적인 지원', ja: '総合サポート', zh: '全面支持' },
+        desc:  { vi: 'Đồng hành cùng nghệ sĩ từ sản xuất, phân phối đến marketing và quản lý bản quyền.', en: 'Accompanying artists from production, distribution to marketing and copyright management.', ko: '제작, 배급, 마케팅 및 저작권 관리까지 아티스트와 함께.', ja: 'プロダクション、配信からマーケティングと著作権管理まで アーティストに同行。', zh: '从制作、发行到营销和版权管理，全程陪伴艺术家。' },
+      },
+      {
+        title: { vi: 'Minh bạch tài chính', en: 'Financial Transparency', ko: '재정 투명성', ja: '財務の透明性', zh: '财务透明' },
+        desc:  { vi: 'Báo cáo doanh thu theo thời gian thực, rõ ràng và trung thực với mọi nghệ sĩ đối tác.', en: 'Real-time revenue reporting, clear and honest with all partner artists.', ko: '모든 파트너 아티스트와 함께 실시간 수익 보고, 명확하고 정직하게.', ja: 'すべてのパートナーアーティストに対してリアルタイムの収益報告、明確かつ誠実に。', zh: '与所有合作艺术家实时收益报告，清晰诚实。' },
+      },
+      {
+        title: { vi: 'Uy tín thương hiệu', en: 'Brand Reputation', ko: '브랜드 신뢰성', ja: 'ブランドの信頼性', zh: '品牌信誉' },
+        desc:  { vi: 'Được hàng trăm nghệ sĩ và doanh nghiệp tin tưởng lựa chọn trong 5 năm qua.', en: 'Trusted by hundreds of artists and businesses over the past 5 years.', ko: '지난 5년간 수백 명의 아티스트와 기업이 선택한 신뢰할 수 있는 파트너.', ja: 'この5年間、数百のアーティストや企業から信頼されてきたパートナー。', zh: '过去5年来受到数百位艺术家和企业的信赖与选择。' },
+      },
+    ],
+    servicesHeading: { vi: 'Dịch vụ của chúng tôi', en: 'Our Services', ko: '서비스', ja: 'サービス', zh: '我们的服务' },
+    servicesItems: [
+      {
+        title: { vi: 'Phân phối âm nhạc số', en: 'Digital Music Distribution', ko: '디지털 음악 배급', ja: 'デジタル音楽配信', zh: '数字音乐发行' },
+        desc:  { vi: 'Đưa âm nhạc của bạn lên 150+ nền tảng streaming toàn cầu chỉ trong vài ngày.', en: 'Get your music on 150+ global streaming platforms within days.', ko: '며칠 내에 150개 이상의 글로벌 스트리밍 플랫폼에 음악을 게시하세요.', ja: '数日以内に150以上のグローバルストリーミングプラットフォームに音楽を届けます。', zh: '几天内将您的音乐上线至150多个全球流媒体平台。' },
+      },
+      {
+        title: { vi: 'Quản lý bản quyền', en: 'Copyright Management', ko: '저작권 관리', ja: '著作権管理', zh: '版权管理' },
+        desc:  { vi: 'Bảo vệ tác phẩm và tối ưu hóa nguồn thu từ bản quyền âm nhạc của bạn.', en: 'Protect your work and optimize revenue from your music copyright.', ko: '작품을 보호하고 음악 저작권 수익을 최적화하세요.', ja: '作品を保護し、音楽著作権からの収益を最適化します。', zh: '保护您的作品并优化音乐版权收益。' },
+      },
+      {
+        title: { vi: 'Marketing âm nhạc', en: 'Music Marketing', ko: '음악 마케팅', ja: '音楽マーケティング', zh: '音乐营销' },
+        desc:  { vi: 'Chiến dịch marketing đa kênh giúp âm nhạc của bạn tiếp cận hàng triệu người nghe.', en: 'Multi-channel marketing campaigns to reach millions of listeners.', ko: '수백만 명의 청취자에게 도달하는 멀티채널 마케팅 캠페인.', ja: '何百万人もの聴衆にリーチするマルチチャネルマーケティングキャンペーン。', zh: '多渠道营销活动，助您的音乐触达数百万听众。' },
+      },
+      {
+        title: { vi: 'Sản xuất nội dung', en: 'Content Production', ko: '콘텐츠 제작', ja: 'コンテンツ制作', zh: '内容制作' },
+        desc:  { vi: 'Sản xuất MV, lyric video, content mạng xã hội chuyên nghiệp, sáng tạo.', en: 'Professional and creative production of MVs, lyric videos, and social media content.', ko: 'MV, 가사 비디오 및 소셜 미디어 콘텐츠의 전문적이고 창의적인 제작.', ja: 'MV、歌詞動画、ソーシャルメディアコンテンツのプロフェッショナルでクリエイティブな制作。', zh: 'MV、歌词视频和社交媒体内容的专业创意制作。' },
+      },
+    ],
+  })
+  console.log('[seed] About page content created')
+}
+
+// ─── Contact ──────────────────────────────────────────────────────────────────
+
+async function seedContact() {
+  const exists = await ContactConfig.findOne({ key: 'global' })
+  if (exists) return
+
+  await ContactConfig.create({
+    key: 'global',
+    bannerSubtitle: { vi: 'LIÊN HỆ', en: 'CONTACT', ko: '연락처', ja: 'お問い合わせ', zh: '联系我们' },
+    bannerTitle: {
+      vi: 'Hãy kết nối với chúng tôi',
+      en: 'Let\'s Connect With Us',
+      ko: '우리와 연결하세요',
+      ja: 'お気軽にご連絡ください',
+      zh: '与我们建立联系',
+    },
+    address: {
+      vi: 'Tầng 5, Tòa nhà WON Tower, 123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh',
+      en: '5th Floor, WON Tower, 123 Nguyen Hue, District 1, Ho Chi Minh City',
+      ko: '5층, WON 타워, 123 응우옌 후에, 1군, 호치민시',
+      ja: '5階、WONタワー、123グエン・フエ、1区、ホーチミン市',
+      zh: '5楼，WON大厦，123阮惠街，1郡，胡志明市',
+    },
+    phone:           '+84 28 1234 5678',
+    hotline:         '1800 1234',
+    email:           'contact@wonmedia.vn',
+    zalo:            '0901234567',
+    googleMapsUrl:   'https://maps.google.com/?q=Ho+Chi+Minh+City',
+    googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d501.7148577413613!2d106.70244752924595!3d10.776489600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4670702e31%3A0xa5777fb3d5b57e59!2sNguy%E1%BB%85n%20Hu%E1%BB%87%2C%20Ph%C6%B0%E1%BB%9Dng%20B%E1%BA%BFn%20Ngh%C3%A9%2C%20Qu%E1%BA%ADn%201%2C%20Th%C3%A0nh%20ph%E1%BB%91%20H%E1%BB%93%20Ch%C3%AD%20Minh%2C%20Vietnam!5e0!3m2!1sen!2s!4v1718000000000!5m2!1sen!2s',
+    formTitle: {
+      vi: 'Gửi tin nhắn cho chúng tôi',
+      en: 'Send Us a Message',
+      ko: '메시지를 보내주세요',
+      ja: 'メッセージを送る',
+      zh: '给我们发消息',
+    },
+    formSubtitle: {
+      vi: 'Điền thông tin bên dưới, chúng tôi sẽ phản hồi trong vòng 24 giờ.',
+      en: 'Fill in the form below and we will respond within 24 hours.',
+      ko: '아래 양식을 작성해 주시면 24시간 내에 답변 드리겠습니다.',
+      ja: '以下のフォームにご記入ください。24時間以内にご返信します。',
+      zh: '填写下面的表单，我们将在24小时内回复。',
+    },
+  })
+  console.log('[seed] Contact page content created')
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export async function runSeed() {
@@ -576,6 +764,8 @@ export async function runSeed() {
     await seedAdmin()
     await seedSettings()
     await seedFooter()
+    await seedAbout()
+    await seedContact()
     await seedPosts()
   } catch (err) {
     console.error('[seed] Failed:', err)
