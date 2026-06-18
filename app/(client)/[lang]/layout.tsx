@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { hasLocale, type Locale, getDictionary } from './dictionaries'
 import { NavbarClient } from '@/components/client/NavbarClient'
 import { AnimationObserver } from '@/components/client/AnimationObserver'
@@ -30,18 +28,6 @@ export default async function ClientLangLayout({
   if (!hasLocale(lang)) notFound()
 
   const dict = await getDictionary(lang as Locale)
-
-  // Kiểm tra đăng nhập qua cookie token
-  let isLoggedIn = false
-  try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('token')?.value
-    if (token) {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-      await jwtVerify(token, secret)
-      isLoggedIn = true
-    }
-  } catch { /* token invalid hoặc hết hạn */ }
 
   // Lấy phone + settings song song
   let phone = ''
@@ -73,7 +59,7 @@ export default async function ClientLangLayout({
       <AnimationObserver />
 
       {/* Sticky Navbar */}
-      <NavbarClient lang={lang} navItems={navItems} loginLabel={dict.nav.login} isLoggedIn={isLoggedIn} logoUrl={logoUrl} brandName={brandName} />
+      <NavbarClient lang={lang} navItems={navItems} logoUrl={logoUrl} brandName={brandName} />
 
       <main style={{ flex: 1, paddingTop: 'var(--topbar-height)' }}>{children}</main>
 
