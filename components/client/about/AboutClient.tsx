@@ -118,7 +118,7 @@ function BannerSection({ t }: { t: AboutT['banner'] }) {
 }
 
 // ─── About ────────────────────────────────────────────────────────────────────
-function AboutSection({ t }: { t: AboutT['about'] }) {
+function AboutSection({ t, lang }: { t: AboutT['about']; lang: string }) {
   return (
     <section style={{ background: '#fff', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
@@ -163,10 +163,10 @@ function AboutSection({ t }: { t: AboutT['about'] }) {
                 <span key={p} style={{ padding: '6px 14px', border: '1.5px solid var(--color-gray-border)', borderRadius: 100, fontSize: 12, fontWeight: 600, color: 'var(--color-gray-text)', fontFamily: 'var(--font-primary)' }}>{p} Partner</span>
               ))}
             </div>
-            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-              className="qp-btn-primary">
+            <motion.a href={`/${lang}/lien-he`} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+              className="qp-btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>
               {t.button}
-            </motion.button>
+            </motion.a>
           </motion.div>
         </div>
       </div>
@@ -359,7 +359,7 @@ export function AboutClient({ t, lang = 'vi' }: { t: AboutT; lang?: string }) {
         /* Why Us grid đã có media query riêng trong WhyUsSection */
       `}</style>
       <BannerSection   t={t.banner}   />
-      <AboutSection    t={t.about}    />
+      <AboutSection    t={t.about}    lang={lang} />
       <TimelineSection t={t.timeline} eyebrow={e.timeline} />
       <WhyUsSection    t={t.whyUs}    eyebrow={e.whyUs}    />
       <ServicesSection t={t.services} eyebrow={e.services} />

@@ -1,11 +1,5 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI!
-
-if (!MONGODB_URI) {
-    throw new Error('Please define MONGODB_URI in .env.local')
-}
-
 // Cache connection để tránh tạo nhiều connection trong dev
 let cached = global.mongoose as {
     conn: typeof mongoose | null
@@ -17,6 +11,11 @@ if (!cached) {
 }
 
 export async function connectDB() {
+    const MONGODB_URI = process.env.MONGODB_URI
+    if (!MONGODB_URI) {
+        throw new Error('Please define MONGODB_URI in .env.local')
+    }
+
     // Mongoose already connected (by any means) — sync cache and return
     if (mongoose.connection.readyState === 1) {
         cached.conn = mongoose
@@ -26,7 +25,6 @@ export async function connectDB() {
 
     // Clear stale/failed cache
     if (mongoose.connection.readyState !== 2) {
-        // Not connecting → reset everything
         cached.conn = null
         cached.promise = null
     }
