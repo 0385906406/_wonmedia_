@@ -9,6 +9,7 @@ export interface PostCard {
   slug: string
   type: 'blog' | 'tuyen-dung'
   thumbnail: string
+  thumbnailPosition?: string
   date: string
   category: string
   title: string
@@ -132,6 +133,7 @@ function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: s
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                objectPosition: post.thumbnailPosition || 'center center',
                 transform: hov ? 'scale(1.05)' : 'scale(1)',
                 transition: 'transform 0.6s cubic-bezier(0.2,0.8,0.2,1)' }} />
           : <div style={{ width: '100%', height: '100%',
@@ -207,6 +209,7 @@ function GridCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                objectPosition: post.thumbnailPosition || 'center center',
                 transform: hov ? 'scale(1.06)' : 'scale(1)',
                 transition: 'transform 0.55s cubic-bezier(0.2,0.8,0.2,1)' }} />
           : <div style={{ width: '100%', height: '100%',
@@ -282,7 +285,7 @@ function ListCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
       }}>
         {post.thumbnail && (
           <img src={post.thumbnail} alt={post.title}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', objectPosition: post.thumbnailPosition || 'center center' }} />
         )}
       </div>
       {/* Body */}

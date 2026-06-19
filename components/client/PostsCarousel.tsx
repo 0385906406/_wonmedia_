@@ -9,6 +9,7 @@ interface Post {
   category: string
   type: 'blog' | 'tuyen-dung'
   thumbnail: string
+  thumbnailPosition?: string
   title: string
   excerpt: string
   slug: string
@@ -33,7 +34,7 @@ function PostMeshCard({ post, lang, readMore }: { post: Post; lang: string; read
       {/* Thumbnail */}
       <div className="qp-mesh-card__media">
         {post.thumbnail
-          ? <img src={post.thumbnail} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ? <img src={post.thumbnail} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', objectPosition: post.thumbnailPosition || 'center center' }} />
           : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" /></svg>}
       </div>
 

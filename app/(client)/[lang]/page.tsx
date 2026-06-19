@@ -115,14 +115,15 @@ async function fetchHomepageData(lang: LocaleKey) {
       })) : null,
       partners: partners.length ? partners.map(p => ({ src: p.logo, alt: p.name })) : null,
       posts: posts.length ? posts.map(p => ({
-        id: (p._id as { toString(): string }).toString(),
-        date: p.date,
-        category: (p.category as Record<string, string>)[lang] || (p.category as Record<string, string>).vi || '',
-        type: p.type as 'blog' | 'tuyen-dung',
-        thumbnail: p.thumbnail,
-        title: (p.title as Record<string, string>)[lang] || (p.title as Record<string, string>).vi || '',
-        excerpt: (p.excerpt as Record<string, string>)[lang] || (p.excerpt as Record<string, string>).vi || '',
-        slug: p.slug,
+        id:                (p._id as { toString(): string }).toString(),
+        date:              p.date,
+        category:          (p.category as Record<string, string>)[lang] || (p.category as Record<string, string>).vi || '',
+        type:              p.type as 'blog' | 'tuyen-dung',
+        thumbnail:         p.thumbnail,
+        thumbnailPosition: (p as { thumbnailPosition?: string }).thumbnailPosition || 'center center',
+        title:             (p.title as Record<string, string>)[lang] || (p.title as Record<string, string>).vi || '',
+        excerpt:           (p.excerpt as Record<string, string>)[lang] || (p.excerpt as Record<string, string>).vi || '',
+        slug:              p.slug,
       })) : null,
     }
   } catch {

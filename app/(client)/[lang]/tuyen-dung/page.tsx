@@ -81,14 +81,15 @@ export default async function TuyenDungPage({
       const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
       const jp = p as unknown as { urgent?: boolean; jobType?: string; location?: string; salary?: string; deadline?: string }
       return {
-        _id:       (p._id as { toString(): string }).toString(),
-        slug:      p.slug,
-        type:      p.type as 'blog' | 'tuyen-dung',
-        thumbnail: p.thumbnail || '',
-        date:      p.date || '',
-        category:  ml(p.category as Record<string, string>),
-        title:     ml(p.title    as Record<string, string>),
-        excerpt:   ml(p.excerpt  as Record<string, string>),
+        _id:               (p._id as { toString(): string }).toString(),
+        slug:              p.slug,
+        type:              p.type as 'blog' | 'tuyen-dung',
+        thumbnail:         p.thumbnail || '',
+        thumbnailPosition: (p as { thumbnailPosition?: string }).thumbnailPosition || 'center center',
+        date:              p.date || '',
+        category:          ml(p.category as Record<string, string>),
+        title:             ml(p.title    as Record<string, string>),
+        excerpt:           ml(p.excerpt  as Record<string, string>),
         urgent:   jp.urgent   ?? false,
         jobType:  jp.jobType  ?? '',
         location: jp.location ?? '',
