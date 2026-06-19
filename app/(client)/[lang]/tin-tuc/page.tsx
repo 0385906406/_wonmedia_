@@ -91,7 +91,7 @@ export default async function TinTucPage({
         excerpt:           ml(p.excerpt  as Record<string, string>),
       }
     })
-  } catch { /* DB unavailable */ }
+  } catch {}
 
   return (
     <BlogClient

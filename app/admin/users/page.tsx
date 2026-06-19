@@ -137,7 +137,6 @@ export default function UsersPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="dh-page-header">
         <div>
           <h1 className="dh-page-title">Người dùng</h1>
@@ -150,7 +149,6 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Table */}
       <div className="dh-card">
         {loading ? (
           <div style={{ padding: 40 }}>
@@ -209,7 +207,6 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Create Modal */}
       {showCreate && (
         <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowCreate(false) }}>
           <div className="dh-modal" style={{ maxWidth: 480 }}>
@@ -247,7 +244,6 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Edit Modal */}
       {showEdit && editUser && (
         <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowEdit(false) }}>
           <div className="dh-modal" style={{ maxWidth: 480 }}>

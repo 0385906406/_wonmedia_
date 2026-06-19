@@ -531,7 +531,6 @@ function PostsEditor() {
         </div>
       </div>
 
-      {/* Mode selector */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {[
           { v: 'auto' as const, label: 'Tự động', desc: 'Tự động lấy N bài mới nhất đang kích hoạt để hiển thị', icon: ZapIcon },
@@ -559,7 +558,6 @@ function PostsEditor() {
         ))}
       </div>
 
-      {/* Limit input — auto mode only */}
       {mode === 'auto' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, borderRadius: 10, background: 'white', border: '1px solid var(--color-gray-border)' }}>
           <div style={{ flex: 1 }}>
@@ -578,7 +576,6 @@ function PostsEditor() {
         </div>
       )}
 
-      {/* Post list */}
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#94a3b8', padding: '24px 0' }}>
           <Loader2Icon size={16} className="animate-spin" />Đang tải danh sách bài viết...

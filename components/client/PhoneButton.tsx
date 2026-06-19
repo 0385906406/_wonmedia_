@@ -26,7 +26,6 @@ export function PhoneButton({ phone, lang }: Props) {
           textDecoration: 'none',
         }}
       >
-        {/* Ping waves */}
         <span style={{
           position: 'absolute',
           width: 44, height: 44, borderRadius: '50%',
@@ -42,7 +41,6 @@ export function PhoneButton({ phone, lang }: Props) {
           opacity: 0.3,
         }} />
 
-        {/* Main pill */}
         <div style={{
           position: 'relative',
           display: 'flex', alignItems: 'center',
@@ -53,7 +51,6 @@ export function PhoneButton({ phone, lang }: Props) {
           paddingRight: hovered ? '14px' : '3px',
           transition: 'padding-right 0.35s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.3s ease',
         }}>
-          {/* Phone icon circle */}
           <div style={{
             width: 38, height: 38, borderRadius: '50%',
             background: '#fff',
@@ -66,7 +63,6 @@ export function PhoneButton({ phone, lang }: Props) {
             </svg>
           </div>
 
-          {/* Phone number */}
           <span style={{
             color: '#fff', fontWeight: 700, fontSize: 13,
             whiteSpace: 'nowrap', overflow: 'hidden',

@@ -478,7 +478,6 @@ function GioiThieuAdminInner() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="dh-page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-navy-pale)', color: 'var(--color-navy)' }}>
@@ -491,9 +490,7 @@ function GioiThieuAdminInner() {
         </div>
       </div>
 
-      {/* Tab card */}
       <div className="dh-card" style={{ overflow: 'hidden', padding: 0 }}>
-        {/* Tab bar */}
         <div style={{ display: 'flex', width: '100%', borderBottom: '1px solid var(--color-gray-border)' }}>
           {TABS.map(({ value, label, icon: Icon }) => (
             <button

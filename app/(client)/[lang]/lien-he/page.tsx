@@ -34,7 +34,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   }
 }
 
-// ─── Fallback ─────────────────────────────────────────────────────────────────
 type L = Record<string, string>
 const tf = (vi: string, en: string, ko?: string, ja?: string, zh?: string): L => ({
   vi, en, ko: ko ?? en, ja: ja ?? en, zh: zh ?? en,
@@ -82,7 +81,6 @@ function getFallbackContact(lang: LocaleKey): ContactT {
   }
 }
 
-// ─── Load ──────────────────────────────────────────────────────────────────────
 async function loadContact(lang: LocaleKey): Promise<ContactT> {
   try {
     await connectDB()
@@ -112,7 +110,6 @@ async function loadContact(lang: LocaleKey): Promise<ContactT> {
   }
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
 export default async function LienHePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()

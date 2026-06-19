@@ -35,7 +35,6 @@ export default function CategoriesPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [lang, setLang]         = useState<LocaleKey>('vi')
   
-  // Form state
   const [slug, setSlug]         = useState('')
   const [name, setName]         = useState({ ...EMPTY_NAME })
   const [forType, setForType]   = useState<'all' | 'blog' | 'tuyen-dung'>('all')
@@ -74,7 +73,6 @@ export default function CategoriesPage() {
     setShowForm(true)
   }
 
-  // Auto-slug from vi name when creating
   useEffect(() => {
     if (!editing && !slugLocked && name.vi) setSlug(slugify(name.vi))
   }, [name.vi, editing, slugLocked])
@@ -94,7 +92,6 @@ export default function CategoriesPage() {
       if (!res.ok) { toast.error(d.error ?? 'Lỗi lưu'); return }
       toast.success(editing ? 'Đã cập nhật danh mục' : 'Đã tạo danh mục')
       setShowForm(false)
-      // Update local state
       if (editing) {
         setCats(prev => prev.map(c => c._id === editing._id ? d.data : c))
       } else {
@@ -118,14 +115,12 @@ export default function CategoriesPage() {
   }
 
   async function toggleActive(cat: Category) {
-    // Optimistic update
     setCats(prev => prev.map(c => c._id === cat._id ? { ...c, active: !c.active } : c))
     const res = await fetch(`/api/categories/${cat._id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: !cat.active }),
     })
     if (!res.ok) {
-      // Rollback nếu thất bại
       setCats(prev => prev.map(c => c._id === cat._id ? { ...c, active: cat.active } : c))
       toast.error('Cập nhật thất bại')
     }
@@ -133,7 +128,6 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="dh-page-header">
         <div>
           <h1 className="dh-page-title">Danh mục</h1>
@@ -144,7 +138,6 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="dh-card">
         {loading ? (
           <div style={{ padding: 40 }}>
@@ -199,7 +192,6 @@ export default function CategoriesPage() {
         )}
       </div>
 
-      {/* Modal form */}
       {showForm && (
         <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
           <div className="dh-modal" style={{ maxWidth: 560 }}>
@@ -208,7 +200,6 @@ export default function CategoriesPage() {
             </div>
             <div className="dh-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-              {/* Lang tabs */}
               <div style={{ display: 'flex', gap: 2, padding: 3, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
                 {ADMIN_LOCALES.map(l => (
                   <button key={l} type="button" onClick={() => setLang(l)}
@@ -222,14 +213,12 @@ export default function CategoriesPage() {
                 ))}
               </div>
 
-              {/* Name */}
               <div>
                 <label className="dh-label">Tên danh mục {lang === 'vi' && <span style={{ color: '#ef4444' }}>*</span>} <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#94a3b8' }}>({LOCALE_META[lang].flag})</span></label>
                 <input className="dh-input" value={name[lang] ?? ''} onChange={e => setName(n => ({ ...n, [lang]: e.target.value }))}
                   placeholder={`Tên danh mục (${LOCALE_META[lang].short})...`} />
               </div>
 
-              {/* Slug */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                   <label className="dh-label" style={{ margin: 0 }}>Slug <span style={{ color: '#ef4444' }}>*</span></label>
@@ -245,7 +234,6 @@ export default function CategoriesPage() {
                 {editing && <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>Không thể đổi slug sau khi tạo.</p>}
               </div>
 
-              {/* Type + Active + Order */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px', gap: 12 }}>
                 <div>
                   <label className="dh-label">Loại bài viết</label>

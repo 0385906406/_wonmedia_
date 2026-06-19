@@ -61,7 +61,6 @@ export function RevenueChart() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 220 }}>
       <g transform={`translate(${pad.left}, ${pad.top})`}>
-        {/* Y grid & labels */}
         {yLabels.map((val) => {
           const y = h - ((val - min) / (max - min)) * h
           return (
@@ -74,11 +73,9 @@ export function RevenueChart() {
           )
         })}
 
-        {/* Lines */}
         <path d={revPath} fill="none" stroke="#3b82f6" strokeWidth={2} />
         <path d={ordPath} fill="none" stroke="#a78bfa" strokeWidth={2} />
 
-        {/* X labels */}
         {xLabelIndices.map((i) => {
           const x = i * step
           return (

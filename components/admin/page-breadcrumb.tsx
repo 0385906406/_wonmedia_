@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation'
 import { HomeIcon, ChevronRightIcon } from 'lucide-react'
 
-// Map URL segment → label tiếng Việt
 const SEGMENT_LABELS: Record<string, string> = {
     admin:       'Trang chủ',
     settings:    'Cài đặt',
@@ -44,7 +43,6 @@ export function PageBreadcrumb() {
         <nav aria-label="Đường dẫn trang" className="flex items-center gap-0.5">
             {crumbs.map((crumb, i) => (
                 <span key={crumb.href} className="flex items-center gap-0.5">
-                    {/* Separator */}
                     {i > 0 && (
                         <ChevronRightIcon
                             className="mx-1 size-3"
@@ -53,7 +51,6 @@ export function PageBreadcrumb() {
                         />
                     )}
 
-                    {/* Home icon thay cho "Trang chủ" text */}
                     {i === 0 ? (
                         <a
                             href={crumb.href}

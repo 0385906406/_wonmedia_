@@ -18,7 +18,6 @@ export function AnimationObserver() {
     const targets = document.querySelectorAll('.wm-animate')
     targets.forEach((el) => observer.observe(el))
 
-    // Also observe dynamically added elements via MutationObserver
     const mutation = new MutationObserver(() => {
       document.querySelectorAll('.wm-animate:not(.wm-observed)').forEach((el) => {
         el.classList.add('wm-observed')

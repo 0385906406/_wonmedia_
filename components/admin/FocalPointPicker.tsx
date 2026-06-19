@@ -1,6 +1,5 @@
 'use client'
 
-// Bảng 3×3 — mỗi ô là tên hiển thị + giá trị CSS object-position
 const GRID: { label: string; value: string; row: number; col: number }[] = [
   { label: 'Trên trái',  value: 'left top',      row: 0, col: 0 },
   { label: 'Trên giữa', value: 'center top',     row: 0, col: 1 },
@@ -24,7 +23,6 @@ export function FocalPointPicker({ thumbnail, value, onChange }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {/* Preview ảnh với focal point overlay */}
       <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '16/9', background: '#F1F5F9' }}>
         {thumbnail ? (
           <img
@@ -38,7 +36,6 @@ export function FocalPointPicker({ thumbnail, value, onChange }: Props) {
           </div>
         )}
 
-        {/* Grid overlay 3×3 */}
         <div style={{
           position: 'absolute', inset: 0,
           display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gridTemplateRows: 'repeat(3,1fr)',
@@ -74,7 +71,6 @@ export function FocalPointPicker({ thumbnail, value, onChange }: Props) {
           })}
         </div>
 
-        {/* Label vị trí hiện tại */}
         <div style={{
           position: 'absolute', bottom: 6, right: 8,
           background: 'rgba(6,35,64,0.7)', backdropFilter: 'blur(4px)',

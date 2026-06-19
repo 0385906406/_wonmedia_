@@ -8,7 +8,6 @@ const CH = 440
 const CX = CW / 2
 const CY = CH / 2
 
-// 6 vị trí đều nhau trên vòng tròn bán kính 185, bắt đầu từ đỉnh
 const R = 185
 const COUNT = 6
 const POSITIONS = Array.from({ length: COUNT }, (_, i) => {
@@ -79,7 +78,6 @@ function PartnerNode({ partner, pos, delay }: { partner: Partner; pos: { x: numb
       }}>
         <img src={partner.src} alt={partner.alt} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       </div>
-      {/* Tooltip: hiện bên dưới nếu logo ở nửa trên vòng tròn (pos.y < 0) */}
       <div style={{
         position: 'absolute',
         ...(pos.y < 0
@@ -149,7 +147,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
       padding: 'var(--space-20) 24px',
       overflow: 'hidden',
     }}>
-      {/* Background image full width */}
       <img
         src="/partner-bg.png"
         alt=""
@@ -165,7 +162,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
 
-        {/* Heading */}
         <div className="qp-sechead" style={{ justifyContent: 'start' }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'start', textAlign: 'start' }}>
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: '15px', letterSpacing: '1.5px' }}>{heading}</span>
@@ -173,7 +169,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
           </div>
         </div>
 
-        {/* Desktop: solar system */}
         <div className="won-solar-desktop">
           <div className="won-solar-wrap">
             <div style={{ position: 'relative', width: `${CW}px`, height: `${CH}px` }}>
@@ -190,9 +185,7 @@ export function PartnersSection({ heading, subheading, items }: Props) {
           </div>
         </div>
 
-        {/* Mobile: grid */}
         <div className="won-partners-grid">
-          {/* Globe center */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}>
             <img
               src="/traiDatLogo%20.png"
@@ -215,7 +208,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
       </div>
 
       <style>{`
-        /* Desktop: show solar, hide grid */
         .won-solar-desktop { display: block; }
         .won-partners-grid  { display: none; }
 
@@ -227,7 +219,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
           overflow: visible;
         }
 
-        /* Tablet */
         @media (max-width: 860px) {
           .won-solar-wrap > div {
             transform: scale(0.75);
@@ -236,7 +227,6 @@ export function PartnersSection({ heading, subheading, items }: Props) {
           }
         }
 
-        /* Mobile: hide solar, show grid */
         @media (max-width: 640px) {
           .won-solar-desktop { display: none; }
           .won-partners-grid  { display: block; }

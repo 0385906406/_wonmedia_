@@ -173,7 +173,6 @@ function LienHeAdminInner() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="dh-page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-navy-pale)', color: 'var(--color-navy)' }}>
@@ -187,9 +186,7 @@ function LienHeAdminInner() {
         </div>
       </div>
 
-      {/* Tab card */}
       <div className="dh-card" style={{ overflow: 'hidden', padding: 0 }}>
-        {/* Tab bar */}
         <div style={{ display: 'flex', width: '100%', borderBottom: '1px solid var(--color-gray-border)' }}>
           {TABS.map(({ value, label, icon: Icon }) => (
             <button key={value} onClick={() => router.push(`/admin/lien-he?tab=${value}`)}
@@ -211,7 +208,6 @@ function LienHeAdminInner() {
 
         <div className="dh-card-body" style={{ padding: 24 }}>
 
-          {/* ── BANNER ── */}
           {tab === 'banner' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
@@ -252,7 +248,6 @@ function LienHeAdminInner() {
             </div>
           )}
 
-          {/* ── INFO ── */}
           {tab === 'info' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
@@ -305,7 +300,6 @@ function LienHeAdminInner() {
             </div>
           )}
 
-          {/* ── INBOX ── */}
           {tab === 'inbox' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>

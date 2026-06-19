@@ -18,7 +18,6 @@ const fadeUp   = { hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0, t
 const fadeLeft = { hidden: { opacity: 0, x: -48 }, visible: { opacity: 1, x: 0, transition: { duration: 0.75, ease: EASE } } }
 const fadeRight= { hidden: { opacity: 0, x: 48  }, visible: { opacity: 1, x: 0, transition: { duration: 0.75, ease: EASE } } }
 
-// ─── SVG Icons ────────────────────────────────────────────────────────────────
 const IPhone = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6.08 6.08l1.09-1.09a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
 const IMail  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
 const IPin   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -29,7 +28,6 @@ const IEdit  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 const IAlert = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
 const ILoader= () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" style={{ animation: 'wm-contact-spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
 
-// ─── Labels ───────────────────────────────────────────────────────────────────
 const LABELS: Record<string, Record<string, string>> = {
   name:         { vi: 'Họ và tên',         en: 'Full Name',          ko: '성명',    ja: 'お名前',      zh: '姓名'   },
   email:        { vi: 'Email',              en: 'Email',              ko: '이메일',  ja: 'メール',       zh: '邮箱'   },
@@ -55,7 +53,6 @@ const LABELS: Record<string, Record<string, string>> = {
 }
 function lb(lang: string, key: string) { return LABELS[key]?.[lang] || LABELS[key]?.en || key }
 
-// ─── Field helper ─────────────────────────────────────────────────────────────
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -70,7 +67,6 @@ function Field({ label, error, children }: { label: string; error?: string; chil
   )
 }
 
-// ─── Banner ───────────────────────────────────────────────────────────────────
 function BannerSection({ t }: { t: ContactT }) {
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: 220, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff', marginTop: 'calc(-1 * var(--topbar-height))' }}>
@@ -100,7 +96,6 @@ function BannerSection({ t }: { t: ContactT }) {
   )
 }
 
-// ─── Info Section ─────────────────────────────────────────────────────────────
 function InfoSection({ t }: { t: ContactT }) {
   const cards = [
     { icon: <IPhone />, color: 'var(--color-teal)', bg: 'var(--color-teal-pale)',   label: lb(t.lang, 'hotlineLabel'), value: t.hotline || t.phone, href: `tel:${(t.hotline || t.phone).replace(/\s/g, '')}` },
@@ -111,7 +106,6 @@ function InfoSection({ t }: { t: ContactT }) {
   return (
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
-        {/* Heading */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
@@ -120,7 +114,6 @@ function InfoSection({ t }: { t: ContactT }) {
           </div>
         </motion.div>
 
-        {/* 3 Info cards */}
         <div className="won-info-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 40 }}>
           {cards.map((c, i) => (
             <motion.div key={i}
@@ -139,7 +132,6 @@ function InfoSection({ t }: { t: ContactT }) {
           ))}
         </div>
 
-        {/* Map */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lift)', border: '1.5px solid var(--color-gray-border)', height: 380 }}>
           {t.googleMapsEmbed && /^https:\/\/(www\.)?google\.com\/maps\//.test(t.googleMapsEmbed) ? (
@@ -165,7 +157,6 @@ function InfoSection({ t }: { t: ContactT }) {
   )
 }
 
-// ─── Form Section ─────────────────────────────────────────────────────────────
 function FormSection({ t }: { t: ContactT }) {
   const [form, setForm]           = useState({ name: '', email: '', subject: '', message: '' })
   const [errors, setErrors]       = useState<Record<string, string>>({})
@@ -233,7 +224,6 @@ function FormSection({ t }: { t: ContactT }) {
   return (
     <section style={{ background: '#fff', paddingBlock: 'var(--space-20)' }}>
       <div className="container">
-        {/* Heading */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
@@ -242,16 +232,13 @@ function FormSection({ t }: { t: ContactT }) {
           </div>
         </motion.div>
 
-        {/* Card */}
         <div className="won-form-wrap" style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lift)', border: '1px solid var(--color-gray-border)' }}>
 
-          {/* Sidebar navy */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeLeft}
             style={{ background: 'var(--gradient-g3)', padding: '48px 36px', display: 'flex', flexDirection: 'column', gap: 32, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(0,169,143,0.14)', filter: 'blur(50px)' }} />
             <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(99,102,241,0.1)', filter: 'blur(36px)' }} />
 
-            {/* Icon + title */}
             <div style={{ position: 'relative', zIndex: 1 }}>
               <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', background: 'rgba(0,169,143,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-teal-light)', marginBottom: 20 }}>
                 <IMsg />
@@ -260,7 +247,6 @@ function FormSection({ t }: { t: ContactT }) {
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, fontFamily: 'var(--font-primary)', margin: 0 }}>{t.formSubtitle}</p>
             </div>
 
-            {/* Contact rows */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
               {[{ icon: <IPhone />, text: t.hotline || t.phone }, { icon: <IMail />, text: t.email }].map((row, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -270,14 +256,12 @@ function FormSection({ t }: { t: ContactT }) {
               ))}
             </div>
 
-            {/* Live badge */}
             <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
               <span className="qp-dot is-live" />
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-teal-light)', fontFamily: 'var(--font-primary)' }}>{lb(lang, 'support')}</span>
             </div>
           </motion.div>
 
-          {/* Form body */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeRight}
             className="won-form-body" style={{ background: '#fff', padding: '48px 40px' }}>
 
@@ -357,7 +341,6 @@ function FormSection({ t }: { t: ContactT }) {
   )
 }
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 export function ContactClient({ t }: { t: ContactT }) {
   return (
     <>

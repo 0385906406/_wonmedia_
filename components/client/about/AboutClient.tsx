@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 export interface AboutT {
   banner: { subtitle: string; title: string }
   about: {
@@ -43,7 +42,6 @@ const fadeRight = {
   visible: { opacity: 1, x: 0,  transition: { duration: 0.8, ease: EASE } },
 }
 
-// ─── Icons SVG ────────────────────────────────────────────────────────────────
 const TIMELINE_ICONS = [
   <svg key="r" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>,
   <svg key="u" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
@@ -87,7 +85,6 @@ const SVC_COLORS  = [
   { bg: 'rgba(252,211,77,0.15)',icon: '#b45309',             line: '#d97706'             },
 ]
 
-// ─── Banner ───────────────────────────────────────────────────────────────────
 function BannerSection({ t }: { t: AboutT['banner'] }) {
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: 240, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff', marginTop: 'calc(-1 * var(--topbar-height))' }}>
@@ -117,21 +114,18 @@ function BannerSection({ t }: { t: AboutT['banner'] }) {
   )
 }
 
-// ─── About ────────────────────────────────────────────────────────────────────
 function AboutSection({ t, lang }: { t: AboutT['about']; lang: string }) {
   return (
     <section style={{ background: '#fff', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-16)', alignItems: 'center' }}>
 
-          {/* Image */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeLeft}
             className="won-about-img-col" style={{ position: 'relative' }}>
             <div style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 24px 64px rgba(6,35,64,0.14)', position: 'relative' }}>
               <img src="/about-team.png" alt="WON Media Team" style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,169,143,0.08) 0%, transparent 60%)' }} />
             </div>
-            {/* Experience badge */}
             <motion.div
               initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={VP}
               transition={{ delay: 0.5, type: 'spring', stiffness: 160 }}
@@ -141,7 +135,6 @@ function AboutSection({ t, lang }: { t: AboutT['about']; lang: string }) {
             </motion.div>
           </motion.div>
 
-          {/* Text */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeRight}
             style={{ paddingBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
@@ -174,7 +167,6 @@ function AboutSection({ t, lang }: { t: AboutT['about']; lang: string }) {
   )
 }
 
-// ─── Timeline ─────────────────────────────────────────────────────────────────
 function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: string }) {
   if (!t.milestones.length) return null
   return (
@@ -189,7 +181,6 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
         </motion.div>
 
         <div style={{ position: 'relative', marginTop: 48 }}>
-          {/* Center line desktop */}
           <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 2, background: 'linear-gradient(to bottom, transparent, var(--color-gray-border) 10%, var(--color-gray-border) 90%, transparent)', transform: 'translateX(-50%)' }} className="won-timeline-line" />
 
           {t.milestones.map((m, i) => {
@@ -202,7 +193,6 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
                 style={{ display: 'flex', justifyContent: isEven ? 'flex-start' : 'flex-end', marginBottom: 40, position: 'relative' }}
                 className="won-timeline-row"
               >
-                {/* Card */}
                 <div style={{
                   width: '45%', background: '#fff',
                   borderRadius: 18, padding: '22px 24px',
@@ -221,7 +211,6 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
                   </ul>
                 </div>
 
-                {/* Center icon */}
                 <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }} className="won-timeline-icon">
                   <div style={{ width: 52, height: 52, borderRadius: '50%', background: `linear-gradient(135deg, ${col.from}, ${col.to})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: `0 6px 20px ${col.from}55`, flexShrink: 0 }}>
                     {TIMELINE_ICONS[i % TIMELINE_ICONS.length]}
@@ -246,7 +235,6 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
   )
 }
 
-// ─── Why Us ───────────────────────────────────────────────────────────────────
 function WhyUsSection({ t, eyebrow }: { t: AboutT['whyUs']; eyebrow: string }) {
   if (!t.reasons.length) return null
   return (
@@ -285,7 +273,6 @@ function WhyUsSection({ t, eyebrow }: { t: AboutT['whyUs']; eyebrow: string }) {
   )
 }
 
-// ─── Services ─────────────────────────────────────────────────────────────────
 function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: string }) {
   if (!t.items.length) return null
   return (
@@ -308,7 +295,6 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
                 transition={{ duration: 0.6, delay: i * 0.07 }}
                 whileHover={{ y: -8, transition: { duration: 0.25 } }}
                 style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 4px 20px rgba(6,35,64,0.07)', border: '1px solid var(--color-gray-border)', cursor: 'default' }}>
-                {/* Image */}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative', background: sc.bg }}>
                   <motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.5 }}
                     src={SVC_IMAGES[i % SVC_IMAGES.length]} alt={svc.title}
@@ -317,7 +303,6 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
                     {SVC_ICONS[i % SVC_ICONS.length]}
                   </div>
                 </div>
-                {/* Content */}
                 <div style={{ padding: '22px 22px 26px', textAlign: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.3px', color: 'var(--color-navy-deep)', marginBottom: 10, fontFamily: 'var(--font-primary)' }}>{svc.title}</h3>
                   <p style={{ fontSize: 13, color: 'var(--color-gray-text)', lineHeight: 1.75, fontFamily: 'var(--font-primary)', margin: '0 0 16px' }}>{svc.desc}</p>
@@ -338,25 +323,20 @@ const EYEBROW: Record<string, { timeline: string; whyUs: string; services: strin
 }
 function ey(lang: string) { return EYEBROW[lang] ?? EYEBROW.vi }
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 export function AboutClient({ t, lang = 'vi' }: { t: AboutT; lang?: string }) {
   const e = ey(lang)
   return (
     <>
       <style>{`
-        /* Banner */
         @media (max-width: 640px) {
           .won-about-banner-inner { padding-block: 36px !important; }
           .won-about-banner-inner h1 { font-size: clamp(20px, 6vw, 28px) !important; letter-spacing: -0.5px !important; }
         }
 
-        /* About — image col: thêm padding-bottom để badge không bị tràn */
         .won-about-img-col { padding-bottom: 28px; }
         @media (max-width: 640px) {
           .won-about-img-col { margin-bottom: 16px; }
         }
-
-        /* Why Us grid đã có media query riêng trong WhyUsSection */
       `}</style>
       <BannerSection   t={t.banner}   />
       <AboutSection    t={t.about}    lang={lang} />

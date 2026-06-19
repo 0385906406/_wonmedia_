@@ -51,14 +51,12 @@ export function ServicesCarousel({ items, heading }: Props) {
         overflow: 'hidden',
       }}
     >
-      {/* Ambient bg */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
         background: 'radial-gradient(ellipse at 15% 50%, rgba(0,169,143,0.07) 0%, transparent 55%), radial-gradient(ellipse at 85% 50%, rgba(99,102,241,0.06) 0%, transparent 55%)',
       }} />
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative' }}>
-        {/* Heading */}
         <div className="wm-animate" style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2 style={{
             color: '#fff',
@@ -76,26 +74,21 @@ export function ServicesCarousel({ items, heading }: Props) {
           }} />
         </div>
 
-        {/* Carousel wrapper */}
         <div style={{ position: 'relative' }}>
-          {/* Prev */}
           <button onClick={scrollPrev} className="wm-carousel-btn wm-carousel-btn--prev" aria-label="Prev">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
           </button>
 
-          {/* Embla viewport */}
           <div ref={emblaRef} style={{ overflow: 'hidden', padding: '8px 4px 16px' }}>
             <div className="wm-carousel-track">
               {items.map((item, i) => (
                 <div key={i} className="wm-carousel-slide wm-service-slide-4">
                   <div className="wm-mesh-card">
-                    {/* Animated gradient border */}
                     <span className="wm-mesh-border" />
 
                     <div className="wm-mesh-content">
-                      {/* Icon */}
                       <div style={{
                         width: '52px', height: '52px', borderRadius: '12px',
                         background: 'rgba(0,169,143,0.12)',
@@ -108,7 +101,6 @@ export function ServicesCarousel({ items, heading }: Props) {
                         {SERVICE_ICONS[i % SERVICE_ICONS.length]}
                       </div>
 
-                      {/* Title */}
                       <h3 style={{
                         fontSize: '18px', fontWeight: 700,
                         color: '#fff', margin: 0, lineHeight: 1.3,
@@ -118,7 +110,6 @@ export function ServicesCarousel({ items, heading }: Props) {
                         {item.title}
                       </h3>
 
-                      {/* Desc */}
                       <p style={{
                         fontSize: '13.5px', lineHeight: 1.7,
                         color: 'rgba(255,255,255,0.7)', margin: 0,
@@ -128,7 +119,6 @@ export function ServicesCarousel({ items, heading }: Props) {
                         {item.desc}
                       </p>
 
-                      {/* Arrow */}
                       <div style={{
                         display: 'flex', alignItems: 'center', gap: '6px',
                         color: 'var(--color-teal-light)', fontSize: '13px', fontWeight: 600,
@@ -145,7 +135,6 @@ export function ServicesCarousel({ items, heading }: Props) {
             </div>
           </div>
 
-          {/* Next */}
           <button onClick={scrollNext} className="wm-carousel-btn wm-carousel-btn--next" aria-label="Next">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"/>

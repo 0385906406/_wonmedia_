@@ -35,7 +35,6 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Click outside / Esc để đóng mobile menu
   useEffect(() => {
     if (!mobileOpen) return
     function handleClickOutside(e: MouseEvent) {
@@ -60,7 +59,6 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
 
   return (
     <>
-      {/* Luôn giữ mobile drawer navy + chữ trắng */}
       <style>{`
         @media (max-width: 1180px) {
           .qp-topbar .qp-nav {
@@ -94,7 +92,6 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
       >
         <div className="qp-topbar__inner container">
 
-          {/* Brand */}
           <Link href={`/${lang}`} className="qp-brand" style={{ textDecoration: 'none' }}>
             <div className="qp-brand__mark" style={{ width: 120, height: 'auto', overflow: 'visible', borderRadius: 0 }}>
               <img
@@ -116,7 +113,6 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
             )}
           </Link>
 
-          {/* Nav */}
           <nav className={`qp-nav${mobileOpen ? ' is-open' : ''}`} aria-label="Main navigation">
             {navItems.map((item) => {
               const isActive = pathname === item.href ||
@@ -136,13 +132,11 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
             })}
           </nav>
 
-          {/* Actions */}
           <div className="qp-topbar__actions">
             <Suspense>
               <LanguageSwitcher currentLocale={lang as Locale} variant="dark" />
             </Suspense>
 
-            {/* Facebook */}
             <a
               href="https://www.facebook.com/wonmediavn"
               target="_blank"
@@ -156,7 +150,6 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
               </svg>
             </a>
 
-            {/* Hamburger */}
             <button
               onClick={() => setMobileOpen(o => !o)}
               className="qp-hamburger"

@@ -42,7 +42,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   }
 }
 
-// ─── Fallback defaults ────────────────────────────────────────────────────────
 const DEFAULT_HERO = {
   title:    { vi: 'BRINGING MUSIC', en: 'BRINGING MUSIC', ko: 'BRINGING MUSIC', ja: 'BRINGING MUSIC', zh: 'BRINGING MUSIC' },
   title2:   { vi: 'TO THE WORLD',   en: 'TO THE WORLD',   ko: 'TO THE WORLD',   ja: 'TO THE WORLD',   zh: 'TO THE WORLD' },
@@ -79,7 +78,6 @@ const SECTION_LABELS: Record<string, { achievements: string; partners: string }>
   zh: { achievements: '令人印象深刻的数字',              partners: '我们的合作伙伴' },
 }
 
-// ─── DB fetch ────────────────────────────────────────────────────────────────
 async function fetchHomepageData(lang: LocaleKey) {
   try {
     await connectDB()
@@ -131,7 +129,6 @@ async function fetchHomepageData(lang: LocaleKey) {
   }
 }
 
-// ─── Fallback static data ────────────────────────────────────────────────────
 const FALLBACK_PARTNERS = [
   { src: '/partners/youtube.png',    alt: 'YouTube' },
   { src: '/partners/facebook.png',   alt: 'Facebook' },
@@ -163,7 +160,6 @@ function getFallbackPosts(lang: string): FP[] {
   ]
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
@@ -194,7 +190,6 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
 
   return (
     <>
-      {/* ── Hero ── */}
       <section style={{ position: 'relative', width: '100%', minHeight: '100vh', marginTop: 'calc(-1 * var(--topbar-height))', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', color: '#fff', userSelect: 'none' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <img src="/banners/banner.png" alt="WON Media" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', filter: 'brightness(0.95) contrast(1.05) saturate(1.1)' }} />
@@ -226,16 +221,12 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
         </div>
       </section>
 
-      {/* ── Services ── */}
       <ServicesCarousel items={services} heading={servicesHeading} lang={lang} />
 
-      {/* ── Achievements / KPI strip ── */}
       <AchievementsSection heading={achievementsHeading} subheading={sectionL.achievements} items={achievements} />
 
-      {/* ── Partners ── */}
       <PartnersSection heading={partnersHeading} subheading={sectionL.partners} items={partners} />
 
-      {/* ── Posts ── */}
       <PostsCarousel posts={posts} heading={postsHeading} subheading={postsL.subheading} seeMore={postsSeeMore} readMore={postsL.readMore} lang={lang} />
 
       <style>{`

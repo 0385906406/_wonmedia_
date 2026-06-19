@@ -29,7 +29,6 @@ export default async function ClientLangLayout({
 
   const dict = await getDictionary(lang as Locale)
 
-  // Lấy phone + settings song song
   let phone = ''
   let logoUrl = ''
   let brandName = ''
@@ -42,7 +41,7 @@ export default async function ClientLangLayout({
     phone = cfg?.phone ?? ''
     logoUrl   = setting?.header?.logoImageUrl  ?? ''
     brandName = setting?.header?.navDisplayName ?? ''
-  } catch { /* ignore */ }
+  } catch {}
 
   const navItems = [
     { href: `/${lang}`,            label: dict.nav.home },
@@ -55,10 +54,8 @@ export default async function ClientLangLayout({
   return (
     <div lang={lang} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-gray-light)' }}>
       <HtmlLang lang={lang} />
-      {/* Global scroll animation observer */}
       <AnimationObserver />
 
-      {/* Sticky Navbar */}
       <NavbarClient lang={lang} navItems={navItems} logoUrl={logoUrl} brandName={brandName} />
 
       <main style={{ flex: 1, paddingTop: 'var(--topbar-height)' }}>{children}</main>

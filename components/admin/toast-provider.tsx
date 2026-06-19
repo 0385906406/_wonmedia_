@@ -8,8 +8,6 @@ import {
     CheckCircleIcon, XCircleIcon, AlertTriangleIcon, InfoIcon, XIcon,
 } from 'lucide-react'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 interface ToastItem {
@@ -29,8 +27,6 @@ interface ToastCtx {
     dismiss: (id: string) => void
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-
 const ToastContext = createContext<ToastCtx | null>(null)
 
 export function useToast(): ToastCtx {
@@ -38,8 +34,6 @@ export function useToast(): ToastCtx {
     if (!ctx) throw new Error('useToast must be used inside <ToastProvider>')
     return ctx
 }
-
-// ─── Config per type ──────────────────────────────────────────────────────────
 
 const CONFIG: Record<ToastType, { color: string; bg: string; Icon: React.ElementType }> = {
     success: {
@@ -64,8 +58,6 @@ const CONFIG: Record<ToastType, { color: string; bg: string; Icon: React.Element
     },
 }
 
-// ─── Single Toast Card ────────────────────────────────────────────────────────
-
 function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: string) => void }) {
     const cfg = CONFIG[item.type]
     const [progress, setProgress] = useState(100)
@@ -74,7 +66,6 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
     const pausedAt = useRef<number | null>(null)
     const remaining = useRef(item.duration)
 
-    // Animate progress bar
     useEffect(() => {
         function tick(now: number) {
             if (!startRef.current) startRef.current = now
@@ -94,8 +85,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
     }
     function handleMouseLeave() {
         if (pausedAt.current) {
-            // Adjust start so remaining time is correct
-            const pausedDuration = Date.now() - pausedAt.current
+                const pausedDuration = Date.now() - pausedAt.current
             if (startRef.current) startRef.current += pausedDuration
             pausedAt.current = null
         }
@@ -124,13 +114,11 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
             className="relative w-[360px] overflow-hidden rounded-xl bg-white border border-gray-100 pointer-events-auto"
         >
             <div className="flex items-start gap-3 px-4 py-3.5 pr-10">
-                {/* Icon */}
-                <div className="flex-shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full"
+                    <div className="flex-shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full"
                     style={{ background: cfg.bg }}>
                     <cfg.Icon className="size-4" style={{ color: cfg.color }} />
                 </div>
 
-                {/* Text */}
                 <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold leading-snug" style={{ color: '#1A1F2E' }}>
                         {item.message}
@@ -143,7 +131,6 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
                 </div>
             </div>
 
-            {/* Close button */}
             <button
                 onClick={() => onDismiss(item.id)}
                 className="absolute top-2.5 right-2.5 flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -151,7 +138,6 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
                 <XIcon className="size-3.5" />
             </button>
 
-            {/* Progress bar */}
             <div
                 className="absolute bottom-0 left-0 right-0 h-[3px] origin-left rounded-b-xl transition-none"
                 style={{
@@ -165,8 +151,6 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
     )
 }
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 let idCounter = 0
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -176,7 +160,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => setMounted(true), [])
 
     const dismiss = useCallback((id: string) => {
-        // Mark as leaving → animate out → remove
         setToasts((prev) => prev.map((t) => t.id === id ? { ...t, leaving: true } : t))
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id))
@@ -200,7 +183,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         <ToastContext.Provider value={ctx}>
             {children}
 
-            {/* Portal: góc trên phải */}
             {mounted && createPortal(
                 <>
                     <style>{`

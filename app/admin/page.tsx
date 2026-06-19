@@ -9,7 +9,6 @@ import {
   NewspaperIcon, GlobeIcon, SettingsIcon,
 } from 'lucide-react'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface Stats {
   blogCount: number
   jobCount: number
@@ -30,7 +29,6 @@ interface RecentMsg {
   subject: string; read: boolean; createdAt: string
 }
 
-// ─── Stat card ────────────────────────────────────────────────────────────────
 function StatCard({
   label, value, icon: Icon, color, href, sub,
 }: {
@@ -57,7 +55,6 @@ function StatCard({
   )
 }
 
-// ─── Quick action ─────────────────────────────────────────────────────────────
 function QuickAction({ label, icon: Icon, color, href }: { label: string; icon: React.ElementType; color: string; href: string }) {
   const router = useRouter()
   return (
@@ -70,7 +67,6 @@ function QuickAction({ label, icon: Icon, color, href }: { label: string; icon: 
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter()
   const [stats, setStats]         = useState<Stats | null>(null)
@@ -86,7 +82,6 @@ export default function DashboardPage() {
       fetch('/api/homepage/achievements').then(r => r.json()),
       fetch('/api/homepage/services').then(r => r.json()),
     ]).then(([postsRes, partnersRes, msgsRes, achRes, svcRes]) => {
-      // Blog vs tuyen-dung từ list
       const allPosts: RecentPost[] = postsRes.data ?? []
       setStats({
         blogCount:       postsRes.total ?? 0,
@@ -100,7 +95,6 @@ export default function DashboardPage() {
       setMsgs((msgsRes.data ?? []).slice(0, 5))
     }).catch(() => {}).finally(() => setLoading(false))
 
-    // Separate call for blog/job counts
     Promise.all([
       fetch('/api/posts?type=blog').then(r => r.json()),
       fetch('/api/posts?type=tuyen-dung').then(r => r.json()),
@@ -121,7 +115,6 @@ export default function DashboardPage() {
   return (
     <div style={{ padding: '28px 24px', width: '100%' }}>
 
-      {/* ── Page header ── */}
       <div className="dh-page-header" style={{ marginBottom: 28 }}>
         <div>
           <h1 className="dh-page-title">Bảng điều khiển</h1>
@@ -129,7 +122,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Stats grid ── */}
       <div className="dash-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
         <StatCard label="Bài viết Blog"    value={stats?.blogCount ?? 0}        icon={NewspaperIcon}  color="#15803d" href="/admin/posts?type=blog"       sub="bài đang hoạt động" />
         <StatCard label="Vị trí Tuyển dụng" value={stats?.jobCount ?? 0}        icon={BriefcaseIcon}  color="#1d4ed8" href="/admin/posts?type=tuyen-dung" sub="vị trí đang tuyển" />
@@ -137,10 +129,8 @@ export default function DashboardPage() {
         <StatCard label="Tin nhắn mới"      value={stats?.unreadMessages ?? 0}  icon={InboxIcon}      color="#dc2626" href="/admin/lien-he?tab=inbox"     sub="chưa đọc" />
       </div>
 
-      {/* ── Main content ── */}
       <div className="dash-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20 }}>
 
-        {/* Left — Recent posts */}
         <div className="dh-card">
           <div className="dh-card-header">
             <div>
@@ -171,7 +161,6 @@ export default function DashboardPage() {
                     onClick={() => router.push(`/admin/posts/${post._id}`)}
                     className="post-row"
                   >
-                    {/* Icon */}
                     <div style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: isBlog ? '#dcfce7' : '#dbeafe' }}>
                       {isBlog ? <FileTextIcon size={16} color="#15803d" /> : <BriefcaseIcon size={16} color="#1d4ed8" />}
                     </div>

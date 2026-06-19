@@ -85,7 +85,7 @@ export default async function TuyenDungDetailPage({
       const { payload } = await jwtVerify(token, secret)
       currentUser = payload as { id: string; name?: string }
     }
-  } catch { /* ignore */ }
+  } catch {}
 
   await connectDB()
   const p = await Post.findOne({ slug, active: true, type: 'tuyen-dung' }).lean()

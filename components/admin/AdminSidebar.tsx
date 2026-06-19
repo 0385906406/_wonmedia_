@@ -54,7 +54,6 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: Props) {
       )}
 
       <aside className={`dh-sidebar${isMobileOpen ? ' open' : ''}`}>
-        {/* Brand */}
         <div className="dh-sidebar-brand">
           <Image
             src="/logo.png"
@@ -66,7 +65,6 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: Props) {
           <span className="dh-sidebar-brand-name" style={{ marginLeft: '10px' }}>WonMedia</span>
         </div>
 
-        {/* Nav */}
         <nav className="dh-sidebar-nav">
           {NAV_ITEMS.map((item, i) => {
             if (item.divider) {
@@ -89,7 +87,6 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: Props) {
           })}
         </nav>
 
-        {/* Bottom */}
         <div className="dh-sidebar-bottom">
           <Link href="/vi" className="dh-nav-item">
             <Home size={16} />

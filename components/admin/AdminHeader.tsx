@@ -45,7 +45,6 @@ export default function AdminHeader({ userName, userRole, onMenuToggle }: Props)
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
     } catch {
-      // BUG-040: network fail → vẫn clear cookie bằng cách set expired client-side
       document.cookie = 'token=; Max-Age=0; path=/'
     }
     router.push('/auth/login')

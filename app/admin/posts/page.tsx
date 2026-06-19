@@ -73,7 +73,6 @@ function PostsListInner() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="dh-page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
           <div style={{
@@ -92,7 +91,6 @@ function PostsListInner() {
         </button>
       </div>
 
-      {/* Filters */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
           <SearchIcon size={15} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-gray-text)', opacity: 0.5 }} />
@@ -134,7 +132,6 @@ function PostsListInner() {
         </button>
       </div>
 
-      {/* Table card */}
       <div className="dh-card" style={{ overflow: 'hidden' }}>
         {loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'var(--color-gray-text)', padding: '64px 0' }}>
@@ -214,7 +211,6 @@ function PostsListInner() {
           </table>
         )}
 
-        {/* Pagination */}
         {pages > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderTop: '1px solid var(--color-gray-border)' }}>
             <p style={{ fontSize: 12, color: '#94a3b8' }}>Trang {page} / {pages} · {total} bài</p>

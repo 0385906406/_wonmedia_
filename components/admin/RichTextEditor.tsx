@@ -28,7 +28,6 @@ import { RteLinkModal } from './rte-link-modal'
 import { RteVideoModal } from './rte-video-modal'
 import { RteColorPicker } from './rte-color-picker'
 
-// ── Typed editor helpers ──────────────────────────────────────────
 interface RteChain {
   run(): boolean
   focus(): RteChain
@@ -62,7 +61,6 @@ interface RteEditor {
 }
 function rte(e: Editor): RteEditor { return e as unknown as RteEditor }
 
-// ── SVG Icons ─────────────────────────────────────────────────────
 const I = {
   Bold:          () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>,
   Italic:        () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>,
@@ -94,7 +92,6 @@ const I = {
   TaskList:      () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="4" height="4" rx="1"/><polyline points="3.8 7 4.8 8 6.5 5.5"/><line x1="11" y1="7" x2="21" y2="7"/><rect x="3" y="13" width="4" height="4" rx="1"/><line x1="11" y1="15" x2="21" y2="15"/></svg>,
 }
 
-// ── Sub-components ────────────────────────────────────────────────
 function Group({ children }: { children: React.ReactNode }) {
   return <div className="rich-text-editor__group">{children}</div>
 }
@@ -107,7 +104,6 @@ function Btn({ children, label, active, onClick }: { children: React.ReactNode; 
   )
 }
 
-// ── Word count helper ─────────────────────────────────────────────
 function syncCount(editor: Editor, setW: (n: number) => void, setC: (n: number) => void) {
   const text = (editor as unknown as { state: { doc: { textContent: string } } }).state.doc.textContent
   const t = text.trim()
@@ -115,7 +111,6 @@ function syncCount(editor: Editor, setW: (n: number) => void, setC: (n: number) 
   setC(text.length)
 }
 
-// ── Props ─────────────────────────────────────────────────────────
 interface Props {
   value: string
   onChange: (html: string) => void
@@ -150,8 +145,6 @@ export function RichTextEditor({
   const onChangeRef = useRef(onChange)
   useEffect(() => { onChangeRef.current = onChange }, [onChange])
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Lưu giá trị HTML mà chính editor vừa tạo ra — để tránh gọi setContent khi value
-  // chỉ là echo ngược lại từ onChange (gây cursor nhảy về đầu)
   const lastEditorOutputRef = useRef<string>(value ?? '')
 
   const editor = useEditor({
@@ -160,7 +153,6 @@ export function RichTextEditor({
       LinkExtension.configure({
         openOnClick: false,
         autolink: true,
-        // Chỉ cho phép http/https — chặn javascript: và data: protocol
         protocols: ['http', 'https', 'mailto'],
         HTMLAttributes: { rel: 'noopener noreferrer' },
       }),
@@ -181,7 +173,7 @@ export function RichTextEditor({
     editorProps: { attributes: { class: 'rich-text-editor__content' } },
     onUpdate: ({ editor: ed }) => {
       const html = ed.getHTML()
-      lastEditorOutputRef.current = html // ghi nhận đây là output của editor
+      lastEditorOutputRef.current = html
       if (debounce.current) clearTimeout(debounce.current)
       debounce.current = setTimeout(() => { startTransition(() => onChangeRef.current(html)) }, 300)
     },

@@ -21,7 +21,6 @@ const RichTextEditor = dynamic(
   { ssr: false, loading: () => <div className="dh-skeleton" style={{ height: 360, borderRadius: 12 }} /> }
 )
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface Category { _id: string; slug: string; name: Record<string, string>; forType: string }
 
 interface PostForm {
@@ -42,7 +41,6 @@ interface PostForm {
 
 type TabId = 'content' | 'seo'
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function slugify(str: string) {
   return str.toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -53,7 +51,6 @@ function slugify(str: string) {
 const IC = 'h-9 rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-indigo-400 focus-visible:ring-1 focus-visible:ring-indigo-400/20 text-sm'
 const TA = 'rounded-lg border-[#E5E8ED] bg-white text-[#1A1F2E] placeholder:text-[#94a3b8] focus-visible:border-indigo-400 focus-visible:ring-1 focus-visible:ring-indigo-400/20 text-sm resize-none'
 
-// ─── LangTabs ─────────────────────────────────────────────────────────────────
 function LangTabs({ active, onChange, form }: { active: LocaleKey; onChange: (l: LocaleKey) => void; form?: PostForm }) {
   return (
     <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light, #F8F9FB)', borderRadius: 10, width: 'fit-content' }}>
@@ -83,14 +80,12 @@ function LangTabs({ active, onChange, form }: { active: LocaleKey; onChange: (l:
   )
 }
 
-// ─── ImageUpload ──────────────────────────────────────────────────────────────
 function ImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
   const [uploading, setUploading] = useState(false)
   const ref = useRef<HTMLInputElement>(null)
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return
-    // Reset input để có thể chọn lại cùng file
     e.target.value = ''
     setUploading(true)
     try {
@@ -145,20 +140,17 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (url: strin
   )
 }
 
-// ─── Preview Modal ────────────────────────────────────────────────────────────
 function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey; onClose: () => void }) {
   const [previewLang, setPreviewLang] = useState<LocaleKey>(lang)
   const ml = (f: MultiLang) => f[previewLang] || f.vi || ''
   const isBlog = form.type === 'blog'
 
-  // Đóng bằng Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  // Khoá scroll body
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
@@ -167,7 +159,6 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
 
-      {/* Toolbar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 24px', height: 48, flexShrink: 0,
@@ -198,10 +189,8 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
         </button>
       </div>
 
-      {/* Page scroll */}
       <div style={{ flex: 1, overflowY: 'auto', background: 'var(--wm-dark, #191B24)' }}>
 
-        {/* ══ HERO ══ — giống hệt PostDetail */}
         <section style={{ position: 'relative', width: '100%', minHeight: 420, display: 'flex', alignItems: 'flex-end', overflow: 'hidden' }}>
           {form.thumbnail ? (
             <img src={form.thumbnail} alt={ml(form.title)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: form.thumbnailPosition || 'center center', filter: 'brightness(0.55) contrast(1.05) saturate(0.9)' }} />
@@ -231,18 +220,15 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
           </div>
         </section>
 
-        {/* ══ CONTENT — giống hệt PostDetail ══ */}
         <div style={{ background: '#F8F9FB' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(32px,6vw,64px) clamp(16px,4vw,32px) clamp(48px,6vw,80px)' }}>
 
-            {/* Thumbnail featured */}
             {form.thumbnail && (
               <div style={{ marginBottom: 52, borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(15,76,129,0.12)' }}>
                 <img src={form.thumbnail} alt={ml(form.title)} style={{ width: '100%', aspectRatio: '16/8', objectFit: 'cover', objectPosition: form.thumbnailPosition || 'center center', display: 'block' }} />
               </div>
             )}
 
-            {/* Article body */}
             {ml(form.content) ? (
               <article className="wm-article-body" dangerouslySetInnerHTML={{ __html: ml(form.content) }} />
             ) : (
@@ -252,7 +238,6 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
               </div>
             )}
 
-            {/* Divider + back — giống client */}
             {ml(form.content) && (
               <>
                 <div style={{ height: 1, background: '#E5E8ED', margin: '56px 0 40px' }} />
@@ -271,7 +256,6 @@ function PreviewModal({ form, lang, onClose }: { form: PostForm; lang: LocaleKey
   )
 }
 
-// ─── Sidebar Card ─────────────────────────────────────────────────────────────
 function SidebarCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ background: '#fff', border: '1px solid var(--color-gray-border,#E5E8ED)', borderRadius: 14, overflow: 'hidden' }}>
@@ -285,7 +269,6 @@ function SidebarCard({ title, children }: { title: string; children: React.React
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 function PostEditorInner() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
@@ -314,7 +297,6 @@ function PostEditorInner() {
   const toast = useToast()
   const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Load categories
   useEffect(() => {
     fetch('/api/admin/categories-all')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -322,7 +304,6 @@ function PostEditorInner() {
       .catch(() => toast.error('Không tải được danh mục'))
   }, [toast.error])
 
-  // Chọn category → tự điền multilang
   function selectCategory(catId: string) {
     setField('categoryId', catId)
     if (!catId) return
@@ -359,7 +340,6 @@ function PostEditorInner() {
     setForm(f => ({ ...f, slug: slugify(f.title.vi) }))
   }, [form.title.vi, isNew, slugLocked])
 
-  // Dọn navigation timer khi unmount
   useEffect(() => {
     return () => { if (navTimerRef.current) clearTimeout(navTimerRef.current) }
   }, [])
@@ -427,7 +407,6 @@ function PostEditorInner() {
     <div>
       {preview && <PreviewModal form={form} lang={lang} onClose={() => setPreview(false)} />}
 
-      {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button type="button" onClick={() => router.push('/admin/posts')}
@@ -466,12 +445,9 @@ function PostEditorInner() {
         </div>
       </div>
 
-      {/* 2-column layout */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 20, alignItems: 'start' }}>
 
-        {/* ── LEFT: Tabs ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {/* Tab nav */}
           <div style={{ display: 'flex', background: '#fff', border: '1px solid #E5E8ED', borderBottom: 'none', borderRadius: '12px 12px 0 0', overflow: 'hidden' }}>
             {TABS.map(t => (
               <button key={t.id} type="button" onClick={() => setTab(t.id)}
@@ -489,13 +465,10 @@ function PostEditorInner() {
             ))}
           </div>
 
-          {/* Tab body */}
           <div style={{ background: '#fff', border: '1px solid #E5E8ED', borderTop: 'none', borderRadius: '0 0 12px 12px', padding: 24 }}>
 
-            {/* ── Nội dung ── */}
             {tab === 'content' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                {/* AI hint */}
                 <div style={{ display: 'flex', gap: 9, padding: '10px 14px', background: '#EEF0FE', borderRadius: 9, border: '1px solid #C7D2FE' }}>
                   <GlobeIcon size={14} style={{ color: '#6366F1', flexShrink: 0, marginTop: 1 }} />
                   <p style={{ margin: 0, fontSize: 12, color: '#4338CA', lineHeight: 1.6 }}>
@@ -506,7 +479,6 @@ function PostEditorInner() {
                 <LangTabs active={lang} onChange={setLang} form={form} />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {/* Category */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                       <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)' }}>Danh mục</label>
@@ -534,7 +506,6 @@ function PostEditorInner() {
                     )}
                   </div>
 
-                  {/* Title */}
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', marginBottom: 6 }}>
                       Tiêu đề {lang === 'vi' && <span style={{ color: '#ef4444' }}>*</span>}
@@ -545,7 +516,6 @@ function PostEditorInner() {
                       placeholder={`Tiêu đề bài viết (${LOCALE_META[lang].short})...`} />
                   </div>
 
-                  {/* Excerpt */}
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', marginBottom: 6 }}>
                       Tóm tắt <span style={{ fontFamily: 'monospace', fontWeight: 400, color: '#94a3b8' }}>({LOCALE_META[lang].flag})</span>
@@ -555,7 +525,6 @@ function PostEditorInner() {
                       rows={3} className={TA} />
                   </div>
 
-                  {/* Content */}
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', marginBottom: 6 }}>
                       Nội dung <span style={{ fontFamily: 'monospace', fontWeight: 400, color: '#94a3b8' }}>({LOCALE_META[lang].flag})</span>
@@ -570,7 +539,6 @@ function PostEditorInner() {
               </div>
             )}
 
-            {/* ── SEO ── */}
             {tab === 'seo' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ display: 'flex', gap: 9, padding: '10px 14px', background: '#F0FDF4', borderRadius: 9, border: '1px solid #BBF7D0' }}>
@@ -582,7 +550,6 @@ function PostEditorInner() {
 
                 <LangTabs active={lang} onChange={setLang} form={form} />
 
-                {/* Meta Title */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)' }}>
@@ -598,7 +565,6 @@ function PostEditorInner() {
                   <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>Để trống → dùng tiêu đề bài. Nên 50–60 ký tự.</p>
                 </div>
 
-                {/* Meta Description */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)' }}>
@@ -614,7 +580,6 @@ function PostEditorInner() {
                   <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>Để trống → dùng tóm tắt. Nên 140–160 ký tự.</p>
                 </div>
 
-                {/* Keywords */}
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', marginBottom: 6 }}>
                     Keywords <span style={{ fontFamily: 'monospace', fontWeight: 400, color: '#94a3b8' }}>({LOCALE_META[lang].flag})</span>
@@ -625,7 +590,6 @@ function PostEditorInner() {
                   <p style={{ margin: '4px 0 0', fontSize: 11, color: '#94a3b8' }}>Phân cách bằng dấu phẩy.</p>
                 </div>
 
-                {/* OG Image */}
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', marginBottom: 6 }}>
                     OG Image <span style={{ fontSize: 11, fontWeight: 400, color: '#94a3b8' }}>(dùng chung mọi ngôn ngữ)</span>
@@ -638,7 +602,6 @@ function PostEditorInner() {
 
                 <div style={{ height: 1, background: '#E5E8ED' }} />
 
-                {/* Google SERP preview */}
                 <div>
                   <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Google Preview — {LOCALE_META[lang].flag} {LOCALE_META[lang].label}
@@ -656,7 +619,6 @@ function PostEditorInner() {
                   </div>
                 </div>
 
-                {/* OG card preview */}
                 <div>
                   <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep,#062340)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Facebook / Zalo Preview
@@ -684,10 +646,8 @@ function PostEditorInner() {
           </div>
         </div>
 
-        {/* ── RIGHT: Sidebar ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'sticky', top: 16 }}>
 
-          {/* Xuất bản */}
           <SidebarCard title="Xuất bản">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -706,9 +666,7 @@ function PostEditorInner() {
             </div>
           </SidebarCard>
 
-          {/* Thông tin */}
           <SidebarCard title="Thông tin">
-            {/* Slug */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Slug (URL) <span style={{ color: '#ef4444' }}>*</span></label>
@@ -728,7 +686,6 @@ function PostEditorInner() {
               )}
             </div>
 
-            {/* Loại bài */}
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Loại bài viết</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7 }}>
@@ -746,7 +703,6 @@ function PostEditorInner() {
               </div>
             </div>
 
-            {/* Ngày */}
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>Ngày đăng</label>
               <Input value={form.date} onChange={e => setField('date', e.target.value)}
@@ -754,7 +710,6 @@ function PostEditorInner() {
             </div>
           </SidebarCard>
 
-          {/* Thumbnail */}
           <SidebarCard title="Thumbnail">
             <ImageUpload value={form.thumbnail} onChange={v => setField('thumbnail', v)} />
             {form.thumbnail && (
@@ -774,10 +729,8 @@ function PostEditorInner() {
             )}
           </SidebarCard>
 
-          {/* Thông tin tuyển dụng */}
           {form.type === 'tuyen-dung' && (
             <SidebarCard title="Tuyển dụng">
-              {/* Tuyển gấp */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <Label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block' }}>
@@ -790,7 +743,6 @@ function PostEditorInner() {
 
               <div style={{ height: 1, background: '#F1F5F9' }} />
 
-              {/* Hạn nộp hồ sơ */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>
                   📅 Hạn nộp hồ sơ
@@ -808,7 +760,6 @@ function PostEditorInner() {
                 )}
               </div>
 
-              {/* Hình thức */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
                   💼 Hình thức làm việc
@@ -836,7 +787,6 @@ function PostEditorInner() {
                 </div>
               </div>
 
-              {/* Địa điểm */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>
                   📍 Địa điểm
@@ -849,7 +799,6 @@ function PostEditorInner() {
                 />
               </div>
 
-              {/* Mức lương */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>
                   💰 Mức lương
@@ -864,7 +813,6 @@ function PostEditorInner() {
             </SidebarCard>
           )}
 
-          {/* Trạng thái dịch */}
           <SidebarCard title="Trạng thái dịch">
             {ADMIN_LOCALES.map(l => {
               const done = !!(form.title[l] && form.content[l])

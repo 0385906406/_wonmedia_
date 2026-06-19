@@ -97,7 +97,7 @@ export default async function TuyenDungPage({
         deadline: jp.deadline ?? '',
       }
     })
-  } catch { /* DB unavailable */ }
+  } catch {}
 
   return (
     <BlogClient

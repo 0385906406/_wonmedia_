@@ -37,12 +37,10 @@ export default function CommentsPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Debounce 400ms — dùng ref để luôn capture giá trị mới nhất
   const handleSearchChange = (value: string) => {
     setSearch(value)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      // Gọi 2 setter trong cùng 1 callback → React batch chúng thành 1 render
       setDebouncedSearch(value)
       setPage(1)
     }, 400)
@@ -82,7 +80,6 @@ export default function CommentsPage() {
 
   return (
     <div>
-      {/* Page header */}
       <div className="dh-page-header">
         <div>
           <h1 className="dh-page-title">Bình luận</h1>
@@ -94,7 +91,6 @@ export default function CommentsPage() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="dh-card" style={{ marginBottom: 20 }}>
         <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
@@ -113,7 +109,6 @@ export default function CommentsPage() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="dh-card">
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center' }}>
@@ -191,7 +186,6 @@ export default function CommentsPage() {
           </table>
         )}
 
-        {/* Pagination */}
         {pages > 1 && (
           <div style={{ padding: '12px 16px', borderTop: '1px solid #E5E8ED', display: 'flex', justifyContent: 'flex-end' }}>
             <div className="dh-pagination">

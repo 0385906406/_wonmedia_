@@ -13,7 +13,6 @@ interface Props {
   items: AchievementItem[]
 }
 
-// ─── Count-Up ────────────────────────────────────────────────────────────────
 function CountUp({ target, running }: { target: number; running: boolean }) {
   const [count, setCount] = useState(0)
   const frameRef = useRef<number | null>(null)
@@ -49,7 +48,6 @@ function CountUp({ target, running }: { target: number; running: boolean }) {
   return <>{count}</>
 }
 
-// ─── Main Section ─────────────────────────────────────────────────────────────
 export function AchievementsSection({ heading, subheading, items }: Props) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -84,7 +82,6 @@ export function AchievementsSection({ heading, subheading, items }: Props) {
   return (
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)' }}>
       <div className="container">
-        {/* Section heading */}
         <div className="qp-sechead">
           <div className="qp-sechead__titles">
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: '15px', letterSpacing: '1.5px' }}>{heading}</span>
@@ -93,7 +90,6 @@ export function AchievementsSection({ heading, subheading, items }: Props) {
         </div>
       </div>
 
-      {/* KPI strip */}
       <div
         className="qp-kpi-strip"
         ref={sectionRef}
@@ -101,7 +97,7 @@ export function AchievementsSection({ heading, subheading, items }: Props) {
           opacity: visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(20px)',
           transition: 'opacity 0.6s ease, transform 0.6s ease',
-          display: 'block', /* override mobile display:none for this use case */
+          display: 'block',
         }}
       >
         <div className="qp-kpi-grid container">

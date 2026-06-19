@@ -24,23 +24,19 @@ interface Props {
   lang: string
 }
 
-// ─── MeshCard slide ───────────────────────────────────────────────────────────
 function PostMeshCard({ post, lang, readMore }: { post: Post; lang: string; readMore: string }) {
   const href = `/${lang}/${post.type === 'blog' ? 'tin-tuc' : 'tuyen-dung'}/${post.slug}`
   const isBlog = post.type === 'blog'
 
   return (
     <a href={href} className="qp-mesh-card" style={{ textDecoration: 'none', height: '100%' }}>
-      {/* Thumbnail */}
       <div className="qp-mesh-card__media">
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', objectPosition: post.thumbnailPosition || 'center center' }} />
           : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" /></svg>}
       </div>
 
-      {/* Body */}
       <div className="qp-mesh-card__body">
-        {/* Category badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span
             className={`qp-category-badge${isBlog ? '' : ' is-policy'}`}
@@ -52,10 +48,8 @@ function PostMeshCard({ post, lang, readMore }: { post: Post; lang: string; read
           </span>
         </div>
 
-        {/* Title */}
         <span className="qp-mesh-card__title">{post.title}</span>
 
-        {/* Excerpt */}
         <p style={{
           fontSize: 13, lineHeight: 1.65, color: 'var(--color-gray-text)', margin: 0,
           display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -63,7 +57,6 @@ function PostMeshCard({ post, lang, readMore }: { post: Post; lang: string; read
           {post.excerpt}
         </p>
 
-        {/* Meta */}
         <div className="qp-mesh-card__meta" style={{ marginTop: 'auto', paddingTop: 8, borderTop: '1px solid var(--color-gray-border)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--color-teal-dark)', fontWeight: 700, fontSize: 12 }}>
             {readMore}
@@ -77,7 +70,6 @@ function PostMeshCard({ post, lang, readMore }: { post: Post; lang: string; read
   )
 }
 
-// ─── Carousel ─────────────────────────────────────────────────────────────────
 export function PostsCarousel({ posts, heading, subheading, seeMore, readMore, lang }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' })
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
@@ -101,7 +93,6 @@ export function PostsCarousel({ posts, heading, subheading, seeMore, readMore, l
       onMouseLeave={() => { isPausedRef.current = false }}
     >
       <div className="container">
-        {/* Section head */}
         <div className="qp-sechead">
           <div className="qp-sechead__titles">
             <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: '15px', letterSpacing: '1.5px' }}>{heading}</span>
@@ -115,9 +106,7 @@ export function PostsCarousel({ posts, heading, subheading, seeMore, readMore, l
           </a>
         </div>
 
-        {/* Carousel wrapper */}
         <div style={{ position: 'relative' }}>
-          {/* Prev */}
           <button
             onClick={scrollPrev}
             aria-label="Prev"
@@ -152,7 +141,6 @@ export function PostsCarousel({ posts, heading, subheading, seeMore, readMore, l
             </div>
           </div>
 
-          {/* Next */}
           <button
             onClick={scrollNext}
             aria-label="Next"

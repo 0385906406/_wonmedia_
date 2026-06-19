@@ -16,8 +16,6 @@ import {
     ShieldAlertIcon, UploadIcon, ImageIcon, LinkIcon,
 } from 'lucide-react'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export interface ColField {
     key: string; label: string
     type: 'text' | 'number' | 'email' | 'url' | 'textarea' | 'boolean'; required: boolean
@@ -38,8 +36,6 @@ function slugify(s: string) {
     return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
         .replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
-
-// ─── Password Modal ───────────────────────────────────────────────────────────
 
 export function PasswordModal({
     open, onOpenChange, onSuccess, collectionName,
@@ -119,8 +115,6 @@ export function PasswordModal({
         </Dialog>
     )
 }
-
-// ─── Create Collection Dialog ─────────────────────────────────────────────────
 
 export function CreateCollectionDialog({
     open, onOpenChange, onCreated,
@@ -228,8 +222,6 @@ export function CreateCollectionDialog({
     )
 }
 
-// ─── Rename Dialog ────────────────────────────────────────────────────────────
-
 export function RenameDialog({
     col, open, onOpenChange, onRenamed,
 }: {
@@ -273,8 +265,6 @@ export function RenameDialog({
         </Dialog>
     )
 }
-
-// ─── Collection Table (with lock support) ─────────────────────────────────────
 
 export function CollectionTable({
     col, isUnlocked, onRequirePassword,
@@ -455,8 +445,6 @@ export function CollectionTable({
     )
 }
 
-// ─── Settings Table (cho fixed tabs — thay form) ──────────────────────────────
-
 export interface SettingsRow {
     key: string
     label: string
@@ -568,18 +556,14 @@ export function SettingsTable({
                                 style={{ background: isEditing ? 'var(--color-indigo-pale)' : undefined, cursor: isEditing || isImage ? 'default' : 'pointer' }}
                                 title={isEditing || isImage ? '' : 'Nhấp đúp để chỉnh sửa'}>
 
-                                {/* Label column */}
                                 <td className={`${td} font-medium`} style={{ color: 'var(--color-navy-deep)' }}>
                                     <div>{row.label}</div>
                                     {row.hint && <div style={{ fontSize: 11, color: 'var(--color-gray-text)', fontWeight: 400, marginTop: 2, opacity: 0.7 }}>{row.hint}</div>}
                                 </td>
 
-                                {/* Value column */}
                                 <td className={td}>
-                                    {/* ── Image type ── */}
                                     {isImage && (
                                         <div className="flex flex-col gap-2">
-                                            {/* Preview + upload row */}
                                             <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 flex-shrink-0 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
                                                     {(isEditing ? editVal : val)
@@ -611,7 +595,6 @@ export function SettingsTable({
                                                 )}
                                             </div>
 
-                                            {/* URL input row */}
                                             {isEditing && (
                                                 <div className="flex items-center gap-2 max-w-xl">
                                                     <LinkIcon className="size-3.5 text-gray-400 flex-shrink-0" />
@@ -629,14 +612,12 @@ export function SettingsTable({
                                                 </div>
                                             )}
 
-                                            {/* Current URL (view mode) */}
                                             {!isEditing && val && (
                                                 <p className="text-xs text-gray-400 font-mono truncate max-w-sm">{val}</p>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* ── Other types ── */}
                                     {!isImage && (
                                         isEditing ? (
                                             <div className="relative max-w-xl">
@@ -672,7 +653,6 @@ export function SettingsTable({
                                     )}
                                 </td>
 
-                                {/* Action column */}
                                 <td className={`${td} whitespace-nowrap`}>
                                     {isEditing ? (
                                         <div className="flex gap-1">

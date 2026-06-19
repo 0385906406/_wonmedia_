@@ -16,7 +16,6 @@ async function getUserFromCookie() {
     const { payload } = await jwtVerify(token, secret)
     const jwt = payload as { id?: string; name?: string; role?: string; email?: string; tokenVersion?: number }
 
-    // Verify tokenVersion với DB để detect revoked tokens
     if (jwt.id) {
       await connectDB()
       const dbUser = await User.findById(jwt.id).select('tokenVersion name role email').lean() as {
@@ -24,7 +23,6 @@ async function getUserFromCookie() {
       } | null
       if (!dbUser) return null
       if ((dbUser.tokenVersion ?? 0) !== (jwt.tokenVersion ?? 0)) return null
-      // Trả DB data (fresh) thay vì JWT data (stale)
       return { name: dbUser.name, role: dbUser.role, email: dbUser.email }
     }
 

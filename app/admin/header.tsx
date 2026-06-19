@@ -216,7 +216,6 @@ export function AdminHeader() {
         </div>
       </header>
 
-      {/* Notifications Sheet */}
       <Sheet open={notifOpen} onOpenChange={setNotifOpen}>
         <SheetContent className="w-[420px] sm:max-w-[420px] p-0 flex flex-col">
           <SheetHeader className="px-6 pt-6 pb-0">
@@ -250,7 +249,6 @@ export function AdminHeader() {
         </SheetContent>
       </Sheet>
 
-      {/* Command Palette */}
       <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
     </>
   )

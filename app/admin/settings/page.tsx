@@ -19,8 +19,6 @@ import {
 } from './collections-tab'
 import { useToast } from '@/components/admin/toast-provider'
 
-// ─── Settings row definitions ─────────────────────────────────────────────────
-
 const GENERAL_ROWS: SettingsRow[] = [
     { key: 'portalName',   label: 'Tên portal',      type: 'text',  group: 'general', hint: 'Hiển thị trong tab trình duyệt' },
     { key: 'tagline',      label: 'Tagline',          type: 'text',  group: 'general', hint: 'Dòng mô tả ngắn bên dưới tên portal' },
@@ -44,8 +42,6 @@ const FIXED_TABS = [
 type FixedId = typeof FIXED_TABS[number]['id']
 const FIXED_IDS = [...FIXED_TABS.map((t) => t.id), 'footer'] as string[]
 
-// ─── Footer form types ─────────────────────────────────────────────────────────
-
 interface FooterForm {
     companyName: MultiLang; brandDesc: MultiLang
     navAbout: MultiLang; navServices: MultiLang; navCareers: MultiLang; navBlog: MultiLang; navContact: MultiLang
@@ -68,8 +64,6 @@ function emptyFooter(): FooterForm {
 }
 
 interface SettingsData { general: Record<string, string>; header: Record<string, string> }
-
-// ─── Nav components ───────────────────────────────────────────────────────────
 
 function NavDivider({ label }: { label: string }) {
     return (
@@ -111,8 +105,6 @@ function NavItem({
         </button>
     )
 }
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
     const toast = useToast()
@@ -207,7 +199,6 @@ export default function SettingsPage() {
     return (
         <div style={{ padding: '28px 24px' }}>
 
-            {/* Page header */}
             <div className="dh-page-header" style={{ marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--gradient-g3)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px -4px rgba(6,35,64,0.35)' }}>
@@ -220,10 +211,8 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Main grid */}
             <div className="s-layout">
 
-                {/* ── Left nav panel ── */}
                 <div className="s-nav-panel">
                     <NavDivider label="Hệ thống" />
                     {FIXED_TABS.map(({ id, label, icon }) => (
@@ -274,10 +263,8 @@ export default function SettingsPage() {
                     )}
                 </div>
 
-                {/* ── Right content ── */}
                 <div className="s-content">
 
-                    {/* Fixed tabs */}
                     {isFixed && activeFixed && (
                         <div className="dh-card">
                             <div className="dh-card-header">
@@ -302,10 +289,8 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* Footer tab */}
                     {activeTab === 'footer' && (
                         <div className="dh-card">
-                            {/* Header */}
                             <div className="dh-card-header">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -322,7 +307,6 @@ export default function SettingsPage() {
                                 </button>
                             </div>
 
-                            {/* Lang tabs */}
                             <div className="dh-lang-tabs">
                                 {ADMIN_LOCALES.map(l => (
                                     <button key={l} type="button" onClick={() => setFooterLang(l)} className={`dh-lang-tab${footerLang === l ? ' active' : ''}`}>
@@ -400,7 +384,6 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* Collection tab */}
                     {activeCol && (
                         <div className="dh-card">
                             <div className="dh-card-header">
@@ -436,7 +419,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Dialogs */}
             {renameCol && (
                 <RenameDialog col={renameCol} open={!!renameCol}
                     onOpenChange={(v) => { if (!v) setRenameCol(null) }}
@@ -470,8 +452,6 @@ export default function SettingsPage() {
     )
 }
 
-// ─── Footer section wrapper ────────────────────────────────────────────────────
-
 const SECTION_COLORS = {
     indigo: { bg: 'var(--color-indigo-pale)', fg: 'var(--color-indigo)', bar: 'var(--color-indigo)' },
     teal:   { bg: 'var(--color-teal-pale)',   fg: 'var(--color-teal-dark)', bar: 'var(--color-teal)' },
@@ -500,8 +480,6 @@ function FSection({ icon, color, title, desc, children }: {
         </div>
     )
 }
-
-// ─── ML Input ────────────────────────────────────────────────────────────────
 
 function MLInput({ label, fKey, multi = false, form, setForm, lang }: {
     label: string; fKey: keyof FooterForm; multi?: boolean

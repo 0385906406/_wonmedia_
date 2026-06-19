@@ -27,14 +27,12 @@ const JOB_TYPE_MAP: Record<string, string> = {
   'internship': 'Thực tập', 'freelance': 'Freelance',
 }
 
-// ─── SVG icons ────────────────────────────────────────────────────────────────
 const IBag = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
 const IPin = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
 const ICoin = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
 const IClock = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 const IArrow = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
 
-// ─── Job meta ─────────────────────────────────────────────────────────────────
 function JobMeta({ post, labels, compact = false }: { post: PostCard; labels: Record<string, string>; compact?: boolean }) {
   if (post.type !== 'tuyen-dung') return null
   const items: { icon: React.ReactNode; text: string }[] = [
@@ -82,7 +80,6 @@ function JobMeta({ post, labels, compact = false }: { post: PostCard; labels: Re
   )
 }
 
-// ─── Category badge ───────────────────────────────────────────────────────────
 function CatBadge({ type, category, labels }: { type: string; category: string; labels: Record<string, string> }) {
   const isBlog = type === 'blog'
   const fallback = isBlog ? (labels.blogLabel || 'Blog') : (labels.careerLabel || 'Tuyển dụng')
@@ -100,7 +97,6 @@ function CatBadge({ type, category, labels }: { type: string; category: string; 
   )
 }
 
-// ─── Featured card ────────────────────────────────────────────────────────────
 function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: string; baseUrl: string; labels: Record<string, string> }) {
   const [hov, setHov] = useState(false)
   const href = `/${lang}/${baseUrl}/${post.slug}`
@@ -128,7 +124,6 @@ function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: s
       }}
       className="blog-featured-card"
     >
-      {/* Image */}
       <div style={{ position: 'relative', overflow: 'hidden', height: 320 }}>
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title}
@@ -143,7 +138,6 @@ function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: s
         </div>
       </div>
 
-      {/* Body */}
       <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16 }}>
         <span style={{ fontSize: '12px', color: '#94a3b8', fontFamily: 'var(--nic-font-monospace, monospace)', letterSpacing: '0.5px' }}>
           {post.date}
@@ -180,7 +174,6 @@ function FeaturedCard({ post, lang, baseUrl, labels }: { post: PostCard; lang: s
   )
 }
 
-// ─── Grid card ────────────────────────────────────────────────────────────────
 function GridCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; lang: string; delay?: number; baseUrl: string; labels: Record<string, string> }) {
   const [hov, setHov] = useState(false)
   const href = `/${lang}/${baseUrl}/${post.slug}`
@@ -204,7 +197,6 @@ function GridCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
         transition: 'transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease',
       }}
     >
-      {/* Thumbnail */}
       <div style={{ overflow: 'hidden', aspectRatio: '16/9', flexShrink: 0, position: 'relative' }}>
         {post.thumbnail
           ? <img src={post.thumbnail} alt={post.title}
@@ -222,7 +214,6 @@ function GridCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
         }} />
       </div>
 
-      {/* Body */}
       <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <CatBadge type={post.type} category={post.category} labels={labels} />
@@ -255,7 +246,6 @@ function GridCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
   )
 }
 
-// ─── List card ────────────────────────────────────────────────────────────────
 function ListCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; lang: string; delay?: number; baseUrl: string; labels: Record<string, string> }) {
   const [hov, setHov] = useState(false)
   const href = `/${lang}/${baseUrl}/${post.slug}`
@@ -277,7 +267,6 @@ function ListCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
         borderRadius: '8px',
       }}
     >
-      {/* Thumb */}
       <div style={{
         width: 80, height: 60, borderRadius: '8px',
         overflow: 'hidden', flexShrink: 0,
@@ -288,7 +277,6 @@ function ListCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', objectPosition: post.thumbnailPosition || 'center center' }} />
         )}
       </div>
-      {/* Body */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <CatBadge type={post.type} category={post.category} labels={labels} />
@@ -314,7 +302,6 @@ function ListCard({ post, lang, delay = 0, baseUrl, labels }: { post: PostCard; 
   )
 }
 
-// ─── Filter bar ───────────────────────────────────────────────────────────────
 function FilterBar({ lang, activeType, labels, baseUrl }: { lang: string; activeType: string; labels: Record<string, string>; baseUrl: string }) {
   const router = useRouter()
 
@@ -345,7 +332,6 @@ function FilterBar({ lang, activeType, labels, baseUrl }: { lang: string; active
   )
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
 export interface BlogClientProps {
   posts: PostCard[]
   lang: string
@@ -359,7 +345,6 @@ export interface BlogClientProps {
   baseUrl?: string
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 function BlogInner({ posts, lang, activeType, total, page, pages, heading, labels, hideFilter, baseUrl = 'tin-tuc' }: BlogClientProps) {
   const router = useRouter()
 
@@ -375,7 +360,6 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
   return (
     <div style={{ fontFamily: 'var(--font-vi)' }}>
 
-      {/* ── Banner ── */}
       <section style={{ position: 'relative', width: '100%', minHeight: 200, display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: 'calc(-1 * var(--topbar-height))' }}>
         <div style={{
           position: 'absolute', inset: 0,
@@ -431,11 +415,9 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
         </div>
       </section>
 
-      {/* ── Content ── */}
       <div style={{ background: '#F8F9FB' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '56px 24px 80px' }}>
 
-          {/* Filter */}
           {!hideFilter && (
             <div style={{ marginBottom: 40 }}>
               <Suspense>
@@ -444,7 +426,6 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
             </div>
           )}
 
-          {/* Empty */}
           {posts.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -469,14 +450,12 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
             </motion.div>
           ) : (
             <>
-              {/* Featured */}
               {featured && (
                 <div style={{ marginBottom: 48 }}>
                   <FeaturedCard post={featured} lang={lang} baseUrl={baseUrl} labels={labels} />
                 </div>
               )}
 
-              {/* Grid heading + grid */}
               {gridPosts.length > 0 && (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, flexWrap: 'wrap' }}>
@@ -497,7 +476,6 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
                 </>
               )}
 
-              {/* List */}
               {listPosts.length > 0 && (
                 <div style={{
                   background: '#fff', borderRadius: '12px',
@@ -515,7 +493,6 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
                 </div>
               )}
 
-              {/* Pagination */}
               {pages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <button

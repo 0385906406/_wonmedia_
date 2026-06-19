@@ -19,7 +19,6 @@ export function CustomerSegChart() {
         <span className="text-xs text-muted-foreground">total customers</span>
       </div>
 
-      {/* Stacked bar */}
       <div className="flex h-3 rounded-full overflow-hidden gap-0.5">
         {segments.map((s) => (
           <div

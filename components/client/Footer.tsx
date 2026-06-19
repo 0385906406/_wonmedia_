@@ -22,7 +22,7 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
     await connectDB()
     footer  = await FooterConfig.findOne({ key: 'global' }).lean() as unknown as Cfg
     contact = await ContactConfig.findOne({ key: 'global' }).lean() as unknown as Cfg
-  } catch { /* DB unavailable */ }
+  } catch {}
 
   const f   = (key: string) => ml(footer,  key, lang)
   const c   = (key: string) => ml(contact, key, lang)
@@ -46,19 +46,15 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
   return (
     <footer style={{ position: 'relative', overflow: 'hidden', background: 'var(--color-navy-deep)', color: 'var(--on-dark-body)', marginTop: 'var(--space-20)' }}>
 
-      {/* Accent stripe */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,var(--color-teal),var(--color-indigo),var(--color-teal))', backgroundSize: '200% 100%' }} />
 
-      {/* Decorative blob */}
       <div style={{ position: 'absolute', top: -120, right: -120, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,169,143,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <div className="container" style={{ position: 'relative', zIndex: 1, padding: '64px 24px 0' }}>
 
-        {/* ── Top grid ─────────────────────────────────────────── */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '48px 40px', paddingBottom: 56 }} className="footer-grid">
 
-          {/* Col 1 — Brand */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <img src="/logo.png" alt="WON Media" style={{ width: 110, height: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.95 }} />
 
@@ -66,7 +62,6 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
               {f('brandDesc') || 'Đơn vị tiên phong trong phân phối âm nhạc số và quản lý bản quyền tại Việt Nam.'}
             </p>
 
-            {/* Socials */}
             <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
               {[
                 { href: 'https://www.facebook.com/wonmediavn', label: 'Facebook', d: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' },
@@ -82,7 +77,6 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
             </div>
           </div>
 
-          {/* Col 2 — Navigation */}
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-teal-light)', marginBottom: 20 }}>
               Khám phá
@@ -98,7 +92,6 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
             </div>
           </div>
 
-          {/* Col 3 — Services */}
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-teal-light)', marginBottom: 20 }}>
               {f('servicesHeading') || 'Dịch vụ'}
@@ -113,7 +106,6 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
             </div>
           </div>
 
-          {/* Col 4 — Contact */}
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-teal-light)', marginBottom: 20 }}>
               Liên hệ
@@ -160,7 +152,6 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
           </div>
         </div>
 
-        {/* ── Bottom bar ────────────────────────────────────────── */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '20px 0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
           <span>{copyright}</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>

@@ -13,7 +13,6 @@ export interface PostDetailData {
   title: string
   excerpt: string
   content: string
-  // Job-specific
   urgent?: boolean
   deadline?: string
   jobType?: string
@@ -112,15 +111,12 @@ function JobInfoPanel({ post }: { post: PostDetailData }) {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Decorative blobs */}
         <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(0,169,143,0.1)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: '30%', width: 140, height: 140, borderRadius: '50%', background: 'rgba(99,102,241,0.08)', pointerEvents: 'none' }} />
 
         <div style={{ position: 'relative', display: 'flex', gap: 32, alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
-          {/* Left: Info grid */}
           <div style={{ flex: 1, minWidth: 240 }}>
-            {/* Badges row */}
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
               {post.urgent && (
                 <span style={{
@@ -148,7 +144,6 @@ function JobInfoPanel({ post }: { post: PostDetailData }) {
               )}
             </div>
 
-            {/* Info items */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
               {infoItems.map((item, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -164,7 +159,6 @@ function JobInfoPanel({ post }: { post: PostDetailData }) {
             </div>
           </div>
 
-          {/* Right: CTA */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start', flexShrink: 0 }}>
             {!isExpired ? (
               <a
@@ -219,7 +213,6 @@ export function PostDetail({
   const [likeCount, setLikeCount] = useState(initLikeCount)
   const [sharing, setSharing] = useState(false)
 
-  // Fetch trạng thái like thực tế của user khi mount
   useEffect(() => {
     if (!isLoggedIn) return
     fetch(`/api/posts/${postId}/like`)
@@ -254,12 +247,10 @@ export function PostDetail({
   return (
     <div style={{ background: 'var(--wm-dark)', fontFamily: 'var(--font-vi)' }}>
 
-      {/* ══ HERO — đúng style trang chủ ══ */}
       <section style={{
         position: 'relative', width: '100%', minHeight: '420px',
         display: 'flex', alignItems: 'flex-end', overflow: 'hidden',
       }}>
-        {/* Background ảnh thumbnail */}
         {post.thumbnail ? (
           <img src={post.thumbnail} alt={post.title} style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
@@ -270,16 +261,13 @@ export function PostDetail({
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #191B24, #0F4C81)' }} />
         )}
 
-        {/* Overlays y hệt trang chủ */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(25,27,36,0.7) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, opacity: 0.45, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)', backgroundSize: '3px 3px' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px', background: 'linear-gradient(to bottom, transparent, var(--wm-dark))' }} />
 
-        {/* Nội dung */}
         <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1280px', margin: '0 auto', padding: 'clamp(80px,10vw,100px) clamp(16px,4vw,32px) 48px' }}>
 
-          {/* Back */}
           <motion.a
             href={`/${lang}/${backUrl}`}
             initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
@@ -298,7 +286,6 @@ export function PostDetail({
             {backLabel}
           </motion.a>
 
-          {/* Category + date */}
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -321,7 +308,6 @@ export function PostDetail({
             </span>
           </motion.div>
 
-          {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -336,7 +322,6 @@ export function PostDetail({
             {post.title}
           </motion.h1>
 
-          {/* Excerpt */}
           {post.excerpt && (
             <motion.p
               initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
@@ -353,16 +338,13 @@ export function PostDetail({
         </div>
       </section>
 
-      {/* ══ CONTENT — nền F8F9FB y hệt section homepage ══ */}
       <div style={{ background: '#F8F9FB' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: 'clamp(32px,6vw,64px) clamp(16px,4vw,32px) clamp(48px,6vw,80px)' }}>
 
-          {/* ── Job Info Panel (chỉ hiện với tuyển dụng) ── */}
           {!isBlog && (
             <JobInfoPanel post={post} />
           )}
 
-          {/* Content */}
           <div>
 
             {post.thumbnail && (
@@ -377,7 +359,6 @@ export function PostDetail({
               </motion.div>
             )}
 
-            {/* Article body */}
             {post.content ? (
               <motion.article
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -392,13 +373,11 @@ export function PostDetail({
               </p>
             )}
 
-            {/* ── Like & Share ── */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
               margin: '48px 0 0', padding: '20px 0', flexWrap: 'wrap',
               borderTop: '1px solid #E5E8ED',
             }}>
-              {/* Like */}
               <button
                 onClick={handleLike}
                 style={{
@@ -420,7 +399,6 @@ export function PostDetail({
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
                 <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>Chia sẻ:</span>
-                {/* Facebook */}
                 <button onClick={() => handleShare('facebook')} title="Chia sẻ Facebook"
                   style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#EAF1F8')}
@@ -430,7 +408,6 @@ export function PostDetail({
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                 </button>
-                {/* Twitter/X */}
                 <button onClick={() => handleShare('twitter')} title="Chia sẻ X/Twitter"
                   style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#EAF1F8')}
@@ -440,7 +417,6 @@ export function PostDetail({
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                 </button>
-                {/* Copy link */}
                 <button onClick={() => handleShare('copy')} title="Sao chép link"
                   style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #E5E8ED', background: sharing ? '#DEF5EE' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', color: sharing ? '#007D69' : '#64748b' }}
                 >
@@ -458,7 +434,6 @@ export function PostDetail({
               </div>
             </div>
 
-            {/* Comment section */}
             <CommentSection
               postId={postId}
               lang={lang}
@@ -467,10 +442,8 @@ export function PostDetail({
               currentUserName={currentUserName}
             />
 
-            {/* Divider */}
             <div style={{ height: 1, background: '#E5E8ED', margin: '56px 0 40px' }} />
 
-            {/* Back button */}
             <a href={`/${lang}/${backUrl}`}
             className="wm-detail-back"
             style={{
@@ -490,12 +463,10 @@ export function PostDetail({
           </div>
         </div>
 
-        {/* ══ RELATED — dùng wm-bloom-card y chang PostsCarousel ══ */}
         {relatedPosts.length > 0 && (
           <div style={{ background: '#fff', borderTop: '1px solid #E5E8ED', padding: '56px 24px 72px' }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
-              {/* Heading giống sections trang chủ */}
               <div className="wm-animate" style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <h2 style={{
                   color: '#0b2a59', fontSize: 'clamp(22px, 3vw, 36px)',
@@ -574,7 +545,6 @@ export function PostDetail({
         @media (max-width: 900px) { .wm-related-grid { grid-template-columns: repeat(2,1fr) !important; } }
         @media (max-width: 580px) { .wm-related-grid { grid-template-columns: 1fr !important; } }
 
-        /* ─── Article typography — dùng màu đúng WM ─── */
         .wm-article-body {
           font-family: var(--font-vi);
           font-size: 16px; line-height: 1.85; color: #334155;

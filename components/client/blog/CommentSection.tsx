@@ -34,7 +34,6 @@ function timeAgo(dateStr: string) {
 }
 
 function Avatar({ name }: { name: string }) {
-  // BUG-044: guard khi name rỗng
   const safeName = name?.trim() || '?'
   const initials = safeName.split(' ').map(w => w[0] ?? '').filter(Boolean).slice(0, 2).join('').toUpperCase() || '?'
   const colors = ['#00A98F', '#6366F1', '#0F4C81', '#B45309', '#15803d']
@@ -126,7 +125,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const esRef = useRef<EventSource | null>(null)
 
-  // Load initial comments
   useEffect(() => {
     fetch(`/api/posts/${postId}/comments`)
       .then(r => r.json())
@@ -134,13 +132,11 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
       .finally(() => setLoading(false))
   }, [postId])
 
-  // SSE realtime
   useEffect(() => {
     const es = new EventSource(`/api/posts/${postId}/comments/stream`)
     esRef.current = es
 
     es.onmessage = (e) => {
-      // BUG-043: guard JSON.parse — malformed frame không crash handler
       let data: { type: string; comment?: Comment; commentId?: string; likes?: CommentLike[] }
       try { data = JSON.parse(e.data) } catch { return }
       if (data.type === 'new' && data.comment) {
@@ -159,7 +155,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
 
   const handleLike = useCallback(async (commentId: string) => {
     if (!isLoggedIn) return
-    // Optimistic update ngay lập tức
     setComments(prev => prev.map(c => {
       if (c._id !== commentId) return c
       const alreadyLiked = currentUserId ? c.likes.some(l => l.userId === currentUserId) : false
@@ -168,7 +163,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
         : [...c.likes, { userId: currentUserId! }]
       return { ...c, likes: newLikes }
     }))
-    // Gọi API (SSE sẽ không fire thêm vì server broadcast chỉ đến các client khác)
     await fetch(`/api/posts/${postId}/comments/${commentId}`, { method: 'POST' })
   }, [postId, isLoggedIn, currentUserId])
 
@@ -194,7 +188,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
     setSubmitting(false)
   }
 
-  // Group: top-level + replies
   const topLevel = comments.filter(c => !c.parentId)
   const replies = (parentId: string) => comments.filter(c => c.parentId === parentId)
 
@@ -216,7 +209,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
         )}
       </h3>
 
-      {/* Form */}
       {isLoggedIn ? (
         <form onSubmit={handleSubmit} style={{ marginBottom: 40 }}>
           {replyTo && (
@@ -308,7 +300,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
         </div>
       )}
 
-      {/* Comments list */}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[1, 2, 3].map(i => (
@@ -333,7 +324,6 @@ export function CommentSection({ postId, lang, isLoggedIn, currentUserId, curren
                 onLike={handleLike}
                 onReply={handleReply}
               />
-              {/* Replies */}
               {replies(c._id).length > 0 && (
                 <div style={{ marginLeft: 48, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {replies(c._id).map(r => (
