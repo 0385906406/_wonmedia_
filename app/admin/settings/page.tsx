@@ -45,7 +45,7 @@ const FIXED_IDS = [...FIXED_TABS.map((t) => t.id), 'footer'] as string[]
 // ─── Footer form types ─────────────────────────────────────────────────────────
 
 interface FooterForm {
-    companyName: MultiLang
+    companyName: MultiLang; brandDesc: MultiLang
     navAbout: MultiLang; navServices: MultiLang; navCareers: MultiLang; navBlog: MultiLang; navContact: MultiLang
     servicesHeading: MultiLang; service1: MultiLang; service2: MultiLang; service3: MultiLang; service4: MultiLang
     locationHeading: MultiLang; locationCity: MultiLang
@@ -54,7 +54,7 @@ interface FooterForm {
 }
 function emptyFooter(): FooterForm {
     return {
-        companyName: emptyMultiLang(),
+        companyName: emptyMultiLang(), brandDesc: emptyMultiLang(),
         navAbout: emptyMultiLang(), navServices: emptyMultiLang(), navCareers: emptyMultiLang(),
         navBlog: emptyMultiLang(), navContact: emptyMultiLang(),
         servicesHeading: emptyMultiLang(), service1: emptyMultiLang(), service2: emptyMultiLang(),
@@ -312,101 +312,75 @@ export default function SettingsPage() {
                     )}
 
                     {/* Footer tab */}
-                    {activeTab === 'footer' && (() => {
-                        const IC = 'w-full h-9 rounded-lg border border-[#E5E8ED] bg-white px-3 text-sm focus:outline-none focus:border-[var(--color-indigo)] focus:ring-2 focus:ring-[var(--color-indigo)]/10'
-                        const FF = footerForm
-                        const setFF = setFooterForm
-
-                        function MLInput({ label, fKey, multi = false }: { label: string; fKey: keyof FooterForm; multi?: boolean }) {
-                            const val = FF[fKey] as MultiLang
-                            return (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                                    <label className="dh-label" style={{ fontSize: 12 }}>
-                                        {label}
-                                        <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--color-gray-text)', marginLeft: 6, opacity: 0.6 }}>
-                                            {LOCALE_META[footerLang].flag} {LOCALE_META[footerLang].short}
-                                        </span>
-                                    </label>
-                                    {multi
-                                        ? <textarea value={val[footerLang] ?? ''} rows={2}
-                                            className={IC.replace('h-9', '') + ' py-2 resize-none'}
-                                            onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />
-                                        : <input value={val[footerLang] ?? ''} className={IC}
-                                            onChange={e => setFF(f => ({ ...f, [fKey]: { ...val, [footerLang]: e.target.value } }))} />}
+                    {activeTab === 'footer' && (
+                        <div className="dh-card">
+                            <div className="dh-card-header">
+                                <div>
+                                    <h2 className="dh-card-title">Footer</h2>
+                                    <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>Nội dung footer hiển thị trên tất cả trang</p>
                                 </div>
-                            )
-                        }
-
-                        return (
-                            <div className="dh-card">
-                                {/* Card header */}
-                                <div className="dh-card-header">
-                                    <div>
-                                        <h2 className="dh-card-title">Footer</h2>
-                                        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>Nội dung footer hiển thị trên tất cả trang</p>
-                                    </div>
-                                    <button onClick={saveFooter} disabled={footerSaving} className="dh-btn dh-btn-sm dh-btn-primary">
-                                        {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}Lưu Footer
-                                    </button>
-                                </div>
-
-                                <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                    {/* Lang tabs */}
-                                    <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
-                                        {ADMIN_LOCALES.map(l => (
-                                            <button key={l} type="button" onClick={() => setFooterLang(l)}
-                                                style={{
-                                                    padding: '5px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
-                                                    fontSize: 12, fontWeight: 700,
-                                                    background: footerLang === l ? '#fff' : 'transparent',
-                                                    color: footerLang === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
-                                                    boxShadow: footerLang === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                                                    transition: 'all 0.12s',
-                                                }}>
-                                                {LOCALE_META[l].flag} {LOCALE_META[l].short}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* Sections */}
-                                    <FooterSection title="Thương hiệu">
-                                        <MLInput label="Tên công ty" fKey="companyName" />
-                                        <MLInput label="Bản quyền (Copyright)" fKey="copyright" />
-                                    </FooterSection>
-
-                                    <FooterSection title="Nhãn điều hướng">
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 12 }}>
-                                            <MLInput label="Giới thiệu"  fKey="navAbout"    />
-                                            <MLInput label="Dịch vụ"     fKey="navServices" />
-                                            <MLInput label="Tuyển dụng"  fKey="navCareers"  />
-                                            <MLInput label="Blog"        fKey="navBlog"     />
-                                            <MLInput label="Liên hệ"     fKey="navContact"  />
-                                        </div>
-                                    </FooterSection>
-
-                                    <FooterSection title="Dịch vụ">
-                                        <MLInput label="Tiêu đề cột dịch vụ" fKey="servicesHeading" />
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                            <MLInput label="Dịch vụ 1" fKey="service1" />
-                                            <MLInput label="Dịch vụ 2" fKey="service2" />
-                                            <MLInput label="Dịch vụ 3" fKey="service3" />
-                                            <MLInput label="Dịch vụ 4" fKey="service4" />
-                                        </div>
-                                    </FooterSection>
-
-                                    <FooterSection title="Địa điểm & Nhãn liên hệ">
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
-                                            <MLInput label="Nhãn trụ sở"          fKey="locationHeading" />
-                                            <MLInput label="Thành phố"             fKey="locationCity"    />
-                                            <MLInput label="Nhãn Điện thoại"       fKey="phoneLabel"      />
-                                            <MLInput label="Nhãn Email"            fKey="emailLabel"      />
-                                            <MLInput label="Nhãn Người đại diện"   fKey="legalRepLabel"   />
-                                        </div>
-                                    </FooterSection>
-                                </div>
+                                <button onClick={saveFooter} disabled={footerSaving} className="dh-btn dh-btn-sm dh-btn-primary">
+                                    {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}Lưu Footer
+                                </button>
                             </div>
-                        )
-                    })()}
+
+                            <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                {/* Lang tabs */}
+                                <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
+                                    {ADMIN_LOCALES.map(l => (
+                                        <button key={l} type="button" onClick={() => setFooterLang(l)}
+                                            style={{
+                                                padding: '5px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
+                                                fontSize: 12, fontWeight: 700,
+                                                background: footerLang === l ? '#fff' : 'transparent',
+                                                color: footerLang === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+                                                boxShadow: footerLang === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                                                transition: 'all 0.12s',
+                                            }}>
+                                            {LOCALE_META[l].flag} {LOCALE_META[l].short}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Sections */}
+                                <FooterSection title="Thương hiệu">
+                                    <MLInput label="Tên công ty" fKey="companyName" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    <MLInput label="Mô tả dưới logo" fKey="brandDesc" multi form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    <MLInput label="Bản quyền (Copyright)" fKey="copyright" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                </FooterSection>
+
+                                <FooterSection title="Nhãn điều hướng">
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 12 }}>
+                                        <MLInput label="Giới thiệu"  fKey="navAbout"    form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Dịch vụ"     fKey="navServices" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Tuyển dụng"  fKey="navCareers"  form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Blog"        fKey="navBlog"     form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Liên hệ"     fKey="navContact"  form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    </div>
+                                </FooterSection>
+
+                                <FooterSection title="Dịch vụ">
+                                    <MLInput label="Tiêu đề cột dịch vụ" fKey="servicesHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                        <MLInput label="Dịch vụ 1" fKey="service1" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Dịch vụ 2" fKey="service2" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Dịch vụ 3" fKey="service3" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Dịch vụ 4" fKey="service4" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    </div>
+                                </FooterSection>
+
+                                <FooterSection title="Địa điểm & Nhãn liên hệ">
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
+                                        <MLInput label="Nhãn trụ sở"          fKey="locationHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Thành phố"             fKey="locationCity"    form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Nhãn Điện thoại"       fKey="phoneLabel"      form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Nhãn Email"            fKey="emailLabel"      form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Nhãn Người đại diện"   fKey="legalRepLabel"   form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    </div>
+                                </FooterSection>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Collection tab */}
                     {activeCol && (
@@ -483,6 +457,31 @@ function FooterSection({ title, children }: { title: string; children: React.Rea
             <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {children}
             </div>
+        </div>
+    )
+}
+
+const FOOTER_IC = 'w-full h-9 rounded-lg border border-[#E5E8ED] bg-white px-3 text-sm focus:outline-none focus:border-[var(--color-indigo)] focus:ring-2 focus:ring-[var(--color-indigo)]/10'
+
+function MLInput({ label, fKey, multi = false, form, setForm, lang }: {
+    label: string; fKey: keyof FooterForm; multi?: boolean
+    form: FooterForm; setForm: React.Dispatch<React.SetStateAction<FooterForm>>; lang: LocaleKey
+}) {
+    const val = form[fKey] as MultiLang
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <label className="dh-label" style={{ fontSize: 12 }}>
+                {label}
+                <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--color-gray-text)', marginLeft: 6, opacity: 0.6 }}>
+                    {LOCALE_META[lang].flag} {LOCALE_META[lang].short}
+                </span>
+            </label>
+            {multi
+                ? <textarea value={val[lang] ?? ''} rows={2}
+                    className={FOOTER_IC.replace('h-9', '') + ' py-2 resize-none'}
+                    onChange={e => setForm(f => ({ ...f, [fKey]: { ...val, [lang]: e.target.value } }))} />
+                : <input value={val[lang] ?? ''} className={FOOTER_IC}
+                    onChange={e => setForm(f => ({ ...f, [fKey]: { ...val, [lang]: e.target.value } }))} />}
         </div>
     )
 }
