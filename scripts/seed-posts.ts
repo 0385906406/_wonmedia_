@@ -331,7 +331,7 @@ const TUYEN_DUNG_POSTS = [
 </ul>
 
 <h2>Cách ứng tuyển</h2>
-<p>Gửi CV + portfolio (link kênh/video đã làm) về email: <strong>hr@wonmedia.vn</strong></p>
+<p>Gửi CV + portfolio (link kênh/video đã làm) về email: <strong>duongnv10504@gmail.com</strong></p>
 <p>Tiêu đề email: <code>[CONTENT CREATOR] Họ và tên - Năm sinh</code></p>`,
       en: `<h2>Job Description</h2>
 <p>You will be a member of WON Media's creative content team, responsible for producing and managing content across digital platforms.</p>
@@ -361,7 +361,7 @@ const TUYEN_DUNG_POSTS = [
 </ul>
 
 <h2>How to Apply</h2>
-<p>Send CV + portfolio (link to channels/videos) to: <strong>hr@wonmedia.vn</strong></p>`,
+<p>Send CV + portfolio (link to channels/videos) to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -418,7 +418,7 @@ const TUYEN_DUNG_POSTS = [
 </ul>
 
 <h2>Ứng tuyển</h2>
-<p>Email: <strong>hr@wonmedia.vn</strong> | Tiêu đề: <code>[DIGITAL MARKETING] Họ tên</code></p>`,
+<p>Email: <strong>duongnv10504@gmail.com</strong> | Tiêu đề: <code>[DIGITAL MARKETING] Họ tên</code></p>`,
       en: `<h2>Job Description</h2>
 <p>Responsible for building and implementing digital marketing strategies for WON Media's music products and partner channels.</p>
 
@@ -435,7 +435,7 @@ const TUYEN_DUNG_POSTS = [
   <li>Young, creative environment</li>
 </ul>
 
-<p>Email: <strong>hr@wonmedia.vn</strong></p>`,
+<p>Email: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -557,7 +557,7 @@ const TUYEN_DUNG_POSTS = [
   <li>Cơ hội thăng tiến lên vị trí Copyright Manager</li>
 </ul>
 
-<p>Ứng tuyển: <strong>hr@wonmedia.vn</strong> | <code>[COPYRIGHT SPECIALIST] Họ tên</code></p>`,
+<p>Ứng tuyển: <strong>duongnv10504@gmail.com</strong> | <code>[COPYRIGHT SPECIALIST] Họ tên</code></p>`,
       en: `<h2>Job Description</h2>
 <p>This is an important position in WON Media's Copyright department, directly ensuring revenue rights and protecting digital assets for artists and partners.</p>
 
@@ -574,7 +574,7 @@ const TUYEN_DUNG_POSTS = [
   <li>Full insurance benefits</li>
 </ul>
 
-<p>Apply: <strong>hr@wonmedia.vn</strong></p>`,
+<p>Apply: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },

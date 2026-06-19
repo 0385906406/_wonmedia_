@@ -50,6 +50,31 @@ const Category = mongoose.models.Category || mongoose.model('Category', new mong
   order:   { type: Number, default: 0 },
 }, { timestamps: true }))
 
+const HomepageHero = mongoose.models.HomepageHero || mongoose.model('HomepageHero', new mongoose.Schema({
+  key: { type: String, default: 'main', unique: true },
+  title: MLSchema, title2: MLSchema, subtitle: MLSchema,
+}, { timestamps: true }))
+
+const HomepageService = mongoose.models.HomepageService || mongoose.model('HomepageService', new mongoose.Schema({
+  order: Number, iconKey: String,
+  title: MLSchema, desc: MLSchema, active: { type: Boolean, default: true },
+}, { timestamps: true }))
+
+const HomepageAchievement = mongoose.models.HomepageAchievement || mongoose.model('HomepageAchievement', new mongoose.Schema({
+  order: Number, value: Number, label: MLSchema, active: { type: Boolean, default: true },
+}, { timestamps: true }))
+
+const HomepagePartner = mongoose.models.HomepagePartner || mongoose.model('HomepagePartner', new mongoose.Schema({
+  order: Number, name: String, logo: String, active: { type: Boolean, default: true },
+}, { timestamps: true }))
+
+const HomepagePostsConfig = mongoose.models.HomepagePostsConfig || mongoose.model('HomepagePostsConfig', new mongoose.Schema({
+  key:         { type: String, default: 'posts', unique: true },
+  mode:        { type: String, enum: ['auto', 'manual'], default: 'auto' },
+  selectedIds: [{ type: String }],
+  limit:       { type: Number, default: 6 },
+}, { timestamps: true }))
+
 const Post = mongoose.models.Post || mongoose.model('Post', new mongoose.Schema({
   slug:           { type: String, required: true, unique: true },
   type:           { type: String, enum: ['blog', 'tuyen-dung'], default: 'blog' },
@@ -293,7 +318,7 @@ const POSTS = [
   <li>Bảo hiểm đầy đủ theo quy định</li>
 </ul>
 <h3>Cách ứng tuyển</h3>
-<p>Gửi CV và portfolio về email: <strong>hr@wonmedia.com</strong></p>`,
+<p>Gửi CV và portfolio về email: <strong>duongnv10504@gmail.com</strong></p>`,
       en: `<h2>Recruitment: Music Content Creator</h2>
 <h3>Job Description</h3>
 <ul>
@@ -309,16 +334,16 @@ const POSTS = [
   <li>Proficient in video editing tools (Premiere, CapCut...)</li>
 </ul>
 <h3>How to Apply</h3>
-<p>Send CV and portfolio to: <strong>hr@wonmedia.com</strong></p>`,
+<p>Send CV and portfolio to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: `<h2>채용: 음악 콘텐츠 크리에이터</h2>
 <h3>지원 방법</h3>
-<p>CV 및 포트폴리오를 이메일로 보내주세요: <strong>hr@wonmedia.com</strong></p>`,
+<p>CV 및 포트폴리오를 이메일로 보내주세요: <strong>duongnv10504@gmail.com</strong></p>`,
       ja: `<h2>採用: 音楽コンテンツクリエイター</h2>
 <h3>応募方法</h3>
-<p>CVとポートフォリオをメールで送ってください: <strong>hr@wonmedia.com</strong></p>`,
+<p>CVとポートフォリオをメールで送ってください: <strong>duongnv10504@gmail.com</strong></p>`,
       zh: `<h2>招聘：音乐内容创作者</h2>
 <h3>申请方式</h3>
-<p>请将简历和作品集发送至邮箱：<strong>hr@wonmedia.com</strong></p>`,
+<p>请将简历和作品集发送至邮箱：<strong>duongnv10504@gmail.com</strong></p>`,
     },
   },
   {
@@ -369,7 +394,7 @@ const POSTS = [
   <li>Laptop và các thiết bị làm việc được cung cấp</li>
 </ul>
 <h3>Cách ứng tuyển</h3>
-<p>Gửi CV về email: <strong>hr@wonmedia.com</strong><br/>Tiêu đề email: <em>[Digital Marketing Executive] – Họ và tên</em></p>`,
+<p>Gửi CV về email: <strong>duongnv10504@gmail.com</strong><br/>Tiêu đề email: <em>[Digital Marketing Executive] – Họ và tên</em></p>`,
       en: `<h2>Recruitment: Digital Marketing Executive</h2>
 <h3>Requirements</h3>
 <ul>
@@ -378,16 +403,16 @@ const POSTS = [
   <li>Data analysis skills with Google Analytics, Meta Business Suite</li>
 </ul>
 <h3>How to Apply</h3>
-<p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+<p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: `<h2>채용: 디지털 마케팅 임원</h2>
 <h3>지원 방법</h3>
-<p>이메일로 CV를 보내주세요: <strong>hr@wonmedia.com</strong></p>`,
+<p>이메일로 CV를 보내주세요: <strong>duongnv10504@gmail.com</strong></p>`,
       ja: `<h2>採用: デジタルマーケティングエグゼクティブ</h2>
 <h3>応募方法</h3>
-<p>CVをメールで送ってください: <strong>hr@wonmedia.com</strong></p>`,
+<p>CVをメールで送ってください: <strong>duongnv10504@gmail.com</strong></p>`,
       zh: `<h2>招聘：数字营销执行</h2>
 <h3>申请方式</h3>
-<p>请将简历发送至：<strong>hr@wonmedia.com</strong></p>`,
+<p>请将简历发送至：<strong>duongnv10504@gmail.com</strong></p>`,
     },
   },
 
@@ -410,8 +435,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>Bạn sẽ trực tiếp sản xuất và quản lý nội dung trên các kênh truyền thông của WonMedia.</p><h2>Trách nhiệm chính</h2><ul><li>Lên ý tưởng và sản xuất nội dung hàng ngày cho Facebook, TikTok, YouTube, Instagram</li><li>Viết bài blog, tin tức âm nhạc, thông cáo báo chí</li><li>Theo dõi và phân tích hiệu quả nội dung</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> làm nội dung số</li><li>Đam mê âm nhạc và văn hóa giải trí</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>12 – 18 triệu VNĐ/tháng</strong> + thưởng KPI</li><li>BHXH, BHYT đầy đủ</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p>You will directly produce and manage content across WonMedia's media channels.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of experience</strong> in digital content</li><li>Passion for music and entertainment culture</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>Bạn sẽ trực tiếp sản xuất và quản lý nội dung trên các kênh truyền thông của WonMedia.</p><h2>Trách nhiệm chính</h2><ul><li>Lên ý tưởng và sản xuất nội dung hàng ngày cho Facebook, TikTok, YouTube, Instagram</li><li>Viết bài blog, tin tức âm nhạc, thông cáo báo chí</li><li>Theo dõi và phân tích hiệu quả nội dung</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> làm nội dung số</li><li>Đam mê âm nhạc và văn hóa giải trí</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>12 – 18 triệu VNĐ/tháng</strong> + thưởng KPI</li><li>BHXH, BHYT đầy đủ</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p>You will directly produce and manage content across WonMedia's media channels.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of experience</strong> in digital content</li><li>Passion for music and entertainment culture</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -433,8 +458,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>WonMedia mở rộng đội ngũ sáng tạo, tìm Graphic Designer có khiếu thẩm mỹ cao.</p><h2>Trách nhiệm</h2><ul><li>Thiết kế cover album, single artwork cho nghệ sĩ</li><li>Tạo visual identity cho các chiến dịch âm nhạc</li><li>Thiết kế banner, poster, key visual sự kiện</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> thiết kế đồ họa</li><li>Thành thạo Adobe Photoshop, Illustrator, After Effects</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 25 triệu VNĐ/tháng</strong></li><li>Hybrid: 3 ngày văn phòng, 2 ngày remote</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p>WonMedia is expanding its creative team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of graphic design experience</strong></li><li>Proficient in Adobe Photoshop, Illustrator, After Effects</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>WonMedia mở rộng đội ngũ sáng tạo, tìm Graphic Designer có khiếu thẩm mỹ cao.</p><h2>Trách nhiệm</h2><ul><li>Thiết kế cover album, single artwork cho nghệ sĩ</li><li>Tạo visual identity cho các chiến dịch âm nhạc</li><li>Thiết kế banner, poster, key visual sự kiện</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> thiết kế đồ họa</li><li>Thành thạo Adobe Photoshop, Illustrator, After Effects</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 25 triệu VNĐ/tháng</strong></li><li>Hybrid: 3 ngày văn phòng, 2 ngày remote</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p>WonMedia is expanding its creative team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of graphic design experience</strong></li><li>Proficient in Adobe Photoshop, Illustrator, After Effects</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -456,8 +481,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>Vị trí then chốt trong đội ngũ sản xuất nội dung của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Dựng phim MV, lyric video, official audio video cho nghệ sĩ</li><li>Tạo reels, short-form video cho TikTok, YouTube Shorts</li><li>Thực hiện color grading, motion graphics</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> dựng phim chuyên nghiệp</li><li>Thành thạo Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>18 – 28 triệu VNĐ/tháng</strong> + thưởng dự án</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p>Key position in WonMedia's content production team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of professional video editing experience</strong></li><li>Proficient in Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>Vị trí then chốt trong đội ngũ sản xuất nội dung của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Dựng phim MV, lyric video, official audio video cho nghệ sĩ</li><li>Tạo reels, short-form video cho TikTok, YouTube Shorts</li><li>Thực hiện color grading, motion graphics</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm</strong> dựng phim chuyên nghiệp</li><li>Thành thạo Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>18 – 28 triệu VNĐ/tháng</strong> + thưởng dự án</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Key position in WonMedia's content production team.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of professional video editing experience</strong></li><li>Proficient in Adobe Premiere Pro, After Effects, DaVinci Resolve</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -479,8 +504,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>Vị trí <strong>100% remote</strong>, dẫn dắt chiến lược digital marketing cho danh mục nghệ sĩ của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Lên kế hoạch và thực thi chiến dịch marketing cho single/album mới</li><li>Quản lý Facebook Ads, Google Ads, TikTok Ads</li><li>Spotify editorial pitching, playlist promotion</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm digital marketing</strong></li><li>Hiểu biết sâu về các nền tảng âm nhạc số</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 22 triệu VNĐ/tháng</strong> + hoa hồng performance</li><li>100% remote — linh hoạt thời gian</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p><strong>100% remote</strong> position leading digital marketing strategies for WonMedia's artist portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of digital marketing experience</strong></li><li>Deep understanding of digital music platforms</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>Vị trí <strong>100% remote</strong>, dẫn dắt chiến lược digital marketing cho danh mục nghệ sĩ của WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Lên kế hoạch và thực thi chiến dịch marketing cho single/album mới</li><li>Quản lý Facebook Ads, Google Ads, TikTok Ads</li><li>Spotify editorial pitching, playlist promotion</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>2 năm kinh nghiệm digital marketing</strong></li><li>Hiểu biết sâu về các nền tảng âm nhạc số</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>15 – 22 triệu VNĐ/tháng</strong> + hoa hồng performance</li><li>100% remote — linh hoạt thời gian</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p><strong>100% remote</strong> position leading digital marketing strategies for WonMedia's artist portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>2 years of digital marketing experience</strong></li><li>Deep understanding of digital music platforms</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -502,8 +527,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>Vị trí chiến lược — cầu nối giữa WonMedia và các đối tác nhãn hàng, nền tảng công nghệ, record labels quốc tế.</p><h2>Trách nhiệm</h2><ul><li>Tìm kiếm và ký kết hợp đồng với đối tác mới trong và ngoài nước</li><li>Đàm phán và xây dựng thỏa thuận hợp tác chiến lược</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>3 năm kinh nghiệm</strong> Business Development hoặc Sales B2B</li><li>Tiếng Anh thành thạo</li></ul><h2>Quyền lợi</h2><ul><li>Lương và bonus <strong>thỏa thuận theo năng lực</strong></li><li>Phúc lợi: BHXH, bảo hiểm sức khỏe cao cấp</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p>Strategic position bridging WonMedia and partners — brands, tech platforms, international record labels.</p><h2>Requirements</h2><ul><li>At least <strong>3 years of experience</strong> in Business Development or B2B Sales</li><li>Fluent English</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>Vị trí chiến lược — cầu nối giữa WonMedia và các đối tác nhãn hàng, nền tảng công nghệ, record labels quốc tế.</p><h2>Trách nhiệm</h2><ul><li>Tìm kiếm và ký kết hợp đồng với đối tác mới trong và ngoài nước</li><li>Đàm phán và xây dựng thỏa thuận hợp tác chiến lược</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>3 năm kinh nghiệm</strong> Business Development hoặc Sales B2B</li><li>Tiếng Anh thành thạo</li></ul><h2>Quyền lợi</h2><ul><li>Lương và bonus <strong>thỏa thuận theo năng lực</strong></li><li>Phúc lợi: BHXH, bảo hiểm sức khỏe cao cấp</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Strategic position bridging WonMedia and partners — brands, tech platforms, international record labels.</p><h2>Requirements</h2><ul><li>At least <strong>3 years of experience</strong> in Business Development or B2B Sales</li><li>Fluent English</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -525,8 +550,8 @@ const POSTS = [
       ko: '', ja: '', zh: '',
     },
     content: {
-      vi: `<h2>Về vị trí</h2><p>Trực tiếp quản lý các trang mạng xã hội của nghệ sĩ trong danh mục WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Vận hành hàng ngày Facebook, TikTok, Instagram, YouTube của nghệ sĩ</li><li>Lên lịch và đăng nội dung theo content calendar</li><li>Tương tác với cộng đồng fan</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> quản lý mạng xã hội</li><li>Yêu âm nhạc, biết xu hướng giải trí hiện tại</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>10 – 15 triệu VNĐ/tháng</strong></li><li>Tham dự sự kiện âm nhạc, concert miễn phí</li></ul><p>Gửi CV về: <strong>hr@wonmedia.com</strong></p>`,
-      en: `<h2>About the role</h2><p>Directly manage artists' social media pages in WonMedia's portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of social media management experience</strong></li><li>Love for music and entertainment trends</li></ul><p>Send CV to: <strong>hr@wonmedia.com</strong></p>`,
+      vi: `<h2>Về vị trí</h2><p>Trực tiếp quản lý các trang mạng xã hội của nghệ sĩ trong danh mục WonMedia.</p><h2>Trách nhiệm</h2><ul><li>Vận hành hàng ngày Facebook, TikTok, Instagram, YouTube của nghệ sĩ</li><li>Lên lịch và đăng nội dung theo content calendar</li><li>Tương tác với cộng đồng fan</li></ul><h2>Yêu cầu</h2><ul><li>Ít nhất <strong>1 năm kinh nghiệm</strong> quản lý mạng xã hội</li><li>Yêu âm nhạc, biết xu hướng giải trí hiện tại</li></ul><h2>Quyền lợi</h2><ul><li>Lương: <strong>10 – 15 triệu VNĐ/tháng</strong></li><li>Tham dự sự kiện âm nhạc, concert miễn phí</li></ul><p>Gửi CV về: <strong>duongnv10504@gmail.com</strong></p>`,
+      en: `<h2>About the role</h2><p>Directly manage artists' social media pages in WonMedia's portfolio.</p><h2>Requirements</h2><ul><li>At least <strong>1 year of social media management experience</strong></li><li>Love for music and entertainment trends</li></ul><p>Send CV to: <strong>duongnv10504@gmail.com</strong></p>`,
       ko: '', ja: '', zh: '',
     },
   },
@@ -556,7 +581,7 @@ async function seedSettings() {
       portalName: 'WonMedia',
       tagline: 'Đơn vị hàng đầu trong lĩnh vực quản lý nội dung số và phát hành âm nhạc tại Việt Nam',
       publicDomain: 'https://wonmedia.vercel.app',
-      systemEmail: 'info@wonmedia.com',
+      systemEmail: 'duongnv10504@gmail.com',
     },
     header: {
       navDisplayName: '', logoEn: 'Won Media', logoVi: 'Won Media',
@@ -570,11 +595,12 @@ async function seedSettings() {
 
 async function seedFooter() {
   const exists = await FooterConfig.findOne({ key: 'global' })
-  if (exists) return
+  if (exists?.brandDesc?.vi) return
 
-  await FooterConfig.create({
+  await FooterConfig.findOneAndUpdate({ key: 'global' }, { $set: {
     key: 'global',
     companyName: { vi: 'CÔNG TY TNHH WON MEDIA', en: 'WON MEDIA CO., LTD.', ko: '원미디어 주식회사', ja: 'ウォンメディア株式会社', zh: '旺传媒有限公司' },
+    brandDesc: { vi: 'Đơn vị tiên phong trong phân phối âm nhạc số và quản lý bản quyền tại Việt Nam.', en: 'Pioneering digital music distribution and copyright management in Vietnam.', ko: '베트남의 디지털 음악 배급 및 저작권 관리 선구자.', ja: 'ベトナムのデジタル音楽配信・著作権管理のパイオニア。', zh: '越南数字音乐发行与版权管理的先驱。' },
     navAbout:    { vi: 'Giới thiệu', en: 'About Us',  ko: '회사 소개', ja: '会社概要',   zh: '关于我们' },
     navServices: { vi: 'Dịch vụ',   en: 'Services',   ko: '서비스',   ja: 'サービス',   zh: '服务' },
     navCareers:  { vi: 'Tuyển dụng',en: 'Careers',    ko: '채용',     ja: '採用情報',   zh: '招聘' },
@@ -587,9 +613,10 @@ async function seedFooter() {
     service4: { vi: 'Sản xuất nội dung',     en: 'Content Production',         ko: '콘텐츠 제작',     ja: 'コンテンツ制作',    zh: '内容制作' },
     locationHeading: { vi: 'Trụ sở:',   en: 'Headquarters:', ko: '본사:',  ja: '本社:',  zh: '总部:' },
     locationCity:    { vi: 'HÀ NỘI, VIỆT NAM', en: 'HANOI, VIETNAM', ko: '하노이, 베트남', ja: 'ハノイ、ベトナム', zh: '河内，越南' },
-    phoneLabel:      { vi: 'Điện thoại:', en: 'Phone:',   ko: '전화:',   ja: '電話:',   zh: '电话:' },
-    emailLabel:      { vi: 'Email:',      en: 'Email:',   ko: '이메일:', ja: 'メール:', zh: '邮箱:' },
-    legalRepLabel:   { vi: 'Người đại diện:', en: 'Legal Rep:', ko: '대표자:', ja: '代表者:', zh: '法人代表:' },
+    phone:   '+84 28 1234 5678',
+    hotline: '1800 1234',
+    email:   'duongnv10504@gmail.com',
+    zalo:    '0901234567',
     copyright: {
       vi: '© 2025 WonMedia. Bảo lưu mọi quyền.',
       en: '© 2025 WonMedia. All rights reserved.',
@@ -597,8 +624,8 @@ async function seedFooter() {
       ja: '© 2025 WonMedia. All rights reserved.',
       zh: '© 2025 WonMedia. 保留所有权利。',
     },
-  })
-  console.log('[seed] Footer created')
+  }}, { upsert: true })
+  console.log('[seed] Footer created/updated with brandDesc')
 }
 
 // ─── About ────────────────────────────────────────────────────────────────────
@@ -758,7 +785,7 @@ async function seedContact() {
     },
     phone:           '+84 28 1234 5678',
     hotline:         '1800 1234',
-    email:           'contact@wonmedia.vn',
+    email:           'duongnv10504@gmail.com',
     zalo:            '0901234567',
     googleMapsUrl:   'https://maps.google.com/?q=Ho+Chi+Minh+City',
     googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d501.7148577413613!2d106.70244752924595!3d10.776489600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4670702e31%3A0xa5777fb3d5b57e59!2sNguy%E1%BB%85n%20Hu%E1%BB%87%2C%20Ph%C6%B0%E1%BB%9Dng%20B%E1%BA%BFn%20Ngh%C3%A9%2C%20Qu%E1%BA%ADn%201%2C%20Th%C3%A0nh%20ph%E1%BB%91%20H%E1%BB%93%20Ch%C3%AD%20Minh%2C%20Vietnam!5e0!3m2!1sen!2s!4v1718000000000!5m2!1sen!2s',
@@ -780,6 +807,72 @@ async function seedContact() {
   console.log('[seed] Contact page content created')
 }
 
+// ─── Homepage ─────────────────────────────────────────────────────────────────
+
+async function seedHomepage() {
+  const heroCount = await HomepageHero.countDocuments()
+  if (!heroCount) {
+    await HomepageHero.create({
+      key: 'main',
+      title:    { vi: 'BRINGING MUSIC', en: 'BRINGING MUSIC', ko: 'BRINGING MUSIC', ja: 'BRINGING MUSIC', zh: 'BRINGING MUSIC' },
+      title2:   { vi: 'TO THE WORLD',   en: 'TO THE WORLD',   ko: 'TO THE WORLD',   ja: 'TO THE WORLD',   zh: 'TO THE WORLD' },
+      subtitle: {
+        vi: 'WON Media – Đơn vị phát hành âm nhạc & khai thác bản quyền hàng đầu Việt Nam.',
+        en: "WON Media – Vietnam's leading music distribution & copyright management company.",
+        ko: 'WON Media – 베트남 최고의 음악 배급 및 저작권 관리 회사.',
+        ja: 'WON Media – ベトナムを代表する音楽配信・著作権管理会社。',
+        zh: 'WON Media – 越南领先的音乐发行与版权管理公司。',
+      },
+    })
+    console.log('[seed] Homepage hero created')
+  }
+
+  const svcCount = await HomepageService.countDocuments()
+  if (!svcCount) {
+    await HomepageService.insertMany([
+      { order: 0, iconKey: 'play',    title: { vi: 'Kinh doanh trên mạng xã hội', en: 'Social Media Business',        ko: '소셜 미디어 비즈니스',   ja: 'ソーシャルメディアビジネス', zh: '社交媒体业务' }, desc: { vi: 'WON Media là đối tác chính thức của YouTube, Facebook và TikTok tại Việt Nam.', en: 'WON Media is an official partner of YouTube, Facebook, and TikTok in Vietnam.', ko: 'WON Media는 베트남의 YouTube, Facebook, TikTok 공식 파트너입니다.', ja: 'WON MediaはベトナムのYouTube、Facebook、TikTokの公式パートナーです。', zh: 'WON Media是越南YouTube、Facebook和TikTok的官方合作伙伴。' } },
+      { order: 1, iconKey: 'music',   title: { vi: 'Phát hành âm nhạc',           en: 'Music Distribution',           ko: '음악 배급',              ja: '音楽配信',                  zh: '音乐发行' },       desc: { vi: 'Triển khai phát hành nhạc tới các nền tảng toàn cầu như Spotify, Apple Music, YouTube Music, TikTok.', en: 'Distribute music to global platforms such as Spotify, Apple Music, YouTube Music, TikTok.', ko: 'Spotify, Apple Music 등 글로벌 플랫폼에 음악을 배급합니다.', ja: 'Spotify、Apple Musicなどのグローバルプラットフォームへ音楽を配信します。', zh: '向Spotify、Apple Music等全球平台发行音乐。' } },
+      { order: 2, iconKey: 'youtube', title: { vi: 'Khai thác nội dung bản quyền', en: 'Copyright Content Exploitation', ko: '저작권 콘텐츠 활용',      ja: '著作権コンテンツ活用',      zh: '版权内容开发' },   desc: { vi: 'Phân phối nội dung có bản quyền thuộc nhiều thể loại trên các nền tảng online và truyền hình.', en: 'Distribute copyrighted content across various genres on online platforms and television.', ko: '다양한 장르의 저작권 콘텐츠를 배급합니다.', ja: '様々なジャンルの著作権コンテンツを配信します。', zh: '分发各类版权内容。' } },
+      { order: 3, iconKey: 'shield',  title: { vi: 'Dịch vụ bản quyền',           en: 'Copyright Services',           ko: '저작권 서비스',          ja: '著作権サービス',            zh: '版权服务' },       desc: { vi: 'Bảo vệ bản quyền nội dung cho các đối tác trên môi trường số; quản lý bản quyền tác giả âm nhạc.', en: 'Protect digital content copyrights for partners and manage music copyright ownership.', ko: '디지털 환경에서 파트너의 콘텐츠 저작권을 보호하고 음악 저작권을 관리합니다.', ja: 'デジタル環境でパートナーのコンテンツ著作権を保護し、音楽著作権を管理します。', zh: '在数字环境中保护合作伙伴的内容版权，管理音乐版权。' } },
+    ])
+    console.log('[seed] Homepage services created')
+  }
+
+  const achCount = await HomepageAchievement.countDocuments()
+  if (!achCount) {
+    await HomepageAchievement.insertMany([
+      { order: 0, value: 150, label: { vi: 'Đối tác',              en: 'Partners',               ko: '파트너',       ja: 'パートナー',          zh: '合作伙伴' } },
+      { order: 1, value: 25,  label: { vi: 'Nút vàng',             en: 'Gold Buttons',           ko: '골든 버튼',    ja: 'ゴールドボタン',      zh: '金牌按钮' } },
+      { order: 2, value: 100, label: { vi: 'Nút bạc YouTube',      en: 'Silver YouTube Buttons', ko: '실버 유튜브',  ja: 'シルバーYouTube',    zh: '银牌YouTube' } },
+      { order: 3, value: 250, label: { vi: 'Kênh trong hệ thống',  en: 'Channels in System',     ko: '시스템 내 채널', ja: 'システム内チャンネル', zh: '系统内频道' } },
+    ])
+    console.log('[seed] Homepage achievements created')
+  }
+
+  const partnerCount = await HomepagePartner.countDocuments()
+  if (!partnerCount) {
+    await HomepagePartner.insertMany([
+      { order: 0, name: 'YouTube',     logo: '/partners/youtube.png' },
+      { order: 1, name: 'Facebook',    logo: '/partners/facebook.png' },
+      { order: 2, name: 'Instagram',   logo: '/partners/instagram.png' },
+      { order: 3, name: 'TikTok',      logo: '/partners/tiktok.png' },
+      { order: 4, name: 'Spotify',     logo: '/partners/spotify.png' },
+      { order: 5, name: 'Apple Music', logo: '/partners/apple-music.png' },
+      { order: 6, name: 'VTV',         logo: '/partners/vtv.png' },
+      { order: 7, name: 'VOV',         logo: '/partners/vov.png' },
+      { order: 8, name: 'VTVcab',      logo: '/partners/vtvcab.png' },
+      { order: 9, name: 'VTV News',    logo: '/partners/vtv-news.png' },
+    ])
+    console.log('[seed] Homepage partners created')
+  }
+
+  const postsConfigCount = await HomepagePostsConfig.countDocuments()
+  if (!postsConfigCount) {
+    await HomepagePostsConfig.create({ key: 'posts', mode: 'auto', selectedIds: [], limit: 6 })
+    console.log('[seed] HomepagePostsConfig created')
+  }
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export async function runSeed() {
@@ -791,6 +884,7 @@ export async function runSeed() {
     await seedFooter()
     await seedAbout()
     await seedContact()
+    await seedHomepage()
     await seedPosts()
   } catch (err) {
     console.error('[seed] Failed:', err)

@@ -79,7 +79,7 @@ const JOBS = [
 </ul>
 
 <h2>Hồ sơ ứng tuyển</h2>
-<p>Gửi CV và portfolio về email: <strong>hr@wonmedia.com</strong><br>Tiêu đề email: <em>[Content Creator] Họ và tên</em></p>`,
+<p>Gửi CV và portfolio về email: <strong>duongnv10504@gmail.com</strong><br>Tiêu đề email: <em>[Content Creator] Họ và tên</em></p>`,
 
       en: `<h2>About the role</h2>
 <p>You will directly produce and manage content across WonMedia's media channels — from articles and short-form videos to infographics and podcasts. This is a great opportunity to work in a dynamic music and entertainment environment.</p>

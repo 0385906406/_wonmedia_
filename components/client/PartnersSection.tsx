@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 
-const LOGO_SIZE = 60
+const LOGO_SIZE = 84
 const CW = 820
 const CH = 440
 const CX = CW / 2
 const CY = CH / 2
 
-// 11 vị trí đều nhau trên vòng tròn bán kính 185, bắt đầu từ đỉnh
+// 6 vị trí đều nhau trên vòng tròn bán kính 185, bắt đầu từ đỉnh
 const R = 185
-const COUNT = 11
+const COUNT = 6
 const POSITIONS = Array.from({ length: COUNT }, (_, i) => {
   const angle = (-Math.PI / 2) + (i * 2 * Math.PI) / COUNT
   return {
@@ -23,18 +23,14 @@ interface Partner { src: string; alt: string }
 interface Props { heading: string; subheading: string; items: Partner[] }
 
 function GlobeNode() {
-  const [hovered, setHovered] = useState(false)
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
         position: 'absolute',
         top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: '160px', height: '160px',
+        width: '120px', height: '120px',
         zIndex: 10,
-        cursor: 'default',
       }}
     >
       <img
@@ -45,29 +41,8 @@ function GlobeNode() {
           objectFit: 'contain',
           filter: 'drop-shadow(0 8px 32px rgba(0,100,200,0.28))',
           animation: 'wonGlobeFloat 4s ease-in-out infinite',
-          transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          transition: 'transform 0.35s ease',
         }}
       />
-      <div style={{
-        position: 'absolute',
-        top: '108%', left: '50%',
-        background: 'rgba(6,35,64,0.92)',
-        color: '#fff',
-        padding: '6px 16px',
-        borderRadius: '8px',
-        fontSize: '13px',
-        fontWeight: 700,
-        whiteSpace: 'nowrap',
-        fontFamily: 'var(--font-primary)',
-        pointerEvents: 'none',
-        opacity: hovered ? 1 : 0,
-        transform: hovered ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(6px)',
-        transition: 'opacity 0.2s ease, transform 0.2s ease',
-        letterSpacing: '0.5px',
-      }}>
-        WON Media
-      </div>
     </div>
   )
 }

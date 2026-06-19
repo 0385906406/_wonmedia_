@@ -138,11 +138,6 @@ const FALLBACK_PARTNERS = [
   { src: '/partners/tiktok.png',     alt: 'TikTok' },
   { src: '/partners/spotify.png',    alt: 'Spotify' },
   { src: '/partners/apple-music.png',alt: 'Apple Music' },
-  { src: '/partners/vtv.png',        alt: 'VTV' },
-  { src: '/partners/vov.png',        alt: 'VOV' },
-  { src: '/partners/vtvcab.png',     alt: 'VTVcab' },
-  { src: '/partners/vtv-news.png',   alt: 'VTV News' },
-  { src: '/partners/style-tv.png',   alt: 'Style TV' },
 ]
 
 type FP = { id: string; date: string; category: string; type: 'blog' | 'tuyen-dung'; thumbnail: string; title: string; excerpt: string; slug: string }
@@ -201,9 +196,9 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
       {/* ── Hero ── */}
       <section style={{ position: 'relative', width: '100%', minHeight: '100vh', marginTop: 'calc(-1 * var(--topbar-height))', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', color: '#fff', userSelect: 'none' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img src="/banners/banner.png" alt="WON Media" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', filter: 'brightness(0.8) contrast(1.1) saturate(1.15)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.22)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(25,27,36,0.65) 100%)' }} />
+          <img src="/banners/banner.png" alt="WON Media" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', filter: 'brightness(0.95) contrast(1.05) saturate(1.1)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.10)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(25,27,36,0.40) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.5, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)', backgroundSize: '3px 3px' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to bottom, transparent, var(--wm-mid))' }} />
         </div>

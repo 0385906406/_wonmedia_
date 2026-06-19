@@ -20,10 +20,11 @@ export interface IFooterConfig extends Document {
   // Location
   locationHeading: Record<string, string>
   locationCity: Record<string, string>
-  // Contact labels
-  phoneLabel: Record<string, string>
-  emailLabel: Record<string, string>
-  legalRepLabel: Record<string, string>
+  // Contact values
+  phone: string
+  hotline: string
+  email: string
+  zalo: string
   // Bottom
   copyright: Record<string, string>
 }
@@ -34,7 +35,10 @@ const FooterConfigSchema = new Schema<IFooterConfig>({
   navAbout: ML, navServices: ML, navCareers: ML, navBlog: ML, navContact: ML,
   servicesHeading: ML, service1: ML, service2: ML, service3: ML, service4: ML,
   locationHeading: ML, locationCity: ML,
-  phoneLabel: ML, emailLabel: ML, legalRepLabel: ML,
+  phone: { type: String, default: '' },
+  hotline: { type: String, default: '' },
+  email: { type: String, default: '' },
+  zalo: { type: String, default: '' },
   copyright: ML,
 }, { strict: false, timestamps: true })
 

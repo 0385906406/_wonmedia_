@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import {
-    GlobeIcon, LayoutIcon, PlusIcon, DatabaseIcon,
+    GlobeIcon, LayoutIcon, DatabaseIcon,
     LockIcon, StarIcon, MoreVerticalIcon, PencilIcon, Trash2Icon,
     FootprintsIcon, SaveIcon, Loader2Icon, SettingsIcon,
+    PhoneIcon, MailIcon, MapPinIcon, HashIcon,
+    TypeIcon, LinkIcon, AlignLeftIcon, ListIcon, NavigationIcon,
 } from 'lucide-react'
 import {
     DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -12,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 import {
-    CollectionTable, CreateCollectionDialog, RenameDialog, PasswordModal,
+    CollectionTable, RenameDialog, PasswordModal,
     SettingsTable, type Collection, type SettingsRow,
 } from './collections-tab'
 import { useToast } from '@/components/admin/toast-provider'
@@ -20,10 +22,10 @@ import { useToast } from '@/components/admin/toast-provider'
 // ─── Settings row definitions ─────────────────────────────────────────────────
 
 const GENERAL_ROWS: SettingsRow[] = [
-    { key: 'portalName',   label: 'Tên portal',      type: 'text',  group: 'general',      hint: 'Hiển thị trong tab trình duyệt' },
-    { key: 'tagline',      label: 'Tagline',          type: 'text',  group: 'general',      hint: 'Dòng mô tả ngắn bên dưới tên portal' },
-    { key: 'publicDomain', label: 'Domain public',    type: 'url',   group: 'general',      hint: 'URL đầy đủ, bao gồm https://' },
-    { key: 'systemEmail',  label: 'Email hệ thống',   type: 'email', group: 'general',      hint: 'Địa chỉ gửi email thông báo tự động' },
+    { key: 'portalName',   label: 'Tên portal',      type: 'text',  group: 'general', hint: 'Hiển thị trong tab trình duyệt' },
+    { key: 'tagline',      label: 'Tagline',          type: 'text',  group: 'general', hint: 'Dòng mô tả ngắn bên dưới tên portal' },
+    { key: 'publicDomain', label: 'Domain public',    type: 'url',   group: 'general', hint: 'URL đầy đủ, bao gồm https://' },
+    { key: 'systemEmail',  label: 'Email hệ thống',   type: 'email', group: 'general', hint: 'Địa chỉ gửi email thông báo tự động' },
 ]
 
 const HEADER_ROWS: SettingsRow[] = [
@@ -35,8 +37,8 @@ const HEADER_ROWS: SettingsRow[] = [
 ]
 
 const FIXED_TABS = [
-    { id: 'general', label: 'Thông tin cơ bản', icon: GlobeIcon,  rows: GENERAL_ROWS, desc: 'Cấu hình cơ bản của hệ thống' },
-    { id: 'header',  label: 'Header & Logo',    icon: LayoutIcon, rows: HEADER_ROWS,  desc: 'Logo, favicon và tên hiển thị trên nav' },
+    { id: 'general', label: 'Thông tin cơ bản', icon: GlobeIcon,      rows: GENERAL_ROWS, desc: 'Cấu hình cơ bản của hệ thống' },
+    { id: 'header',  label: 'Header & Logo',    icon: LayoutIcon,     rows: HEADER_ROWS,  desc: 'Logo, favicon và tên hiển thị trên nav' },
 ] as const
 
 type FixedId = typeof FIXED_TABS[number]['id']
@@ -49,7 +51,7 @@ interface FooterForm {
     navAbout: MultiLang; navServices: MultiLang; navCareers: MultiLang; navBlog: MultiLang; navContact: MultiLang
     servicesHeading: MultiLang; service1: MultiLang; service2: MultiLang; service3: MultiLang; service4: MultiLang
     locationHeading: MultiLang; locationCity: MultiLang
-    phoneLabel: MultiLang; emailLabel: MultiLang; legalRepLabel: MultiLang
+    phone: string; hotline: string; email: string; zalo: string
     copyright: MultiLang
 }
 function emptyFooter(): FooterForm {
@@ -60,48 +62,48 @@ function emptyFooter(): FooterForm {
         servicesHeading: emptyMultiLang(), service1: emptyMultiLang(), service2: emptyMultiLang(),
         service3: emptyMultiLang(), service4: emptyMultiLang(),
         locationHeading: emptyMultiLang(), locationCity: emptyMultiLang(),
-        phoneLabel: emptyMultiLang(), emailLabel: emptyMultiLang(), legalRepLabel: emptyMultiLang(),
+        phone: '', hotline: '', email: '', zalo: '',
         copyright: emptyMultiLang(),
     }
 }
 
 interface SettingsData { general: Record<string, string>; header: Record<string, string> }
 
-// ─── Nav item component ───────────────────────────────────────────────────────
+// ─── Nav components ───────────────────────────────────────────────────────────
 
-function NavGroup({ title }: { title: string }) {
+function NavDivider({ label }: { label: string }) {
     return (
-        <div style={{ padding: '16px 16px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'var(--color-gray-text)', opacity: 0.6 }}>
-            {title}
+        <div style={{ padding: '20px 14px 6px', fontSize: 9, fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--dh-font-mono-sans)' }}>
+            {label}
         </div>
     )
 }
 
 function NavItem({
-    label, icon: Icon, active, onClick, badge, warning, extra,
+    label, icon: Icon, active, onClick, warning, badge, extra,
 }: {
     label: string; icon?: React.ElementType; active: boolean; onClick: () => void
-    badge?: string; warning?: boolean; extra?: React.ReactNode
+    warning?: boolean; badge?: string; extra?: React.ReactNode
 }) {
     return (
         <button onClick={onClick}
             style={{
-                display: 'flex', alignItems: 'center', gap: 9,
-                width: '100%', padding: '9px 14px', borderRadius: 8,
-                border: 'none', cursor: 'pointer', textAlign: 'left',
-                fontSize: 13, fontWeight: active ? 600 : 500,
-                background: active ? 'rgba(99,102,241,0.1)' : 'transparent',
-                color: active ? 'var(--color-indigo)' : 'var(--color-gray-text)',
+                display: 'flex', alignItems: 'center', gap: 9, width: '100%',
+                padding: '9px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                textAlign: 'left', fontSize: 13,
+                fontWeight: active ? 700 : 500,
+                background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+                color: active ? '#fff' : 'rgba(255,255,255,0.65)',
+                borderLeft: `3px solid ${active ? 'var(--color-teal-light)' : 'transparent'}`,
                 transition: 'all 0.15s',
-                borderLeft: `3px solid ${active ? 'var(--color-indigo)' : 'transparent'}`,
             }}
-            className="settings-nav-item"
+            className="s-nav-item"
         >
-            {Icon && <Icon size={15} style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }} />}
+            {Icon && <Icon size={14} style={{ flexShrink: 0, opacity: active ? 1 : 0.75 }} />}
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-            {warning && <LockIcon size={12} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+            {warning && <LockIcon size={11} style={{ color: '#fcd34d', flexShrink: 0 }} />}
             {badge && (
-                <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 100, background: active ? 'var(--color-indigo-pale)' : 'var(--color-gray-light)', color: active ? 'var(--color-indigo)' : 'var(--color-gray-text)' }}>
+                <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 100, background: active ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)', color: active ? '#fff' : 'rgba(255,255,255,0.5)', letterSpacing: '0.5px' }}>
                     {badge}
                 </span>
             )}
@@ -114,20 +116,17 @@ function NavItem({
 
 export default function SettingsPage() {
     const toast = useToast()
-    const [activeTab, setActiveTab]   = useState<string>('general')
-    const [data, setData]             = useState<SettingsData>({ general: {}, header: {} })
+    const [activeTab, setActiveTab]     = useState<string>('general')
+    const [data, setData]               = useState<SettingsData>({ general: {}, header: {} })
     const [collections, setCollections] = useState<Collection[]>([])
-    const [loading, setLoading]       = useState(true)
+    const [loading, setLoading]         = useState(true)
 
-    // Footer
-    const [footerForm, setFooterForm] = useState<FooterForm>(emptyFooter)
-    const [footerLang, setFooterLang] = useState<LocaleKey>('vi')
+    const [footerForm, setFooterForm]     = useState<FooterForm>(emptyFooter)
+    const [footerLang, setFooterLang]     = useState<LocaleKey>('vi')
     const [footerSaving, setFooterSaving] = useState(false)
 
-    // Dialogs
-    const [showCreate, setShowCreate] = useState(false)
-    const [renameCol, setRenameCol]   = useState<Collection | null>(null)
-    const [pwModal, setPwModal]       = useState<{ col: Collection; onSuccess: () => void } | null>(null)
+    const [renameCol, setRenameCol]     = useState<Collection | null>(null)
+    const [pwModal, setPwModal]         = useState<{ col: Collection; onSuccess: () => void } | null>(null)
     const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set())
 
     const tabClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -146,7 +145,6 @@ export default function SettingsPage() {
 
     function handleRowSaved(group: FixedId, key: string, value: string) {
         setData((d) => ({ ...d, [group]: { ...d[group], [key]: value } }))
-        toast.success('Đã lưu')
     }
 
     function handleColTabClick(id: string) {
@@ -190,7 +188,6 @@ export default function SettingsPage() {
     const isFixed     = FIXED_IDS.includes(activeTab)
     const activeFixed = FIXED_TABS.find((t) => t.id === activeTab)
 
-    // ── Footer save / AI translate ──
     async function saveFooter() {
         setFooterSaving(true)
         try {
@@ -199,6 +196,7 @@ export default function SettingsPage() {
             else toast.error('Lỗi lưu Footer')
         } finally { setFooterSaving(false) }
     }
+
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: 10, color: 'var(--color-gray-text)' }}>
             <Loader2Icon size={18} className="animate-spin" />
@@ -210,25 +208,24 @@ export default function SettingsPage() {
         <div style={{ padding: '28px 24px' }}>
 
             {/* Page header */}
-            <div className="dh-page-header" style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <SettingsIcon size={19} style={{ color: 'var(--color-indigo)' }} />
+            <div className="dh-page-header" style={{ marginBottom: 28 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--gradient-g3)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px -4px rgba(6,35,64,0.35)' }}>
+                        <SettingsIcon size={20} style={{ color: '#fff' }} />
                     </div>
                     <div>
                         <h1 className="dh-page-title">Cài đặt</h1>
-                        <p className="dh-page-desc">Quản lý cấu hình hệ thống và tích hợp</p>
+                        <p className="dh-page-desc">Quản lý cấu hình hệ thống và giao diện</p>
                     </div>
                 </div>
             </div>
 
-            {/* Main grid: left nav + right content */}
-            <div className="settings-layout">
+            {/* Main grid */}
+            <div className="s-layout">
 
-                {/* ── Left navigation panel ── */}
-                <div className="dh-card settings-nav-panel">
-
-                    <NavGroup title="Hệ thống" />
+                {/* ── Left nav panel ── */}
+                <div className="s-nav-panel">
+                    <NavDivider label="Hệ thống" />
                     {FIXED_TABS.map(({ id, label, icon }) => (
                         <NavItem key={id} label={label} icon={icon} active={activeTab === id} onClick={() => setActiveTab(id)} />
                     ))}
@@ -236,10 +233,10 @@ export default function SettingsPage() {
 
                     {collections.length > 0 && (
                         <>
-                            <div style={{ margin: '8px 14px', borderTop: '1px solid var(--color-gray-border)' }} />
-                            <NavGroup title="Danh mục" />
+                            <div style={{ margin: '10px 10px', height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                            <NavDivider label="Danh mục" />
                             {collections.map((col) => (
-                                <div key={col._id} style={{ position: 'relative', display: 'flex', alignItems: 'center', paddingRight: 4 }}>
+                                <div key={col._id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                     <NavItem
                                         label={col.name}
                                         icon={col.important ? LockIcon : DatabaseIcon}
@@ -249,12 +246,10 @@ export default function SettingsPage() {
                                     />
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button
-                                                onClick={(e) => e.stopPropagation()}
-                                                style={{ position: 'absolute', right: 8, padding: 4, borderRadius: 6, border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-gray-text)', opacity: 0, transition: 'opacity 0.15s' }}
-                                                className="col-menu-btn"
-                                            >
-                                                <MoreVerticalIcon size={13} />
+                                            <button onClick={(e) => e.stopPropagation()}
+                                                style={{ position: 'absolute', right: 6, padding: 4, borderRadius: 5, border: 'none', background: 'transparent', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', opacity: 0, transition: 'opacity 0.15s' }}
+                                                className="s-col-menu">
+                                                <MoreVerticalIcon size={12} />
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
@@ -277,30 +272,26 @@ export default function SettingsPage() {
                             ))}
                         </>
                     )}
-
-                    <div style={{ margin: '8px 14px 12px', borderTop: '1px solid var(--color-gray-border)' }} />
-                    <div style={{ padding: '0 10px 12px' }}>
-                        <button onClick={() => setShowCreate(true)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', borderRadius: 8, border: '1.5px dashed var(--color-gray-border)', background: 'transparent', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--color-indigo)', transition: 'all 0.15s' }}
-                            className="add-col-btn">
-                            <PlusIcon size={14} />Thêm danh mục
-                        </button>
-                    </div>
                 </div>
 
-                {/* ── Right content panel ── */}
-                <div className="settings-content">
+                {/* ── Right content ── */}
+                <div className="s-content">
 
-                    {/* Fixed settings tabs */}
+                    {/* Fixed tabs */}
                     {isFixed && activeFixed && (
                         <div className="dh-card">
                             <div className="dh-card-header">
-                                <div>
-                                    <h2 className="dh-card-title">{activeFixed.label}</h2>
-                                    <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>{activeFixed.desc}</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <activeFixed.icon size={15} style={{ color: 'var(--color-indigo)' }} />
+                                    </div>
+                                    <div>
+                                        <h2 className="dh-card-title">{activeFixed.label}</h2>
+                                        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>{activeFixed.desc}</p>
+                                    </div>
                                 </div>
-                                <span style={{ fontSize: 11, color: 'var(--color-gray-text)', display: 'flex', alignItems: 'center', gap: 4, opacity: 0.6 }}>
-                                    Nhấp đúp để chỉnh sửa
+                                <span style={{ fontSize: 11, color: 'var(--color-gray-text)', opacity: 0.5, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    Nhấp đúp để chỉnh
                                 </span>
                             </div>
                             <SettingsTable
@@ -314,70 +305,97 @@ export default function SettingsPage() {
                     {/* Footer tab */}
                     {activeTab === 'footer' && (
                         <div className="dh-card">
+                            {/* Header */}
                             <div className="dh-card-header">
-                                <div>
-                                    <h2 className="dh-card-title">Footer</h2>
-                                    <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>Nội dung footer hiển thị trên tất cả trang</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <FootprintsIcon size={15} style={{ color: 'var(--color-indigo)' }} />
+                                    </div>
+                                    <div>
+                                        <h2 className="dh-card-title">Footer</h2>
+                                        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>Nội dung hiển thị ở cuối tất cả các trang</p>
+                                    </div>
                                 </div>
                                 <button onClick={saveFooter} disabled={footerSaving} className="dh-btn dh-btn-sm dh-btn-primary">
-                                    {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}Lưu Footer
+                                    {footerSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}
+                                    {footerSaving ? 'Đang lưu...' : 'Lưu Footer'}
                                 </button>
                             </div>
 
-                            <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                {/* Lang tabs */}
-                                <div style={{ display: 'flex', gap: 3, padding: 4, background: 'var(--color-gray-light)', borderRadius: 10, width: 'fit-content' }}>
-                                    {ADMIN_LOCALES.map(l => (
-                                        <button key={l} type="button" onClick={() => setFooterLang(l)}
-                                            style={{
-                                                padding: '5px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
-                                                fontSize: 12, fontWeight: 700,
-                                                background: footerLang === l ? '#fff' : 'transparent',
-                                                color: footerLang === l ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
-                                                boxShadow: footerLang === l ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                                                transition: 'all 0.12s',
-                                            }}>
-                                            {LOCALE_META[l].flag} {LOCALE_META[l].short}
-                                        </button>
-                                    ))}
-                                </div>
+                            {/* Lang tabs */}
+                            <div className="dh-lang-tabs">
+                                {ADMIN_LOCALES.map(l => (
+                                    <button key={l} type="button" onClick={() => setFooterLang(l)} className={`dh-lang-tab${footerLang === l ? ' active' : ''}`}>
+                                        <span>{LOCALE_META[l].flag}</span>
+                                        {LOCALE_META[l].label}
+                                        {footerLang === l && <span className="dh-lang-dot" />}
+                                    </button>
+                                ))}
+                            </div>
 
-                                {/* Sections */}
-                                <FooterSection title="Thương hiệu">
-                                    <MLInput label="Tên công ty" fKey="companyName" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                                <FSection icon={<TypeIcon size={14} />} color="indigo" title="Thương hiệu" desc="Tên cty, mô tả logo và dòng bản quyền">
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                        <MLInput label="Tên công ty" fKey="companyName" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Bản quyền (Copyright)" fKey="copyright" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                    </div>
                                     <MLInput label="Mô tả dưới logo" fKey="brandDesc" multi form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                    <MLInput label="Bản quyền (Copyright)" fKey="copyright" form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                </FooterSection>
+                                </FSection>
 
-                                <FooterSection title="Nhãn điều hướng">
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 12 }}>
+                                <FSection icon={<NavigationIcon size={14} />} color="teal" title="Điều hướng" desc="Nhãn các liên kết trong cột Khám phá">
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 10 }}>
                                         <MLInput label="Giới thiệu"  fKey="navAbout"    form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Dịch vụ"     fKey="navServices" form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Tuyển dụng"  fKey="navCareers"  form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Blog"        fKey="navBlog"     form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Liên hệ"     fKey="navContact"  form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                     </div>
-                                </FooterSection>
+                                </FSection>
 
-                                <FooterSection title="Dịch vụ">
-                                    <MLInput label="Tiêu đề cột dịch vụ" fKey="servicesHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                <FSection icon={<ListIcon size={14} />} color="navy" title="Dịch vụ" desc="Cột dịch vụ hiển thị trong footer">
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                        <MLInput label="Tiêu đề cột" fKey="servicesHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <div />
                                         <MLInput label="Dịch vụ 1" fKey="service1" form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Dịch vụ 2" fKey="service2" form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Dịch vụ 3" fKey="service3" form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                         <MLInput label="Dịch vụ 4" fKey="service4" form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                     </div>
-                                </FooterSection>
+                                </FSection>
 
-                                <FooterSection title="Địa điểm & Nhãn liên hệ">
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
-                                        <MLInput label="Nhãn trụ sở"          fKey="locationHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                        <MLInput label="Thành phố"             fKey="locationCity"    form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                        <MLInput label="Nhãn Điện thoại"       fKey="phoneLabel"      form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                        <MLInput label="Nhãn Email"            fKey="emailLabel"      form={footerForm} setForm={setFooterForm} lang={footerLang} />
-                                        <MLInput label="Nhãn Người đại diện"   fKey="legalRepLabel"   form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                <FSection icon={<MapPinIcon size={14} />} color="teal" title="Địa điểm" desc="Nhãn trụ sở / thành phố">
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                        <MLInput label="Nhãn trụ sở" fKey="locationHeading" form={footerForm} setForm={setFooterForm} lang={footerLang} />
+                                        <MLInput label="Thành phố"   fKey="locationCity"    form={footerForm} setForm={setFooterForm} lang={footerLang} />
                                     </div>
-                                </FooterSection>
+                                </FSection>
+
+                                <FSection icon={<PhoneIcon size={14} />} color="indigo" title="Thông tin liên hệ" desc="Các trường này dùng chung cho mọi ngôn ngữ">
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                        {([
+                                            { key: 'phone',   label: 'Số điện thoại', icon: PhoneIcon,   placeholder: '+84 28 1234 5678' },
+                                            { key: 'hotline', label: 'Hotline',        icon: PhoneIcon,   placeholder: '1800 1234' },
+                                            { key: 'email',   label: 'Email',          icon: MailIcon,    placeholder: 'contact@wonmedia.vn' },
+                                            { key: 'zalo',    label: 'Zalo',           icon: HashIcon,    placeholder: '0901234567' },
+                                        ] as const).map(({ key, label, icon: Ic, placeholder }) => (
+                                            <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                                <label className="dh-label" style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}>
+                                                    <Ic size={11} style={{ color: 'var(--color-indigo)', opacity: 0.7 }} />
+                                                    {label}
+                                                </label>
+                                                <input
+                                                    value={footerForm[key]}
+                                                    onChange={e => setFooterForm(f => ({ ...f, [key]: e.target.value }))}
+                                                    placeholder={placeholder}
+                                                    className="dh-input"
+                                                    style={{ height: 36 }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </FSection>
+
                             </div>
                         </div>
                     )}
@@ -387,18 +405,18 @@ export default function SettingsPage() {
                         <div className="dh-card">
                             <div className="dh-card-header">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    {activeCol.important
-                                        ? <LockIcon size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
-                                        : <DatabaseIcon size={16} style={{ color: 'var(--color-indigo)', flexShrink: 0 }} />}
+                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: activeCol.important ? 'var(--color-yellow-light)' : 'var(--color-indigo-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        {activeCol.important
+                                            ? <LockIcon size={15} style={{ color: '#b45309' }} />
+                                            : <DatabaseIcon size={15} style={{ color: 'var(--color-indigo)' }} />}
+                                    </div>
                                     <div>
                                         <h2 className="dh-card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                             {activeCol.name}
-                                            {activeCol.important && (
-                                                <span className="dh-badge dh-badge-yellow" style={{ fontSize: 10 }}>Quan trọng</span>
-                                            )}
+                                            {activeCol.important && <span className="dh-badge dh-badge-yellow" style={{ fontSize: 10 }}>Quan trọng</span>}
                                         </h2>
                                         {activeCol.description && (
-                                            <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400 }}>{activeCol.description}</p>
+                                            <p style={{ fontSize: 12, color: 'var(--color-gray-text)', margin: '2px 0 0', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>{activeCol.description}</p>
                                         )}
                                     </div>
                                 </div>
@@ -419,8 +437,6 @@ export default function SettingsPage() {
             </div>
 
             {/* Dialogs */}
-            <CreateCollectionDialog open={showCreate} onOpenChange={setShowCreate}
-                onCreated={(col) => { setCollections((p) => [...p, col]); setActiveTab(col._id) }} />
             {renameCol && (
                 <RenameDialog col={renameCol} open={!!renameCol}
                     onOpenChange={(v) => { if (!v) setRenameCol(null) }}
@@ -433,14 +449,22 @@ export default function SettingsPage() {
             )}
 
             <style>{`
-                .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
-                .settings-nav-panel { padding: 10px 6px; }
-                .settings-nav-item:hover { background: var(--color-gray-light) !important; color: var(--color-navy-deep) !important; }
-                .col-menu-btn { position: absolute; right: 8px; }
-                .settings-nav-panel:hover .col-menu-btn { opacity: 0.5 !important; }
-                .col-menu-btn:hover { opacity: 1 !important; background: var(--color-gray-light); }
-                .add-col-btn:hover { border-color: var(--color-indigo) !important; background: var(--color-indigo-pale) !important; }
-                @media (max-width: 860px) { .settings-layout { grid-template-columns: 1fr; } .settings-nav-panel { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; } }
+                .s-layout { display: grid; grid-template-columns: 230px 1fr; gap: 20px; align-items: start; }
+                .s-nav-panel {
+                    background: var(--gradient-g3);
+                    border-radius: var(--dh-radius-card);
+                    padding: 8px 6px 12px;
+                    box-shadow: 0 4px 20px -6px rgba(6,35,64,0.3);
+                    position: sticky; top: 76px;
+                }
+                .s-content { display: flex; flex-direction: column; gap: 0; }
+                .s-nav-item:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
+                .s-nav-panel:hover .s-col-menu { opacity: 0.5 !important; }
+                .s-col-menu:hover { opacity: 1 !important; background: rgba(255,255,255,0.1); }
+                @media (max-width: 860px) {
+                    .s-layout { grid-template-columns: 1fr; }
+                    .s-nav-panel { position: static; display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; }
+                }
             `}</style>
         </div>
     )
@@ -448,20 +472,36 @@ export default function SettingsPage() {
 
 // ─── Footer section wrapper ────────────────────────────────────────────────────
 
-function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
+const SECTION_COLORS = {
+    indigo: { bg: 'var(--color-indigo-pale)', fg: 'var(--color-indigo)', bar: 'var(--color-indigo)' },
+    teal:   { bg: 'var(--color-teal-pale)',   fg: 'var(--color-teal-dark)', bar: 'var(--color-teal)' },
+    navy:   { bg: 'var(--color-navy-pale)',   fg: 'var(--color-navy)',      bar: 'var(--color-navy)' },
+}
+
+function FSection({ icon, color, title, desc, children }: {
+    icon: React.ReactNode; color: keyof typeof SECTION_COLORS
+    title: string; desc?: string; children: React.ReactNode
+}) {
+    const c = SECTION_COLORS[color]
     return (
         <div style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', overflow: 'hidden' }}>
-            <div style={{ padding: '10px 16px', background: 'var(--color-gray-light)', borderBottom: '1px solid var(--color-gray-border)' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>{title}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', background: 'var(--color-gray-light)', borderBottom: '1px solid var(--color-gray-border)', borderLeft: `3px solid ${c.bar}` }}>
+                <span style={{ width: 26, height: 26, borderRadius: 7, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: c.fg }}>
+                    {icon}
+                </span>
+                <div>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'var(--color-navy-deep)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>{title}</p>
+                    {desc && <p style={{ margin: 0, fontSize: 11, color: 'var(--color-gray-text)', marginTop: 1 }}>{desc}</p>}
+                </div>
             </div>
-            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {children}
             </div>
         </div>
     )
 }
 
-const FOOTER_IC = 'w-full h-9 rounded-lg border border-[#E5E8ED] bg-white px-3 text-sm focus:outline-none focus:border-[var(--color-indigo)] focus:ring-2 focus:ring-[var(--color-indigo)]/10'
+// ─── ML Input ────────────────────────────────────────────────────────────────
 
 function MLInput({ label, fKey, multi = false, form, setForm, lang }: {
     label: string; fKey: keyof FooterForm; multi?: boolean
@@ -472,15 +512,14 @@ function MLInput({ label, fKey, multi = false, form, setForm, lang }: {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label className="dh-label" style={{ fontSize: 12 }}>
                 {label}
-                <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--color-gray-text)', marginLeft: 6, opacity: 0.6 }}>
+                <span style={{ fontFamily: 'var(--dh-font-mono-sans)', fontSize: 10, color: 'var(--color-gray-text)', marginLeft: 6, opacity: 0.55 }}>
                     {LOCALE_META[lang].flag} {LOCALE_META[lang].short}
                 </span>
             </label>
             {multi
-                ? <textarea value={val[lang] ?? ''} rows={2}
-                    className={FOOTER_IC.replace('h-9', '') + ' py-2 resize-none'}
+                ? <textarea value={val[lang] ?? ''} rows={2} className="dh-textarea" style={{ resize: 'none' }}
                     onChange={e => setForm(f => ({ ...f, [fKey]: { ...val, [lang]: e.target.value } }))} />
-                : <input value={val[lang] ?? ''} className={FOOTER_IC}
+                : <input value={val[lang] ?? ''} className="dh-input" style={{ height: 36 }}
                     onChange={e => setForm(f => ({ ...f, [fKey]: { ...val, [lang]: e.target.value } }))} />}
         </div>
     )

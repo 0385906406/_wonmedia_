@@ -39,7 +39,7 @@ async function seed() {
     },
     phone:           '0347835103',
     hotline:         '0347835103',
-    email:           'contact@wonmedia.vn',
+    email:           'duongnv10504@gmail.com',
     zalo:            '0347835103',
     googleMapsUrl:   'https://maps.app.goo.gl/DqaY4ULEUoSxgYi8A',
     googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.0965800432!2d105.78148157597976!3d21.028234088625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab5967da8865%3A0x86cbf64e9a0d0b7f!2sPham%20Hung%2C%20Me%20Tri%2C%20Nam%20Tu%20Liem!5e0!3m2!1svi!2s!4v1700000000000!5m2!1svi!2s',

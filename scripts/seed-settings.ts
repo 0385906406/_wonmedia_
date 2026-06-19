@@ -35,7 +35,7 @@ const SETTINGS = {
     portalName: 'WonMedia',
     tagline: 'Đơn vị hàng đầu trong lĩnh vực quản lý nội dung số và phát hành âm nhạc tại Việt Nam',
     publicDomain: 'https://wonmedia.vercel.app',
-    systemEmail: 'info@wonmedia.com',
+    systemEmail: 'duongnv10504@gmail.com',
   },
   header: {
     navDisplayName: '',

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed-superadmin.ts",
+    "seed:all": "tsx scripts/seed-all.ts",
     "seed:homepage": "tsx scripts/seed-homepage.ts",
     "seed:about": "tsx scripts/seed-about.ts",
     "seed:contact": "tsx scripts/seed-contact.ts",
