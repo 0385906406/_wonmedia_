@@ -86,7 +86,7 @@ function LienHeAdminInner() {
   const tab = searchParams.get('tab') ?? 'banner'
 
   const [form, setForm]   = useState<ContactForm>(defaultForm)
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [lang, setLang]       = useState<LocaleKey>('vi')
@@ -99,9 +99,9 @@ function LienHeAdminInner() {
     fetch('/api/contact')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(r => { if (r.data) setForm(f => ({ ...f, ...r.data })) })
-      .catch(() => toastErr('Không tải được cấu hình liên hệ'))
+      .catch(() => toast.error('Không tải được cấu hình liên hệ'))
       .finally(() => setLoading(false))
-  }, [toastErr])
+  }, [toast.error])
 
   useEffect(() => {
     if (tab !== 'inbox') return
@@ -109,18 +109,18 @@ function LienHeAdminInner() {
     fetch('/api/contact/submit')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(r => { if (r.data) setSubs(r.data); if (r.unread !== undefined) setUnread(r.unread) })
-      .catch(() => toastErr('Không tải được hộp thư'))
+      .catch(() => toast.error('Không tải được hộp thư'))
       .finally(() => setSubLoading(false))
-  }, [tab, toastErr])
+  }, [tab, toast.error])
 
   async function save() {
     setSaving(true)
     try {
       const res = await fetch('/api/contact', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       const data = await res.json()
-      if (res.ok) toastOk('Đã lưu trang Liên hệ!')
-      else toastErr(data.error ?? 'Lỗi lưu')
-    } catch { toastErr('Lỗi kết nối')
+      if (res.ok) toast.success('Đã lưu trang Liên hệ!')
+      else toast.error(data.error ?? 'Lỗi lưu')
+    } catch { toast.error('Lỗi kết nối')
     } finally { setSaving(false) }
   }
 
@@ -135,7 +135,7 @@ function LienHeAdminInner() {
     if (!res.ok) {
       setSubs(s => s.map(x => x._id === sub._id ? { ...x, read: sub.read } : x))
       setUnread(u => newRead ? u + 1 : Math.max(0, u - 1))
-      toastErr('Cập nhật thất bại')
+      toast.error('Cập nhật thất bại')
     }
   }
 
@@ -145,7 +145,7 @@ function LienHeAdminInner() {
       method: 'DELETE', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
-    if (!res.ok) { toastErr('Xoá thất bại'); return }
+    if (!res.ok) { toast.error('Xoá thất bại'); return }
     setSubs(s => s.filter(x => x._id !== id))
   }
 
@@ -230,9 +230,9 @@ function LienHeAdminInner() {
                             bannerTitle:    { ...f.bannerTitle,    ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title])) },
                             bannerSubtitle: { ...f.bannerSubtitle, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
                           }))
-                          toastOk('Đã dịch Banner!')
+                          toast.success('Đã dịch Banner!')
                         })
-                      } catch (e) { toastErr(String(e)) }
+                      } catch (e) { toast.error(String(e)) }
                     }}>
                     <SparklesIcon size={13} />AI Dịch
                   </button>

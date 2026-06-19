@@ -428,7 +428,7 @@ function GioiThieuAdminInner() {
   const tab          = searchParams.get('tab') ?? 'banner'
 
   const [form, setForm]   = useState<AboutForm>(defaultForm)
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [lang, setLang]       = useState<LocaleKey>('vi')
@@ -453,22 +453,22 @@ function GioiThieuAdminInner() {
           }))
         }
       })
-      .catch(() => toastErr('Không tải được nội dung trang Giới thiệu'))
+      .catch(() => toast.error('Không tải được nội dung trang Giới thiệu'))
       .finally(() => setLoading(false))
-  }, [toastErr])
+  }, [toast.error])
 
   async function save() {
     setSaving(true)
     try {
       const res  = await fetch('/api/about', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       const data = await res.json()
-      if (res.ok) toastOk('Đã lưu trang Giới thiệu!')
-      else toastErr(data.error ?? 'Lỗi lưu dữ liệu')
-    } catch { toastErr('Lỗi kết nối')
+      if (res.ok) toast.success('Đã lưu trang Giới thiệu!')
+      else toast.error(data.error ?? 'Lỗi lưu dữ liệu')
+    } catch { toast.error('Lỗi kết nối')
     } finally { setSaving(false) }
   }
 
-  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save, onAI: (m, t) => t === 'success' ? toastOk(m) : toastErr(m) }
+  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save, onAI: (m, t) => t === 'success' ? toast.success(m) : toast.error(m) }
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 256, gap: 8, color: 'var(--color-gray-text)' }}>

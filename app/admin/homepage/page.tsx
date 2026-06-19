@@ -98,7 +98,7 @@ function HeroEditor() {
   const [lang, setLang] = useState<LocaleKey>('vi')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
 
   useEffect(() => {
     fetch('/api/homepage/hero').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setData(r.data) }).catch(() => {}).finally(() => setLoading(false))
@@ -108,8 +108,8 @@ function HeroEditor() {
     setSaving(true)
     try {
       const res = await fetch('/api/homepage/hero', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: data.title, title2: data.title2, subtitle: data.subtitle }) })
-      if (res.ok) toastOk('Đã lưu banner!')
-      else toastErr('Lỗi lưu banner')
+      if (res.ok) toast.success('Đã lưu banner!')
+      else toast.error('Lỗi lưu banner')
     } finally { setSaving(false) }
   }
 
@@ -148,7 +148,7 @@ function HeroEditor() {
 }
 
 function ServicesEditor() {
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [items, setItems] = useState<ServiceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<ServiceItem | null>(null)
@@ -174,15 +174,15 @@ function ServicesEditor() {
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/services' : `/api/homepage/services/${editItem._id}`
       const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { toastOk(isNew ? 'Đã thêm dịch vụ!' : 'Đã cập nhật!'); fetchItems(); setEditItem(null) }
-      else toastErr('Lỗi lưu dữ liệu')
+      if (res.ok) { toast.success(isNew ? 'Đã thêm dịch vụ!' : 'Đã cập nhật!'); fetchItems(); setEditItem(null) }
+      else toast.error('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     if (!confirm('Xóa dịch vụ này?')) return
     const res = await fetch(`/api/homepage/services/${id}`, { method: 'DELETE' })
-    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
+    if (res.ok) { toast.success('Đã xóa!'); fetchItems() }
   }
 
   async function toggleActive(item: ServiceItem) {
@@ -265,7 +265,7 @@ function ServicesEditor() {
 }
 
 function AchievementsEditor() {
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [items, setItems] = useState<AchievementItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<AchievementItem | null>(null)
@@ -285,15 +285,15 @@ function AchievementsEditor() {
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/achievements' : `/api/homepage/achievements/${editItem._id}`
       const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { toastOk('Đã lưu!'); fetchItems(); setEditItem(null) }
-      else toastErr('Lỗi lưu dữ liệu')
+      if (res.ok) { toast.success('Đã lưu!'); fetchItems(); setEditItem(null) }
+      else toast.error('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     if (!confirm('Xóa thành tựu này?')) return
     const res = await fetch(`/api/homepage/achievements/${id}`, { method: 'DELETE' })
-    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
+    if (res.ok) { toast.success('Đã xóa!'); fetchItems() }
   }
 
   const BAR_COLORS = ['#f97316', '#00A98F', 'var(--color-indigo)', 'var(--color-navy)']
@@ -365,7 +365,7 @@ function AchievementsEditor() {
 }
 
 function PartnersEditor() {
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [items, setItems] = useState<PartnerItem[]>([])
   const [loading, setLoading] = useState(true)
   const [editItem, setEditItem] = useState<PartnerItem | null>(null)
@@ -384,15 +384,15 @@ function PartnersEditor() {
       const isNew = !editItem._id
       const url = isNew ? '/api/homepage/partners' : `/api/homepage/partners/${editItem._id}`
       const res = await fetch(url, { method: isNew ? 'POST' : 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editItem) })
-      if (res.ok) { toastOk('Đã lưu!'); fetchItems(); setEditItem(null) }
-      else toastErr('Lỗi lưu dữ liệu')
+      if (res.ok) { toast.success('Đã lưu!'); fetchItems(); setEditItem(null) }
+      else toast.error('Lỗi lưu dữ liệu')
     } finally { setSaving(false) }
   }
 
   async function deleteItem(id: string) {
     if (!confirm(`Xóa đối tác "${items.find(i => i._id === id)?.name}"?`)) return
     const res = await fetch(`/api/homepage/partners/${id}`, { method: 'DELETE' })
-    if (res.ok) { toastOk('Đã xóa!'); fetchItems() }
+    if (res.ok) { toast.success('Đã xóa!'); fetchItems() }
   }
 
   return (
@@ -465,7 +465,7 @@ function PartnersEditor() {
 }
 
 function PostsEditor() {
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const [items, setItems]           = useState<PostItem[]>([])
   const [loading, setLoading]       = useState(true)
   const [saving, setSaving]         = useState(false)
@@ -504,9 +504,9 @@ function PostsEditor() {
         body: JSON.stringify({ mode, selectedIds: [...selectedIds], limit }),
       })
       const data = await res.json()
-      if (res.ok) toastOk('Đã lưu cấu hình bài viết!')
-      else toastErr(data?.error ?? `Lỗi lưu cấu hình (${res.status})`)
-    } catch { toastErr('Không kết nối được server')
+      if (res.ok) toast.success('Đã lưu cấu hình bài viết!')
+      else toast.error(data?.error ?? `Lỗi lưu cấu hình (${res.status})`)
+    } catch { toast.error('Không kết nối được server')
     } finally { setSaving(false) }
   }
 

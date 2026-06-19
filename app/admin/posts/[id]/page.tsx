@@ -311,20 +311,16 @@ function PostEditorInner() {
   const [saving,     setSaving]     = useState(false)
   const [translating, setTrans]     = useState(false)
   const [slugLocked, setSlugLocked] = useState(!isNew)
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
   const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const showToast = useCallback((msg: string, type: 'success' | 'error') => {
-    type === 'success' ? toastOk(msg) : toastErr(msg)
-  }, [toastOk, toastErr])
 
   // Load categories
   useEffect(() => {
     fetch('/api/admin/categories-all')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => setCategories(d.data ?? []))
-      .catch(() => toastErr('Không tải được danh mục'))
-  }, [toastErr])
+      .catch(() => toast.error('Không tải được danh mục'))
+  }, [toast.error])
 
   // Chọn category → tự điền multilang
   function selectCategory(catId: string) {
@@ -354,9 +350,9 @@ function PostEditorInner() {
           salary:            r.data.salary            ?? '',
         }))
       })
-      .catch(() => toastErr('Không tải được bài viết'))
+      .catch(() => toast.error('Không tải được bài viết'))
       .finally(() => setLoading(false))
-  }, [id, isNew, toastErr])
+  }, [id, isNew, toast.error])
 
   useEffect(() => {
     if (!isNew || slugLocked) return
@@ -376,7 +372,7 @@ function PostEditorInner() {
   }
 
   async function translate() {
-    if (!form.title.vi && !form.content.vi) { showToast('Nhập nội dung tiếng Việt trước.', 'error'); return }
+    if (!form.title.vi && !form.content.vi) { toast.error('Nhập nội dung tiếng Việt trước.'); return }
     setTrans(true)
     try {
       const res = await fetch('/api/ai/translate', {
@@ -384,7 +380,7 @@ function PostEditorInner() {
         body: JSON.stringify({ fields: { title: form.title.vi, excerpt: form.excerpt.vi, content: form.content.vi }, targetLocales: ['en','ko','ja','zh'] }),
       })
       const data = await res.json()
-      if (!res.ok || data.error) { showToast(data.error ?? 'Lỗi dịch AI', 'error'); return }
+      if (!res.ok || data.error) { toast.error(data.error ?? 'Lỗi dịch AI'); return }
       const t = data.translations as Record<string, { title: string; excerpt: string; content: string }>
       setForm(f => ({
         ...f,
@@ -392,22 +388,22 @@ function PostEditorInner() {
         excerpt: { ...f.excerpt, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
         content: { ...f.content, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.content])) },
       }))
-      showToast('Đã dịch sang EN · KO · JA · ZH ✓', 'success')
-    } catch { showToast('Không kết nối được AI.', 'error') }
+      toast.success('Đã dịch sang EN · KO · JA · ZH ✓')
+    } catch { toast.error('Không kết nối được AI.') }
     finally { setTrans(false) }
   }
 
   async function save() {
-    if (!form.slug)     { showToast('Slug không được để trống.', 'error'); return }
-    if (!form.title.vi) { showToast('Tiêu đề tiếng Việt không được để trống.', 'error'); return }
+    if (!form.slug)     { toast.error('Slug không được để trống.'); return }
+    if (!form.title.vi) { toast.error('Tiêu đề tiếng Việt không được để trống.'); return }
     setSaving(true)
     try {
       const url    = isNew ? '/api/posts' : `/api/posts/${id}`
       const method = isNew ? 'POST' : 'PUT'
       const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       const data   = await res.json()
-      if (!res.ok) { showToast(data.error ?? 'Lỗi lưu', 'error'); return }
-      showToast(isNew ? 'Đã tạo bài viết!' : 'Đã lưu thay đổi!', 'success')
+      if (!res.ok) { toast.error(data.error ?? 'Lỗi lưu'); return }
+      toast.success(isNew ? 'Đã tạo bài viết!' : 'Đã lưu thay đổi!')
       if (isNew) {
         navTimerRef.current = setTimeout(() => router.push(`/admin/posts/${data.data._id}`), 800)
       }

@@ -26,7 +26,7 @@ function slugify(str: string) {
 
 export default function CategoriesPage() {
   const [cats, setCats]         = useState<Category[]>([])
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
 
   const [loading, setLoading]   = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -50,10 +50,10 @@ export default function CategoriesPage() {
       const d = await res.json()
       setCats(d.data ?? [])
     } else {
-      toastErr('Không tải được danh mục')
+      toast.error('Không tải được danh mục')
     }
     setLoading(false)
-  }, [toastErr])
+  }, [toast.error])
 
   useEffect(() => { load() }, [load])
 
@@ -80,8 +80,8 @@ export default function CategoriesPage() {
   }, [name.vi, editing, slugLocked])
 
   async function save() {
-    if (!name.vi.trim()) { toastErr('Tên tiếng Việt không được để trống'); return }
-    if (!slug.trim())    { toastErr('Slug không được để trống'); return }
+    if (!name.vi.trim()) { toast.error('Tên tiếng Việt không được để trống'); return }
+    if (!slug.trim())    { toast.error('Slug không được để trống'); return }
     setSaving(true)
     try {
       const url = editing ? `/api/categories/${editing._id}` : '/api/categories'
@@ -91,8 +91,8 @@ export default function CategoriesPage() {
         body: JSON.stringify({ slug, name, forType, active, order }),
       })
       const d = await res.json()
-      if (!res.ok) { toastErr(d.error ?? 'Lỗi lưu'); return }
-      toastOk(editing ? 'Đã cập nhật danh mục' : 'Đã tạo danh mục')
+      if (!res.ok) { toast.error(d.error ?? 'Lỗi lưu'); return }
+      toast.success(editing ? 'Đã cập nhật danh mục' : 'Đã tạo danh mục')
       setShowForm(false)
       // Update local state
       if (editing) {
@@ -109,10 +109,10 @@ export default function CategoriesPage() {
     const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const d = await res.json().catch(() => ({}))
-      toastErr(d.error ?? 'Xoá thất bại')
+      toast.error(d.error ?? 'Xoá thất bại')
     } else {
       setCats(prev => prev.filter(c => c._id !== id))
-      toastOk('Đã xoá danh mục')
+      toast.success('Đã xoá danh mục')
     }
     setDeleting(null)
   }
@@ -127,7 +127,7 @@ export default function CategoriesPage() {
     if (!res.ok) {
       // Rollback nếu thất bại
       setCats(prev => prev.map(c => c._id === cat._id ? { ...c, active: cat.active } : c))
-      toastErr('Cập nhật thất bại')
+      toast.error('Cập nhật thất bại')
     }
   }
 

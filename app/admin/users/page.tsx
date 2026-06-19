@@ -45,7 +45,7 @@ export default function UsersPage() {
   const [loading, setLoading]     = useState(true)
   const [currentUserId, setCurrentUserId] = useState<string>('')
   const [isSuperadmin, setIsSuperadmin]   = useState(false)
-  const { success: toastOk, error: toastErr } = useToast()
+  const toast = useToast()
 
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm]             = useState({ ...EMPTY_FORM })
@@ -79,7 +79,7 @@ export default function UsersPage() {
 
   async function create() {
     if (!form.name.trim() || !form.email.trim() || !form.password.trim()) {
-      toastErr('Vui lòng điền đầy đủ thông tin'); return
+      toast.error('Vui lòng điền đầy đủ thông tin'); return
     }
     setSaving(true)
     try {
@@ -88,11 +88,11 @@ export default function UsersPage() {
         body: JSON.stringify(form),
       })
       const d = await res.json()
-      if (!res.ok) { toastErr(d.error ?? 'Lỗi tạo user'); return }
+      if (!res.ok) { toast.error(d.error ?? 'Lỗi tạo user'); return }
       setUsers(prev => [d.data, ...prev])
       setShowCreate(false)
       setForm({ ...EMPTY_FORM })
-      toastOk('Đã tạo user thành công')
+      toast.success('Đã tạo user thành công')
     } finally { setSaving(false) }
   }
 
@@ -104,7 +104,7 @@ export default function UsersPage() {
 
   async function saveEdit() {
     if (!editUser) return
-    if (!editForm.name.trim()) { toastErr('Tên không được để trống'); return }
+    if (!editForm.name.trim()) { toast.error('Tên không được để trống'); return }
     setSaving(true)
     try {
       const body: Record<string, string> = {}
@@ -117,10 +117,10 @@ export default function UsersPage() {
         body: JSON.stringify(body),
       })
       const d = await res.json()
-      if (!res.ok) { toastErr(d.error ?? 'Lỗi cập nhật'); return }
+      if (!res.ok) { toast.error(d.error ?? 'Lỗi cập nhật'); return }
       setUsers(prev => prev.map(u => u._id === editUser._id ? d.data : u))
       setShowEdit(false)
-      toastOk('Đã cập nhật user')
+      toast.success('Đã cập nhật user')
     } finally { setSaving(false) }
   }
 
@@ -129,9 +129,9 @@ export default function UsersPage() {
     setDeleting(id)
     const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
     const d = await res.json()
-    if (!res.ok) { toastErr(d.error ?? 'Lỗi xoá'); setDeleting(null); return }
+    if (!res.ok) { toast.error(d.error ?? 'Lỗi xoá'); setDeleting(null); return }
     setUsers(prev => prev.filter(u => u._id !== id))
-    toastOk('Đã xoá user')
+    toast.success('Đã xoá user')
     setDeleting(null)
   }
 

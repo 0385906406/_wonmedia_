@@ -129,7 +129,7 @@ export function RichTextEditor({
   placeholder = 'Nhập nội dung bài viết...',
   imageUploadEndpoint = '/api/admin/media/upload',
 }: Props) {
-  const { error: pushError } = useToast()
+  const toast = useToast()
 
   const [showLink,     setShowLink]     = useState(false)
   const [showVideo,    setShowVideo]    = useState(false)
@@ -235,12 +235,12 @@ export function RichTextEditor({
     try {
       const fd = new FormData(); fd.append('file', file)
       const res = await fetch(imageUploadEndpoint, { method: 'POST', body: fd })
-      if (!res.ok) { pushError('Upload thất bại'); return }
+      if (!res.ok) { toast.error('Upload thất bại'); return }
       const { data } = await res.json()
       rte(editor).chain().focus().setImage({ src: data.url, alt: file.name }).run()
-    } catch { pushError('Lỗi upload ảnh') }
+    } catch { toast.error('Lỗi upload ảnh') }
     finally { setUploading(false) }
-  }, [editor, imageUploadEndpoint, pushError])
+  }, [editor, imageUploadEndpoint, toast.error])
 
   // Tái dùng cùng 1 input element — tránh memory leak khi click nhiều lần
   const imageInputRef = useRef<HTMLInputElement | null>(null)
