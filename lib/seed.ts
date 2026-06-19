@@ -42,6 +42,14 @@ const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema(
   role:     { type: String, enum: ['superadmin', 'admin', 'user'], default: 'user' },
 }, { timestamps: true }))
 
+const Category = mongoose.models.Category || mongoose.model('Category', new mongoose.Schema({
+  slug:    { type: String, required: true, unique: true, trim: true },
+  name:    MLSchema,
+  forType: { type: String, enum: ['blog', 'tuyen-dung', 'all'], default: 'all' },
+  active:  { type: Boolean, default: true },
+  order:   { type: Number, default: 0 },
+}, { timestamps: true }))
+
 const Post = mongoose.models.Post || mongoose.model('Post', new mongoose.Schema({
   slug:           { type: String, required: true, unique: true },
   type:           { type: String, enum: ['blog', 'tuyen-dung'], default: 'blog' },
@@ -59,6 +67,32 @@ const Post = mongoose.models.Post || mongoose.model('Post', new mongoose.Schema(
   location:       { type: String, default: '' },
   salary:         { type: String, default: '' },
 }, { timestamps: true }))
+
+// ─── Categories ───────────────────────────────────────────────────────────────
+
+async function seedCategories() {
+  const count = await Category.countDocuments()
+  if (count > 0) return
+
+  const categories = [
+    // Blog
+    { slug: 'tin-tuc',       forType: 'blog',      order: 1,  name: { vi: 'Tin tức',         en: 'News',           ko: '뉴스',     ja: 'ニュース',     zh: '新闻'   } },
+    { slug: 'giai-tri',      forType: 'blog',      order: 2,  name: { vi: 'Giải trí',        en: 'Entertainment',  ko: '엔터테인먼트', ja: 'エンタメ',   zh: '娱乐'   } },
+    { slug: 'am-nhac',       forType: 'blog',      order: 3,  name: { vi: 'Âm nhạc',         en: 'Music',          ko: '음악',     ja: '音楽',         zh: '音乐'   } },
+    { slug: 'video',         forType: 'blog',      order: 4,  name: { vi: 'Video',            en: 'Video',          ko: '비디오',   ja: 'ビデオ',       zh: '视频'   } },
+    { slug: 'podcast',       forType: 'blog',      order: 5,  name: { vi: 'Podcast',          en: 'Podcast',        ko: '팟캐스트', ja: 'ポッドキャスト', zh: '播客'  } },
+    { slug: 'su-kien',       forType: 'blog',      order: 6,  name: { vi: 'Sự kiện',          en: 'Events',         ko: '이벤트',   ja: 'イベント',     zh: '活动'   } },
+    // Tuyển dụng
+    { slug: 'content',       forType: 'tuyen-dung', order: 1, name: { vi: 'Content Creator', en: 'Content Creator', ko: '콘텐츠 크리에이터', ja: 'コンテンツクリエイター', zh: '内容创作者' } },
+    { slug: 'marketing',     forType: 'tuyen-dung', order: 2, name: { vi: 'Marketing',        en: 'Marketing',      ko: '마케팅',   ja: 'マーケティング', zh: '市场营销' } },
+    { slug: 'thiet-ke',      forType: 'tuyen-dung', order: 3, name: { vi: 'Thiết kế',         en: 'Design',         ko: '디자인',   ja: 'デザイン',     zh: '设计'   } },
+    { slug: 'ky-thuat',      forType: 'tuyen-dung', order: 4, name: { vi: 'Kỹ thuật',         en: 'Technical',      ko: '기술',     ja: '技術',         zh: '技术'   } },
+    { slug: 'kinh-doanh',    forType: 'tuyen-dung', order: 5, name: { vi: 'Kinh doanh',       en: 'Business',       ko: '비즈니스', ja: 'ビジネス',     zh: '商务'   } },
+  ]
+
+  await Category.insertMany(categories.map(c => ({ ...c, active: true })))
+  console.log(`[seed] ${categories.length} categories created`)
+}
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
@@ -752,6 +786,7 @@ export async function runSeed() {
   try {
     await connectDB()
     await seedAdmin()
+    await seedCategories()
     await seedSettings()
     await seedFooter()
     await seedAbout()
