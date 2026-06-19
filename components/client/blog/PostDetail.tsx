@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { useState, useCallback, useEffect } from 'react'
-import { CommentSection } from './CommentSection'
 
 export interface PostDetailData {
   slug: string
@@ -33,8 +32,6 @@ interface Props {
   backLabel: string
   relatedPosts: RelatedPost[]
   isLoggedIn?: boolean
-  currentUserId?: string
-  currentUserName?: string
   likeCount?: number
   thumbnailPosition?: string
 }
@@ -205,7 +202,7 @@ function JobInfoPanel({ post }: { post: PostDetailData }) {
 
 export function PostDetail({
   post, postId, lang, backUrl, backLabel, relatedPosts,
-  isLoggedIn = false, currentUserId, currentUserName, likeCount: initLikeCount = 0,
+  isLoggedIn = false, likeCount: initLikeCount = 0,
   thumbnailPosition = 'center center',
 }: Props) {
   const isBlog = post.type === 'blog'
@@ -433,14 +430,6 @@ export function PostDetail({
                 </button>
               </div>
             </div>
-
-            <CommentSection
-              postId={postId}
-              lang={lang}
-              isLoggedIn={isLoggedIn}
-              currentUserId={currentUserId}
-              currentUserName={currentUserName}
-            />
 
             <div style={{ height: 1, background: '#E5E8ED', margin: '56px 0 40px' }} />
 

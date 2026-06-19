@@ -127,8 +127,6 @@ export default async function TinTucDetailPage({
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
       isLoggedIn={!!user}
-      currentUserId={user?.id}
-      currentUserName={user?.name}
       likeCount={(p as { likes?: string[] }).likes?.length ?? 0}
       thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />

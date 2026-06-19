@@ -131,8 +131,6 @@ export default async function TuyenDungDetailPage({
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
       isLoggedIn={!!currentUser}
-      currentUserId={currentUser?.id}
-      currentUserName={currentUser?.name}
       likeCount={p.likes?.length ?? 0}
       thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />
