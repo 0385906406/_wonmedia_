@@ -201,7 +201,7 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.10)' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(25,27,36,0.40) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.5, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)', backgroundSize: '3px 3px' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to bottom, transparent, var(--wm-mid))' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to bottom, transparent, var(--wm-mid))', opacity: 0.6 }} />
         </div>
 
         <div className="wm-hero-content" style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: 'clamp(80px,12vh,120px) 20px clamp(60px,8vh,80px)' }}>
@@ -222,12 +222,6 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
             <a href={`/${lang}/lien-he`} className="wm-btn-outline wm-hero-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', borderRadius: '100px', background: 'transparent', color: '#fff', fontWeight: 700, textDecoration: 'none', fontFamily: 'var(--font-primary)' }}>
               {cta.secondary}
             </a>
-          </div>
-          <div className="wm-hero-scroll-anim wm-hero-scroll" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', opacity: 0.55 }}>
-            <span style={{ fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase' }}>Scroll</span>
-            <div style={{ width: '24px', height: '40px', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.4)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '6px 0' }}>
-              <div style={{ width: '4px', height: '8px', borderRadius: '2px', background: 'rgba(255,255,255,0.8)', animation: 'wm-scroll-dot 1.8s ease-in-out infinite' }} />
-            </div>
           </div>
         </div>
       </section>
@@ -251,7 +245,6 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
         .wm-hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
         .wm-hero-btn-primary  { padding: 15px 36px; font-size: 15px; }
         .wm-hero-btn-secondary { padding: 14px 32px; font-size: 15px; }
-        .wm-hero-scroll { margin-top: 64px; }
 
         /* Hero — mobile */
         @media (max-width: 640px) {
@@ -261,13 +254,6 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
           .wm-hero-ctas { flex-direction: column; align-items: center; gap: 10px; }
           .wm-hero-btn-primary  { padding: 13px 28px; font-size: 14px; width: fit-content; }
           .wm-hero-btn-secondary { padding: 12px 28px; font-size: 14px; width: fit-content; }
-          .wm-hero-scroll { margin-top: 36px; }
-        }
-
-        @keyframes wm-scroll-dot {
-          0%   { transform: translateY(0); opacity: 1; }
-          80%  { transform: translateY(14px); opacity: 0; }
-          100% { transform: translateY(0); opacity: 0; }
         }
       `}</style>
     </>

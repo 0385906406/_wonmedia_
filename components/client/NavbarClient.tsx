@@ -26,16 +26,14 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
 
   const isHome = pathname === `/${lang}` || pathname === `/${lang}/`
 
-  // Scroll listener — chỉ cần khi ở trang chủ
   useEffect(() => {
-    if (!isHome) return
     function onScroll() {
       setScrolled(window.scrollY > 60)
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [isHome])
+  }, [])
 
   // Click outside / Esc để đóng mobile menu
   useEffect(() => {
@@ -54,13 +52,11 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
     }
   }, [mobileOpen])
 
-  // Trang chủ chưa scroll → trong suốt; đã scroll hoặc trang khác → xám
-  // Chữ luôn trắng vì nền xám đủ tối
-  const transparent = isHome && !scrolled
-  const navBg      = transparent ? 'transparent' : 'rgba(157,166,177,0.95)'
+  const transparent = !scrolled
+  const navBg      = transparent ? 'transparent' : 'rgba(6,35,64,0.78)'
   const textColor   = 'rgba(255,255,255,0.92)'
   const iconColor   = 'rgba(255,255,255,0.78)'
-  const borderColor = transparent ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.28)'
+  const borderColor = transparent ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)'
 
   return (
     <>
@@ -91,7 +87,7 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
           left: 0,
           right: 0,
           background: navBg,
-          backdropFilter: transparent ? 'none' : 'blur(12px)',
+          backdropFilter: transparent ? 'none' : 'blur(20px)',
           borderBottomColor: transparent ? 'transparent' : undefined,
           transition: 'background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease',
         }}
@@ -100,7 +96,7 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
 
           {/* Brand */}
           <Link href={`/${lang}`} className="qp-brand" style={{ textDecoration: 'none' }}>
-            <div className="qp-brand__mark" style={{ width: 120, height: 'auto' }}>
+            <div className="qp-brand__mark" style={{ width: 120, height: 'auto', overflow: 'visible', borderRadius: 0 }}>
               <img
                 src={logoUrl || '/logo.png'}
                 alt={brandName || 'WON Media'}

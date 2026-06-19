@@ -376,7 +376,7 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
     <div style={{ fontFamily: 'var(--font-vi)' }}>
 
       {/* ── Banner ── */}
-      <section style={{ position: 'relative', width: '100%', minHeight: 200, display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', width: '100%', minHeight: 200, display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: 'calc(-1 * var(--topbar-height))' }}>
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, #0F4C81 0%, #062340 100%)',
@@ -393,7 +393,7 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
           pointerEvents: 'none',
         }} />
 
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1280px', margin: '0 auto', padding: '52px 32px 44px', width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1280px', margin: '0 auto', padding: 'calc(var(--topbar-height) + 52px) 32px 44px', width: '100%' }}>
           <motion.span
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

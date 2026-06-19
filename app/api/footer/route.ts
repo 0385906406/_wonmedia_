@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { connectDB } from '@/lib/mongodb'
 import FooterConfig from '@/models/FooterConfig'
 import { getAuthUser, requireAdmin } from '@/lib/auth-api'
+
+const LOCALES = ['vi', 'en', 'ko', 'ja', 'zh']
 
 export async function GET() {
   try {
@@ -22,6 +25,7 @@ export async function PUT(req: NextRequest) {
     const cfg = await FooterConfig.findOneAndUpdate(
       { key: 'global' }, { $set: body }, { new: true, upsert: true }
     )
+    LOCALES.forEach(lang => revalidatePath(`/${lang}`, 'layout'))
     return NextResponse.json({ success: true, data: cfg })
   } catch (e) { return NextResponse.json({ error: 'Server error' }, { status: 500 }) }
 }

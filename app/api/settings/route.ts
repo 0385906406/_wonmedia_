@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { connectDB } from '@/lib/mongodb'
 import Setting from '@/models/Setting'
 import { getAuthUser, requireAdmin } from '@/lib/auth-api'
+
+const LOCALES = ['vi', 'en', 'ko', 'ja', 'zh']
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -46,6 +49,7 @@ export async function PUT(req: NextRequest) {
       { new: true, upsert: true }
     )
 
+    LOCALES.forEach(lang => revalidatePath(`/${lang}`, 'layout'))
     return NextResponse.json({ success: true, data: setting })
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

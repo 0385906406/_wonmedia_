@@ -1,7 +1,7 @@
 'use client'
 
 import {
-    createContext, useCallback, useContext, useEffect, useRef, useState,
+    createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -188,13 +188,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         setToasts([{ id, type, message: msg, description: desc, duration: dur, leaving: false }])
     }, [])
 
-    const ctx: ToastCtx = {
-        success: (m, d, dur) => add('success', m, d, dur),
-        error:   (m, d, dur) => add('error',   m, d, dur),
-        warning: (m, d, dur) => add('warning', m, d, dur),
-        info:    (m, d, dur) => add('info',    m, d, dur),
+    const ctx: ToastCtx = useMemo(() => ({
+        success: (m: string, d?: string, dur?: number) => add('success', m, d, dur),
+        error:   (m: string, d?: string, dur?: number) => add('error',   m, d, dur),
+        warning: (m: string, d?: string, dur?: number) => add('warning', m, d, dur),
+        info:    (m: string, d?: string, dur?: number) => add('info',    m, d, dur),
         dismiss,
-    }
+    }), [add, dismiss])
 
     return (
         <ToastContext.Provider value={ctx}>

@@ -90,7 +90,7 @@ const SVC_COLORS  = [
 // ─── Banner ───────────────────────────────────────────────────────────────────
 function BannerSection({ t }: { t: AboutT['banner'] }) {
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: 240, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: 240, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff', marginTop: 'calc(-1 * var(--topbar-height))' }}>
       <motion.div
         initial={{ scale: 1.1 }} whileInView={{ scale: 1 }} viewport={VP}
         transition={{ duration: 1.6, ease: 'easeOut' }}
@@ -99,7 +99,7 @@ function BannerSection({ t }: { t: AboutT['banner'] }) {
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(6,35,64,0.82) 0%, rgba(0,169,143,0.3) 100%)' }} />
       <div style={{ position: 'absolute', inset: 0, opacity: 0.35, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 0)', backgroundSize: '4px 4px' }} />
 
-      <div className="container won-about-banner-inner" style={{ position: 'relative', zIndex: 10, paddingBlock: '52px' }}>
+      <div className="container won-about-banner-inner" style={{ position: 'relative', zIndex: 10, paddingTop: 'calc(var(--topbar-height) + 52px)', paddingBottom: '52px' }}>
         <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.7, delay: 0.1 }}
           style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <span style={{ width: 40, height: 3, background: 'var(--color-teal)', borderRadius: 2, display: 'block' }} />

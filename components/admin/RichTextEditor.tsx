@@ -242,24 +242,11 @@ export function RichTextEditor({
     finally { setUploading(false) }
   }, [editor, imageUploadEndpoint, toast.error])
 
-  // Tái dùng cùng 1 input element — tránh memory leak khi click nhiều lần
-  const imageInputRef = useRef<HTMLInputElement | null>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   const handleImage = useCallback(() => {
-    if (!imageInputRef.current) {
-      const inp = document.createElement('input')
-      inp.type = 'file'
-      inp.accept = 'image/png,image/jpeg,image/gif,image/webp'
-      imageInputRef.current = inp
-    }
-    const inp = imageInputRef.current
-    // Gắn handler mới mỗi lần để luôn dùng uploadFile mới nhất (closure)
-    inp.onchange = async () => {
-      if (inp.files?.[0]) await uploadFile(inp.files[0])
-      inp.value = '' // reset để chọn lại cùng file
-    }
-    inp.click()
-  }, [uploadFile])
+    imageInputRef.current?.click()
+  }, [])
 
   const insertTable = useCallback(() => {
     if (!editor) return
@@ -444,6 +431,18 @@ export function RichTextEditor({
 
       {showLink  && <RteLinkModal  editor={editor} onClose={() => setShowLink(false)} />}
       {showVideo && <RteVideoModal editor={editor} onClose={() => setShowVideo(false)} />}
+
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp"
+        style={{ display: 'none' }}
+        onChange={async e => {
+          const file = e.target.files?.[0]
+          e.target.value = ''
+          if (file) await uploadFile(file)
+        }}
+      />
     </>
   )
 }
