@@ -164,7 +164,6 @@ export default function DashboardPage() {
                     <div style={{ width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: isBlog ? '#dcfce7' : '#dbeafe' }}>
                       {isBlog ? <FileTextIcon size={16} color="#15803d" /> : <BriefcaseIcon size={16} color="#1d4ed8" />}
                     </div>
-                    {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {post.title?.vi || '(Chưa có tiêu đề)'}
@@ -176,7 +175,6 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     </div>
-                    {/* Status */}
                     <div style={{ flexShrink: 0 }}>
                       {post.active
                         ? <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#15803d', fontWeight: 600 }}><CheckCircle2Icon size={12} />Active</span>
@@ -189,10 +187,8 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Right column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Quick actions */}
           <div className="dh-card">
             <div className="dh-card-header"><h2 className="dh-card-title">Thao tác nhanh</h2></div>
             <div className="dh-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -204,7 +200,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent messages */}
           <div className="dh-card">
             <div className="dh-card-header">
               <h2 className="dh-card-title">Tin nhắn gần đây</h2>
@@ -245,7 +240,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* WON Media info */}
           <div style={{ background: 'linear-gradient(135deg, #062340 0%, #0F4C81 100%)', borderRadius: 16, padding: '20px', color: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <TrophyIcon size={18} color="#FCD34D" />

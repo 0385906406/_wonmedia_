@@ -5,6 +5,7 @@ const ML = { vi: { type: String, default: '' }, en: { type: String, default: '' 
 export interface IFooterConfig extends Document {
   key: string
   companyName: Record<string, string>
+  brandDesc: Record<string, string>
   // Nav links
   navAbout: Record<string, string>
   navServices: Record<string, string>
@@ -31,7 +32,7 @@ export interface IFooterConfig extends Document {
 
 const FooterConfigSchema = new Schema<IFooterConfig>({
   key: { type: String, default: 'global', unique: true },
-  companyName: ML,
+  companyName: ML, brandDesc: ML,
   navAbout: ML, navServices: ML, navCareers: ML, navBlog: ML, navContact: ML,
   servicesHeading: ML, service1: ML, service2: ML, service3: ML, service4: ML,
   locationHeading: ML, locationCity: ML,

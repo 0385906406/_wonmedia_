@@ -189,8 +189,6 @@ export function RichTextEditor({
     const curr = editor.getHTML()
     const empty = (h: string) => !h || h === '<p></p>'
 
-    // Chỉ gọi setContent khi value thay đổi từ BÊN NGOÀI (ví dụ: đổi tab ngôn ngữ)
-    // Bỏ qua khi value chỉ là echo lại từ onUpdate của chính editor → tránh cursor nhảy
     const isExternalChange = newValue !== lastEditorOutputRef.current
     if (isExternalChange && newValue !== curr && !(empty(newValue) && empty(curr))) {
       lastEditorOutputRef.current = newValue
@@ -270,9 +268,7 @@ export function RichTextEditor({
         onDragLeave={() => setDragOver(false)}
         onDrop={async e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f?.type.startsWith('image/')) await uploadFile(f) }}>
 
-        {/* ── Main toolbar ── */}
         <div className="rich-text-editor__toolbar">
-          {/* Heading */}
           <Group>
             <div ref={headingRef} className="rte-heading-wrap">
               <Btn label={headingLabel()} active={act('heading')} onClick={() => setShowHeading(v => !v)}>
@@ -299,7 +295,6 @@ export function RichTextEditor({
             </div>
           </Group>
 
-          {/* Inline */}
           <Group>
             <Btn label="In đậm (Ctrl+B)"   active={act('bold')}      onClick={() => r.chain().focus().toggleBold().run()}><I.Bold /></Btn>
             <Btn label="In nghiêng (Ctrl+I)" active={act('italic')}   onClick={() => r.chain().focus().toggleItalic().run()}><I.Italic /></Btn>
@@ -308,7 +303,6 @@ export function RichTextEditor({
             <Btn label="Code inline" active={act('code')}             onClick={() => r.chain().focus().toggleCode().run()}><I.Code /></Btn>
           </Group>
 
-          {/* Color */}
           <Group>
             <div className="rte-color-picker-wrap">
               <Btn label="Màu chữ" active={!!txtColor || colorMode === 'text'} onClick={() => setColorMode(v => v === 'text' ? null : 'text')}>
@@ -324,7 +318,6 @@ export function RichTextEditor({
             </div>
           </Group>
 
-          {/* Align */}
           <Group>
             <Btn label="Căn trái"    active={act('paragraph', { textAlign: 'left' })}    onClick={() => r.chain().focus().setTextAlign('left').run()}><I.AlignLeft /></Btn>
             <Btn label="Căn giữa"    active={act('paragraph', { textAlign: 'center' })}  onClick={() => r.chain().focus().setTextAlign('center').run()}><I.AlignCenter /></Btn>
@@ -332,7 +325,6 @@ export function RichTextEditor({
             <Btn label="Căn đều"     active={act('paragraph', { textAlign: 'justify' })} onClick={() => r.chain().focus().setTextAlign('justify').run()}><I.AlignJustify /></Btn>
           </Group>
 
-          {/* Insert */}
           <Group>
             <div ref={tableRef} className="rte-heading-wrap">
               <Btn label="Bảng" active={inTable || showTable} onClick={() => setShowTable(v => !v)}><I.Table /></Btn>
@@ -367,7 +359,6 @@ export function RichTextEditor({
             <Btn label="Đường kẻ ngang"     onClick={() => r.chain().focus().setHorizontalRule().run()}><I.Hr /></Btn>
           </Group>
 
-          {/* Lists */}
           <Group>
             <Btn label="Danh sách chấm"   active={act('bulletList')}  onClick={() => r.chain().focus().toggleBulletList().run()}><I.BulletList /></Btn>
             <Btn label="Danh sách số"     active={act('orderedList')} onClick={() => r.chain().focus().toggleOrderedList().run()}><I.OrderedList /></Btn>
@@ -376,7 +367,6 @@ export function RichTextEditor({
             <Btn label="Khối code"        active={act('codeBlock')}   onClick={() => r.chain().focus().toggleCodeBlock().run()}><I.CodeBlock /></Btn>
           </Group>
 
-          {/* History */}
           <Group>
             <Btn label="Hoàn tác (Ctrl+Z)"     onClick={() => r.chain().focus().undo().run()}><I.Undo /></Btn>
             <Btn label="Làm lại (Ctrl+Y)"      onClick={() => r.chain().focus().redo().run()}><I.Redo /></Btn>
@@ -386,7 +376,6 @@ export function RichTextEditor({
           </Group>
         </div>
 
-        {/* ── Table context bar ── */}
         {inTable && (
           <div className="rich-text-editor__table-bar">
             <Group>

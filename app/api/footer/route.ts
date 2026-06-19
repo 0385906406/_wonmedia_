@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest) {
     const cfg = await FooterConfig.findOneAndUpdate(
       { key: 'global' }, { $set: body }, { new: true, upsert: true }
     )
-    LOCALES.forEach(lang => revalidatePath(`/${lang}`, 'layout'))
+    revalidatePath('/', 'layout')
     return NextResponse.json({ success: true, data: cfg })
   } catch (e) { return NextResponse.json({ error: 'Server error' }, { status: 500 }) }
 }

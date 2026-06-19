@@ -77,7 +77,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
         }
         rafRef.current = requestAnimationFrame(tick)
         return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-    }, []) // eslint-disable-line
+    }, [])
 
     function handleMouseEnter() {
         if (rafRef.current) cancelAnimationFrame(rafRef.current)

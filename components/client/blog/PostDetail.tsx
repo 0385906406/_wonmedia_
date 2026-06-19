@@ -287,7 +287,7 @@ export function PostDetail({
             transition={{ duration: 0.8, delay: 0.2 }}
             style={{
               fontFamily: 'var(--font-vi)',
-              fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 900,
+              fontSize: 'clamp(22px, 3.5vw, 38px)', fontWeight: 900,
               letterSpacing: '-1.5px', lineHeight: 1.1,
               color: '#fff', margin: '0 0 18px',
               textShadow: '0 4px 40px rgba(0,0,0,0.4)',
