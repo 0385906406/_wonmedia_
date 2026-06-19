@@ -63,22 +63,13 @@ const Post = mongoose.models.Post || mongoose.model('Post', new mongoose.Schema(
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
 async function seedAdmin() {
-  const exists = await User.findOne({ email: 'admin@wonmedia.com' })
-  if (exists) return
-
-  const seedPassword = process.env.SEED_ADMIN_PASSWORD ?? 'Admin@123456'
-  if (!process.env.SEED_ADMIN_PASSWORD && process.env.NODE_ENV === 'production') {
-    console.warn('[seed] ⚠️  SEED_ADMIN_PASSWORD env var không được set — đang dùng mật khẩu mặc định. Đặt env var này trước khi deploy production!')
-  }
-  const hashed = await bcrypt.hash(seedPassword, 12)
-  await User.create({
-    name: 'Super Admin',
-    email: 'admin@wonmedia.com',
-    password: hashed,
-    role: 'superadmin',
-  })
-  // Không log credentials ra console — set SEED_ADMIN_PASSWORD trong .env để đổi password mặc định
-  console.log('[seed] Super admin account created: admin@wonmedia.com')
+  const hashed = await bcrypt.hash('wonmedia', 12)
+  await User.findOneAndUpdate(
+    { role: 'superadmin' },
+    { name: 'Super Admin', email: 'wonmedia@wonmedia.com', password: hashed, role: 'superadmin' },
+    { upsert: true }
+  )
+  console.log('[seed] Super admin: wonmedia@wonmedia.com / wonmedia')
 }
 
 // ─── Posts ────────────────────────────────────────────────────────────────────
