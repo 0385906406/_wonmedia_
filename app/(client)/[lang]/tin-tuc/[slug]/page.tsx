@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import type { Metadata } from 'next'
 import { hasLocale } from '../../dictionaries'
 import { sanitizeHtml } from '@/lib/sanitize-html'
@@ -12,17 +10,6 @@ import Post from '@/models/Post'
 const BACK_LABELS: Record<LocaleKey, string> = {
   vi: 'Quay lại Tin tức', en: 'Back to News',
   ko: '뉴스로 돌아가기', ja: 'ニュースに戻る', zh: '返回新闻',
-}
-
-async function getCurrentUser() {
-  try {
-    const store = await cookies()
-    const token = store.get('token')?.value
-    if (!token) return null
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-    const { payload } = await jwtVerify(token, secret)
-    return payload as { id: string; name?: string }
-  } catch { return null }
 }
 
 export async function generateMetadata({
@@ -91,7 +78,6 @@ export default async function TinTucDetailPage({
   const p = await Post.findOne({ slug, active: true, type: 'blog' }).lean()
   if (!p) notFound()
 
-  const user = await getCurrentUser()
   const ml = (f: Record<string, string>) => f?.[lk] || f?.['vi'] || ''
 
   const post: PostDetailData = {
@@ -121,13 +107,10 @@ export default async function TinTucDetailPage({
   return (
     <PostDetail
       post={post}
-      postId={(p._id as { toString(): string }).toString()}
       lang={lang}
       backUrl="tin-tuc"
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
-      isLoggedIn={!!user}
-      likeCount={(p as { likes?: string[] }).likes?.length ?? 0}
       thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />
   )

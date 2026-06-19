@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import type { Metadata } from 'next'
 import { hasLocale } from '../../dictionaries'
 import { sanitizeHtml } from '@/lib/sanitize-html'
@@ -76,17 +74,6 @@ export default async function TuyenDungDetailPage({
   if (!hasLocale(lang)) notFound()
   const lk = lang as LocaleKey
 
-  let currentUser: { id: string; name?: string } | null = null
-  try {
-    const store = await cookies()
-    const token = store.get('token')?.value
-    if (token) {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-      const { payload } = await jwtVerify(token, secret)
-      currentUser = payload as { id: string; name?: string }
-    }
-  } catch {}
-
   await connectDB()
   const p = await Post.findOne({ slug, active: true, type: 'tuyen-dung' }).lean()
   if (!p) notFound()
@@ -125,13 +112,10 @@ export default async function TuyenDungDetailPage({
   return (
     <PostDetail
       post={post}
-      postId={(p._id as { toString(): string }).toString()}
       lang={lang}
       backUrl="tuyen-dung"
       backLabel={BACK_LABELS[lk]}
       relatedPosts={relatedPosts}
-      isLoggedIn={!!currentUser}
-      likeCount={p.likes?.length ?? 0}
       thumbnailPosition={(p as { thumbnailPosition?: string }).thumbnailPosition ?? 'center center'}
     />
   )

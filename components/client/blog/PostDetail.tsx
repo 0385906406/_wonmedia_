@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 
 export interface PostDetailData {
   slug: string
@@ -26,13 +26,10 @@ interface RelatedPost {
 
 interface Props {
   post: PostDetailData
-  postId: string
   lang: string
   backUrl: string
   backLabel: string
   relatedPosts: RelatedPost[]
-  isLoggedIn?: boolean
-  likeCount?: number
   thumbnailPosition?: string
 }
 
@@ -201,31 +198,11 @@ function JobInfoPanel({ post }: { post: PostDetailData }) {
 }
 
 export function PostDetail({
-  post, postId, lang, backUrl, backLabel, relatedPosts,
-  isLoggedIn = false, likeCount: initLikeCount = 0,
+  post, lang, backUrl, backLabel, relatedPosts,
   thumbnailPosition = 'center center',
 }: Props) {
   const isBlog = post.type === 'blog'
-  const [liked, setLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(initLikeCount)
   const [sharing, setSharing] = useState(false)
-
-  useEffect(() => {
-    if (!isLoggedIn) return
-    fetch(`/api/posts/${postId}/like`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) { setLiked(d.liked); setLikeCount(d.count) } })
-      .catch(() => {})
-  }, [postId, isLoggedIn])
-
-  const handleLike = useCallback(async () => {
-    if (!isLoggedIn) { window.location.href = '/auth/login'; return }
-    const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST' })
-    if (!res.ok) return
-    const data = await res.json()
-    setLiked(data.liked)
-    setLikeCount(data.count)
-  }, [postId, isLoggedIn])
 
   const handleShare = useCallback(async (platform: string) => {
     const url = window.location.href
@@ -242,10 +219,10 @@ export function PostDetail({
   }, [post.title])
 
   return (
-    <div style={{ background: 'var(--wm-dark)', fontFamily: 'var(--font-vi)' }}>
+    <div style={{ background: 'var(--wm-dark)', fontFamily: 'var(--font-vi)', marginTop: 'calc(-1 * var(--topbar-height))' }}>
 
       <section style={{
-        position: 'relative', width: '100%', minHeight: '420px',
+        position: 'relative', width: '100%', minHeight: 'calc(420px + var(--topbar-height))',
         display: 'flex', alignItems: 'flex-end', overflow: 'hidden',
       }}>
         {post.thumbnail ? (
@@ -263,7 +240,7 @@ export function PostDetail({
         <div style={{ position: 'absolute', inset: 0, opacity: 0.45, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)', backgroundSize: '3px 3px' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px', background: 'linear-gradient(to bottom, transparent, var(--wm-dark))' }} />
 
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1280px', margin: '0 auto', padding: 'clamp(80px,10vw,100px) clamp(16px,4vw,32px) 48px' }}>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1280px', margin: '0 auto', padding: 'calc(var(--topbar-height) + clamp(40px,5vw,64px)) clamp(16px,4vw,32px) 48px' }}>
 
           <motion.a
             href={`/${lang}/${backUrl}`}
@@ -375,25 +352,6 @@ export function PostDetail({
               margin: '48px 0 0', padding: '20px 0', flexWrap: 'wrap',
               borderTop: '1px solid #E5E8ED',
             }}>
-              <button
-                onClick={handleLike}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '10px 20px', borderRadius: 100, border: 'none',
-                  background: liked ? '#EEF0FE' : '#F8F9FB',
-                  color: liked ? '#6366F1' : '#64748b',
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  transition: 'all 0.2s', fontFamily: 'var(--font-primary)',
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24"
-                  fill={liked ? 'currentColor' : 'none'}
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                {likeCount > 0 ? `${likeCount} Thích` : 'Thích'}
-              </button>
-
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
                 <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>Chia sẻ:</span>
                 <button onClick={() => handleShare('facebook')} title="Chia sẻ Facebook"
