@@ -33,7 +33,7 @@ export async function PUT(req: NextRequest) {
     await connectDB()
     const body = await req.json()
 
-    const allowed = ['general', 'header']
+    const allowed = ['general', 'header', 'integrations']
     const update: Record<string, unknown> = {}
     for (const group of allowed) {
       if (body[group] && typeof body[group] === 'object') {

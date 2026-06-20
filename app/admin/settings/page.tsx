@@ -19,7 +19,7 @@ import {
 } from './collections-tab'
 import { useToast } from '@/components/admin/toast-provider'
 
-interface SettingsData { general: Record<string, string>; header: Record<string, string> }
+interface SettingsData { general: Record<string, string>; header: Record<string, string>; integrations: Record<string, string> }
 
 interface FooterForm {
     companyName: MultiLang; brandDesc: MultiLang; copyright: MultiLang
@@ -47,7 +47,7 @@ const FIXED_IDS = ['general', 'header', 'footer']
 export default function SettingsPage() {
     const toast = useToast()
     const [activeTab, setActiveTab]     = useState<string>('general')
-    const [settingsData, setSettingsData] = useState<SettingsData>({ general: {}, header: {} })
+    const [settingsData, setSettingsData] = useState<SettingsData>({ general: {}, header: {}, integrations: {} })
     const [settingsSaving, setSettingsSaving] = useState(false)
     const [collections, setCollections] = useState<Collection[]>([])
     const [loading, setLoading]         = useState(true)
@@ -68,13 +68,13 @@ export default function SettingsPage() {
             fetch('/api/collections').then(r => r.json()),
             fetch('/api/footer').then(r => r.json()),
         ]).then(([sRes, cRes, fRes]) => {
-            if (sRes.data) setSettingsData({ general: sRes.data.general ?? {}, header: sRes.data.header ?? {} })
+            if (sRes.data) setSettingsData({ general: sRes.data.general ?? {}, header: sRes.data.header ?? {}, integrations: sRes.data.integrations ?? {} })
             if (cRes.data) setCollections(cRes.data)
             if (fRes.data) setFooterForm(f => ({ ...f, ...fRes.data }))
         }).finally(() => setLoading(false))
     }, [])
 
-    async function saveSettings(group: 'general' | 'header', overrides?: Record<string, string>) {
+    async function saveSettings(group: 'general' | 'header' | 'integrations', overrides?: Record<string, string>) {
         setSettingsSaving(true)
         try {
             const data = overrides ? { ...settingsData[group], ...overrides } : settingsData[group]
@@ -153,9 +153,10 @@ export default function SettingsPage() {
                 {/* ── Sidebar ── */}
                 <aside className="s-sidebar">
                     <p className="s-sidebar-label">Hệ thống</p>
-                    <SideItem icon={GlobeIcon}      label="Thông tin cơ bản" active={activeTab === 'general'} onClick={() => setActiveTab('general')} />
-                    <SideItem icon={LayoutIcon}     label="Header & Logo"    active={activeTab === 'header'}  onClick={() => setActiveTab('header')} />
-                    <SideItem icon={FootprintsIcon} label="Footer"           active={activeTab === 'footer'}  onClick={() => setActiveTab('footer')} />
+                    <SideItem icon={GlobeIcon}      label="Thông tin cơ bản"   active={activeTab === 'general'}       onClick={() => setActiveTab('general')} />
+                    <SideItem icon={LayoutIcon}     label="Header & Logo"      active={activeTab === 'header'}        onClick={() => setActiveTab('header')} />
+                    <SideItem icon={FootprintsIcon} label="Footer"             active={activeTab === 'footer'}        onClick={() => setActiveTab('footer')} />
+                    <SideItem icon={MailIcon}       label="Email thông báo"    active={activeTab === 'integrations'}  onClick={() => setActiveTab('integrations')} />
 
                     <>
                         <div className="s-divider" />
@@ -411,6 +412,42 @@ export default function SettingsPage() {
                                     </p>
                                 </div>
                             )}
+                        </SettingsCard>
+                    )}
+
+                    {/* Email & Thông báo */}
+                    {activeTab === 'integrations' && (
+                        <SettingsCard
+                            icon={<MailIcon size={15} style={{ color: 'var(--color-indigo)' }} />}
+                            title="Email thông báo"
+                            desc="Cấu hình địa chỉ nhận email khi có liên hệ từ website"
+                            action={
+                                <button onClick={() => saveSettings('integrations')} disabled={settingsSaving} className="dh-btn dh-btn-sm dh-btn-primary">
+                                    {settingsSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}
+                                    Lưu
+                                </button>
+                            }
+                        >
+                            <div className="s-form-grid">
+                                <FormField label="Email nhận liên hệ" hint="Mỗi khi có form liên hệ mới, thông báo sẽ gửi đến địa chỉ này">
+                                    <input className="dh-input" type="email"
+                                        value={settingsData.integrations.resendToEmail ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendToEmail: e.target.value } }))}
+                                        placeholder="contact@wonmedia.vn" />
+                                </FormField>
+                                <FormField label="Email gửi (From)" hint="Địa chỉ xuất hiện ở ô 'Từ' trong email — phải được xác minh trên Resend">
+                                    <input className="dh-input" type="email"
+                                        value={settingsData.integrations.resendFromEmail ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendFromEmail: e.target.value } }))}
+                                        placeholder="no-reply@wonmedia.vn" />
+                                </FormField>
+                                <FormField label="Resend API Key" hint="Lấy tại resend.com → API Keys. Để trống nếu dùng biến môi trường RESEND_API_KEY">
+                                    <input className="dh-input" type="password"
+                                        value={settingsData.integrations.resendApiKey ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendApiKey: e.target.value } }))}
+                                        placeholder="re_xxxxxxxxxxxxxxxx" />
+                                </FormField>
+                            </div>
                         </SettingsCard>
                     )}
 

@@ -1,4 +1,27 @@
 import { Resend } from 'resend'
+import { connectDB } from '@/lib/mongodb'
+import Setting from '@/models/Setting'
+
+async function getEmailConfig() {
+  try {
+    await connectDB()
+    const setting = await Setting.findOne({ key: 'global' }).lean() as {
+      integrations?: { resendApiKey?: string; resendFromEmail?: string; resendToEmail?: string }
+    } | null
+    const db = setting?.integrations ?? {}
+    return {
+      apiKey:    db.resendApiKey?.trim()    || process.env.RESEND_API_KEY?.trim()    || '',
+      fromEmail: db.resendFromEmail?.trim() || process.env.RESEND_FROM_EMAIL?.trim() || 'onboarding@resend.dev',
+      toEmail:   db.resendToEmail?.trim()   || process.env.RESEND_TO_EMAIL?.trim()   || 'contact@wonmedia.vn',
+    }
+  } catch {
+    return {
+      apiKey:    process.env.RESEND_API_KEY?.trim()    || '',
+      fromEmail: process.env.RESEND_FROM_EMAIL?.trim() || 'onboarding@resend.dev',
+      toEmail:   process.env.RESEND_TO_EMAIL?.trim()   || 'contact@wonmedia.vn',
+    }
+  }
+}
 
 function escapeHtml(str: string): string {
   return str
@@ -16,9 +39,7 @@ export async function sendContactNotification(data: {
   message: string
 }) {
   try {
-    const apiKey    = process.env.RESEND_API_KEY?.trim()
-    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'onboarding@resend.dev'
-    const toEmail   = process.env.RESEND_TO_EMAIL?.trim() || 'contact@wonmedia.vn'
+    const { apiKey, fromEmail, toEmail } = await getEmailConfig()
 
     if (!apiKey) return { ok: false, reason: 'no_api_key' }
 
