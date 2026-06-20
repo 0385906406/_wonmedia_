@@ -26,6 +26,10 @@ export interface IFooterConfig extends Document {
   hotline: string
   email: string
   zalo: string
+  // Social links
+  facebookUrl: string
+  youtubeUrl: string
+  tiktokUrl: string
   // Bottom
   copyright: Record<string, string>
 }
@@ -40,6 +44,9 @@ const FooterConfigSchema = new Schema<IFooterConfig>({
   hotline: { type: String, default: '' },
   email: { type: String, default: '' },
   zalo: { type: String, default: '' },
+  facebookUrl: { type: String, default: '' },
+  youtubeUrl:  { type: String, default: '' },
+  tiktokUrl:   { type: String, default: '' },
   copyright: ML,
 }, { strict: false, timestamps: true })
 

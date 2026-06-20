@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import { hasLocale } from '../dictionaries'
 import { ContactClient, type ContactT } from '@/components/client/contact/ContactClient'
 import type { LocaleKey } from '@/types/multilang'
@@ -11,9 +11,6 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
 const SEO_CONTACT: Record<LocaleKey, { title: string; desc: string }> = {
   vi: { title: 'Liên hệ – WON Media',   desc: 'Liên hệ với WON Media để được tư vấn và hỗ trợ dịch vụ truyền thông chuyên nghiệp.' },
   en: { title: 'Contact – WON Media',   desc: 'Contact WON Media for consultation and professional media service support.' },
-  ko: { title: '문의하기 – WON Media',   desc: 'WON Media에 문의하여 전문 미디어 서비스 상담 및 지원을 받으세요.' },
-  ja: { title: 'お問い合わせ – WON Media', desc: 'WON Mediaにお問い合わせいただき、プロのメディアサービスの相談とサポートを受けてください。' },
-  zh: { title: '联系我们 – WON Media',   desc: '联系WON Media，获取专业媒体服务咨询和支持。' },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {

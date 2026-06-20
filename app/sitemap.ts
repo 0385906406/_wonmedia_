@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/mongodb'
 import Post from '@/models/Post'
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
-const LOCALES = ['vi', 'en', 'ko', 'ja', 'zh']
+const LOCALES = ['vi', 'en']
 const STATIC_PATHS = ['', '/gioi-thieu', '/lien-he', '/tin-tuc', '/tuyen-dung']
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

@@ -6,7 +6,7 @@ import {
     MoreVerticalIcon, PencilIcon, Trash2Icon, FootprintsIcon,
     SaveIcon, Loader2Icon, SettingsIcon, PhoneIcon, MailIcon,
     MapPinIcon, HashIcon, TypeIcon, ListIcon, NavigationIcon,
-    UploadIcon, ImageIcon, CheckIcon,
+    UploadIcon, ImageIcon, CheckIcon, Share2Icon, LinkIcon,
 } from 'lucide-react'
 import {
     DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -27,6 +27,7 @@ interface FooterForm {
     servicesHeading: MultiLang; service1: MultiLang; service2: MultiLang; service3: MultiLang; service4: MultiLang
     locationHeading: MultiLang; locationCity: MultiLang
     phone: string; hotline: string; email: string; zalo: string
+    facebookUrl: string; youtubeUrl: string; tiktokUrl: string
 }
 function emptyFooter(): FooterForm {
     return {
@@ -37,6 +38,7 @@ function emptyFooter(): FooterForm {
         service3: emptyMultiLang(), service4: emptyMultiLang(),
         locationHeading: emptyMultiLang(), locationCity: emptyMultiLang(),
         phone: '', hotline: '', email: '', zalo: '',
+        facebookUrl: '', youtubeUrl: '', tiktokUrl: '',
     }
 }
 
@@ -383,6 +385,29 @@ export default function SettingsPage() {
                                     </p>
                                 </div>
                             )}
+
+                            {footerTab === 'social' && (
+                                <div className="s-form-grid">
+                                    {([
+                                        { key: 'facebookUrl', label: 'Facebook URL', placeholder: 'https://www.facebook.com/wonmediavn' },
+                                        { key: 'youtubeUrl',  label: 'YouTube URL',  placeholder: 'https://www.youtube.com/@wonmedia' },
+                                        { key: 'tiktokUrl',   label: 'TikTok URL',   placeholder: 'https://www.tiktok.com/@wonmedia' },
+                                    ] as const).map(({ key, label, placeholder }) => (
+                                        <FormField key={key} label={label} icon={<LinkIcon size={12} style={{ color: 'var(--color-indigo)', opacity: 0.7 }} />}>
+                                            <input
+                                                className="dh-input"
+                                                type="url"
+                                                value={footerForm[key]}
+                                                onChange={e => setFooterForm(f => ({ ...f, [key]: e.target.value }))}
+                                                placeholder={placeholder}
+                                            />
+                                        </FormField>
+                                    ))}
+                                    <p style={{ gridColumn: '1 / -1', fontSize: 12, color: 'var(--color-gray-text)', background: 'var(--color-gray-light)', borderRadius: 8, padding: '10px 14px', margin: 0 }}>
+                                        Để trống để ẩn icon mạng xã hội tương ứng. URL phải bắt đầu bằng https://.
+                                    </p>
+                                </div>
+                            )}
                         </SettingsCard>
                     )}
 
@@ -466,11 +491,12 @@ export default function SettingsPage() {
 }
 
 const FOOTER_TABS = [
-    { id: 'brand',    label: 'Thương hiệu', icon: TypeIcon },
-    { id: 'nav',      label: 'Điều hướng',  icon: NavigationIcon },
-    { id: 'services', label: 'Dịch vụ',     icon: ListIcon },
-    { id: 'location', label: 'Địa điểm',    icon: MapPinIcon },
-    { id: 'contact',  label: 'Liên hệ',     icon: PhoneIcon },
+    { id: 'brand',    label: 'Thương hiệu',  icon: TypeIcon },
+    { id: 'nav',      label: 'Điều hướng',   icon: NavigationIcon },
+    { id: 'services', label: 'Dịch vụ',      icon: ListIcon },
+    { id: 'location', label: 'Địa điểm',     icon: MapPinIcon },
+    { id: 'contact',  label: 'Liên hệ',      icon: PhoneIcon },
+    { id: 'social',   label: 'Mạng xã hội',  icon: Share2Icon },
 ]
 
 function SideItem({ icon: Icon, label, active, onClick, warning }: {

@@ -46,6 +46,9 @@ async function seed() {
     emailLabel:      { vi: 'Email:', en: 'Email:', ko: '이메일:', ja: 'メール:', zh: '邮箱:' },
     legalRepLabel:   { vi: 'Người đại diện:', en: 'Legal Representative:', ko: '법인 대표:', ja: '法人代表:', zh: '法人代表:' },
     copyright:       { vi: '© 2023 – 2026 WON MEDIA. Bản quyền thuộc về WON Media.', en: '© 2023 – 2026 WON MEDIA. All rights reserved.', ko: '© 2023 – 2026 WON MEDIA. 모든 권리 보유.', ja: '© 2023 – 2026 WON MEDIA. 全著作権所有。', zh: '© 2023 – 2026 WON MEDIA. 版权所有。' },
+    facebookUrl: 'https://www.facebook.com/wonmediavn',
+    youtubeUrl:  'https://www.youtube.com/@wonmedia',
+    tiktokUrl:   'https://www.tiktok.com/@wonmedia',
   })
 
   console.log('✅ Đã tạo FooterConfig!')

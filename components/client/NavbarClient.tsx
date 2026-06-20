@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LanguageSwitcher } from '@/app/(client)/[lang]/language-switcher'
-import type { Locale } from '@/proxy'
+import type { Locale } from '@/lib/locales'
 
 interface NavItem {
   href: string

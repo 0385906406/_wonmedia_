@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { locales, type Locale } from '@/proxy'
+import { locales, type Locale } from '@/lib/locales'
 import { useState, useRef, useEffect } from 'react'
 
 const LANG_LABELS: Record<Locale, { label: string; short: string; flagUrl: string }> = {

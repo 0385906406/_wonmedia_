@@ -9,8 +9,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import {
-  SaveIcon, ArrowLeftIcon, UploadIcon, Loader2Icon, SparklesIcon,
-  ImageIcon, GlobeIcon, FileTextIcon, SearchIcon, EyeIcon, ExternalLinkIcon,
+  SaveIcon, ArrowLeftIcon, UploadIcon, Loader2Icon,
+  ImageIcon, FileTextIcon, SearchIcon, EyeIcon, ExternalLinkIcon,
 } from 'lucide-react'
 import { FocalPointPicker } from '@/components/admin/FocalPointPicker'
 import { useToast } from '@/components/admin/toast-provider'
@@ -292,7 +292,6 @@ function PostEditorInner() {
   const [preview,    setPreview]    = useState(false)
   const [loading,    setLoading]    = useState(!isNew)
   const [saving,     setSaving]     = useState(false)
-  const [translating, setTrans]     = useState(false)
   const [slugLocked, setSlugLocked] = useState(!isNew)
   const toast = useToast()
   const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -351,28 +350,6 @@ function PostEditorInner() {
     setForm(f => ({ ...f, [key]: { ...f[key], [lang]: value } }))
   }
 
-  async function translate() {
-    if (!form.title.vi && !form.content.vi) { toast.error('Nhập nội dung tiếng Việt trước.'); return }
-    setTrans(true)
-    try {
-      const res = await fetch('/api/ai/translate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields: { title: form.title.vi, excerpt: form.excerpt.vi, content: form.content.vi }, targetLocales: ['en','ko','ja','zh'] }),
-      })
-      const data = await res.json()
-      if (!res.ok || data.error) { toast.error(data.error ?? 'Lỗi dịch AI'); return }
-      const t = data.translations as Record<string, { title: string; excerpt: string; content: string }>
-      setForm(f => ({
-        ...f,
-        title:   { ...f.title,   ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title])) },
-        excerpt: { ...f.excerpt, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
-        content: { ...f.content, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.content])) },
-      }))
-      toast.success('Đã dịch sang EN · KO · JA · ZH ✓')
-    } catch { toast.error('Không kết nối được AI.') }
-    finally { setTrans(false) }
-  }
-
   async function save() {
     if (!form.slug)     { toast.error('Slug không được để trống.'); return }
     if (!form.title.vi) { toast.error('Tiêu đề tiếng Việt không được để trống.'); return }
@@ -425,11 +402,6 @@ function PostEditorInner() {
             className="gap-2 border-[#E5E8ED] h-9 text-sm">
             <EyeIcon size={13} /> Xem trước
           </Button>
-          <Button variant="outline" onClick={translate} disabled={translating || saving}
-            className="gap-2 border-[#E5E8ED] text-[#6366F1] hover:bg-indigo-50 hover:border-indigo-300 h-9 text-sm">
-            {translating ? <Loader2Icon size={13} className="animate-spin" /> : <SparklesIcon size={13} />}
-            {translating ? 'Đang dịch...' : 'AI Dịch'}
-          </Button>
           {!isNew && (
             <a href={`/vi/${form.type === 'blog' ? 'tin-tuc' : 'tuyen-dung'}/${form.slug}`} target="_blank" rel="noreferrer">
               <Button variant="outline" type="button" className="gap-2 border-[#E5E8ED] h-9 text-sm">
@@ -437,7 +409,7 @@ function PostEditorInner() {
               </Button>
             </a>
           )}
-          <Button onClick={save} disabled={saving || translating}
+          <Button onClick={save} disabled={saving}
             style={{ background: 'var(--color-indigo,#6366F1)', color: '#fff', height: 36, fontSize: 13, fontWeight: 600, gap: 6, paddingLeft: 16, paddingRight: 16, border: 'none', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             {saving ? <Loader2Icon size={13} className="animate-spin" /> : <SaveIcon size={13} />}
             {saving ? 'Đang lưu...' : isNew ? 'Tạo bài viết' : 'Lưu thay đổi'}
@@ -469,13 +441,6 @@ function PostEditorInner() {
 
             {tab === 'content' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ display: 'flex', gap: 9, padding: '10px 14px', background: '#EEF0FE', borderRadius: 9, border: '1px solid #C7D2FE' }}>
-                  <GlobeIcon size={14} style={{ color: '#6366F1', flexShrink: 0, marginTop: 1 }} />
-                  <p style={{ margin: 0, fontSize: 12, color: '#4338CA', lineHeight: 1.6 }}>
-                    Nhập <strong>tiếng Việt</strong> trước → nhấn <strong>AI Dịch</strong> để dịch sang EN · KO · JA · ZH tự động.
-                  </p>
-                </div>
-
                 <LangTabs active={lang} onChange={setLang} form={form} />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
   ImageIcon, MapPinIcon, MailIcon, SaveIcon, Loader2Icon,
-  SparklesIcon, InboxIcon, Trash2Icon, EyeIcon, EyeOffIcon,
+  InboxIcon, Trash2Icon, EyeIcon, EyeOffIcon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
@@ -149,16 +149,6 @@ function LienHeAdminInner() {
     setSubs(s => s.filter(x => x._id !== id))
   }
 
-  async function aiTranslate(fields: Record<string, string>, onDone: (t: Record<string, Record<string, string>>) => void) {
-    const res = await fetch('/api/ai/translate', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: { title: fields.title, excerpt: fields.subtitle }, targetLocales: ['en', 'ko', 'ja', 'zh'] }),
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error)
-    onDone(data.translations)
-  }
-
   const saveBtn = (
     <button onClick={save} disabled={saving} className="dh-btn dh-btn-primary gap-2">
       {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu thay đổi
@@ -215,25 +205,7 @@ function LienHeAdminInner() {
                   <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Banner trang Liên hệ</h3>
                   <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Ảnh nền + tiêu đề hiển thị trên cùng</p>
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="dh-btn dh-btn-secondary dh-btn-sm gap-2"
-                    disabled={saving}
-                    onClick={async () => {
-                      try {
-                        await aiTranslate({ title: form.bannerTitle.vi, subtitle: form.bannerSubtitle.vi }, t => {
-                          setForm(f => ({
-                            ...f,
-                            bannerTitle:    { ...f.bannerTitle,    ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.title])) },
-                            bannerSubtitle: { ...f.bannerSubtitle, ...Object.fromEntries(Object.entries(t).map(([lc, v]) => [lc, v.excerpt])) },
-                          }))
-                          toast.success('Đã dịch Banner!')
-                        })
-                      } catch (e) { toast.error(String(e)) }
-                    }}>
-                    <SparklesIcon size={13} />AI Dịch
-                  </button>
-                  {saveBtn}
-                </div>
+                {saveBtn}
               </div>
               <LangTabs active={lang} onChange={setLang} />
               <MLField label="Dòng phụ (subtitle)" value={form.bannerSubtitle} onChange={v => setForm(f => ({ ...f, bannerSubtitle: v }))} lang={lang} />

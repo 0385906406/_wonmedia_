@@ -3,10 +3,10 @@ import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
+import { locales, defaultLocale, type Locale } from '@/lib/locales'
 
-export const locales = ['vi', 'en', 'ko', 'ja', 'zh'] as const
-export type Locale = (typeof locales)[number]
-export const defaultLocale: Locale = 'vi'
+export type { Locale } from '@/lib/locales'
+export { locales, defaultLocale }
 
 if (!process.env.JWT_SECRET) {
   console.error('[proxy] FATAL: JWT_SECRET environment variable is not set. Admin routes will reject all requests.')

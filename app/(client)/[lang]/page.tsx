@@ -19,9 +19,6 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
 const SEO_HOME: Record<LocaleKey, { title: string; desc: string }> = {
   vi: { title: 'WON Media – Truyền thông & Giải trí chuyên nghiệp', desc: 'WON Media cung cấp dịch vụ truyền thông, quảng cáo và giải trí chuyên nghiệp tại Việt Nam.' },
   en: { title: 'WON Media – Professional Media & Entertainment',    desc: 'WON Media provides professional media, advertising and entertainment services in Vietnam.' },
-  ko: { title: 'WON Media – 전문 미디어 & 엔터테인먼트',              desc: 'WON Media는 베트남의 전문 미디어, 광고 및 엔터테인먼트 서비스를 제공합니다.' },
-  ja: { title: 'WON Media – プロのメディア & エンターテインメント',    desc: 'WON Mediaはベトナムのプロのメディア、広告、エンターテインメントサービスを提供します。' },
-  zh: { title: 'WON Media – 专业媒体与娱乐',                          desc: 'WON Media在越南提供专业的媒体、广告和娱乐服务。' },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -35,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     description: desc,
     alternates: {
       canonical: url,
-      languages: { vi: `${SITE}/vi`, en: `${SITE}/en`, ko: `${SITE}/ko`, ja: `${SITE}/ja`, zh: `${SITE}/zh` },
+      languages: { vi: `${SITE}/vi`, en: `${SITE}/en` },
     },
     openGraph: { title, description: desc, url, type: 'website', siteName: 'WON Media', locale: lk },
     twitter: { card: 'summary_large_image', title, description: desc },
@@ -57,25 +54,16 @@ const DEFAULT_HERO = {
 const CTA_LABELS: Record<string, { primary: string; secondary: string }> = {
   vi: { primary: 'Khám phá dịch vụ', secondary: 'Liên hệ ngay' },
   en: { primary: 'Explore Services',  secondary: 'Contact Us' },
-  ko: { primary: '서비스 탐색',          secondary: '문의하기' },
-  ja: { primary: 'サービスを見る',       secondary: 'お問い合わせ' },
-  zh: { primary: '探索服务',            secondary: '立即联系' },
 }
 
 const POSTS_LABELS: Record<string, { subheading: string; readMore: string }> = {
   vi: { subheading: 'Tin tức & Tuyển dụng', readMore: 'Xem thêm' },
   en: { subheading: 'News & Careers',        readMore: 'Read more' },
-  ko: { subheading: '뉴스 & 채용',             readMore: '더 보기' },
-  ja: { subheading: 'ニュース & 採用',          readMore: '続きを読む' },
-  zh: { subheading: '新闻 & 招聘',             readMore: '阅读更多' },
 }
 
 const SECTION_LABELS: Record<string, { achievements: string; partners: string }> = {
-  vi: { achievements: 'Những con số ấn tượng',       partners: 'Đối tác của chúng tôi' },
-  en: { achievements: 'Our Impressive Numbers',       partners: 'Our Partners' },
-  ko: { achievements: '인상적인 수치들',                 partners: '우리의 파트너' },
-  ja: { achievements: '印象的な数字',                   partners: '私たちのパートナー' },
-  zh: { achievements: '令人印象深刻的数字',              partners: '我们的合作伙伴' },
+  vi: { achievements: 'Những con số ấn tượng', partners: 'Đối tác của chúng tôi' },
+  en: { achievements: 'Our Impressive Numbers', partners: 'Our Partners' },
 }
 
 async function fetchHomepageData(lang: LocaleKey) {

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import { hasLocale } from '../dictionaries'
 import { AboutClient, type AboutT } from '@/components/client/about/AboutClient'
 import type { LocaleKey } from '@/types/multilang'
@@ -11,9 +11,6 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://wonmedia.vn'
 const SEO_ABOUT: Record<LocaleKey, { title: string; desc: string }> = {
   vi: { title: 'Về chúng tôi – WON Media',     desc: 'Tìm hiểu về WON Media – đơn vị truyền thông sáng tạo, chuyên nghiệp hàng đầu tại Việt Nam.' },
   en: { title: 'About Us – WON Media',          desc: 'Learn about WON Media – a leading creative and professional media company in Vietnam.' },
-  ko: { title: '회사 소개 – WON Media',          desc: 'WON Media에 대해 알아보세요 – 베트남 최고의 창의적이고 전문적인 미디어 회사.' },
-  ja: { title: '会社概要 – WON Media',            desc: 'WON Mediaについて – ベトナム有数のクリエイティブでプロのメディア会社。' },
-  zh: { title: '关于我们 – WON Media',            desc: '了解WON Media – 越南领先的创意和专业媒体公司。' },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {

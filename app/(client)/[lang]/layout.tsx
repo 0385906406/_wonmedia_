@@ -14,9 +14,6 @@ export function generateStaticParams() {
   return [
     { lang: 'vi' },
     { lang: 'en' },
-    { lang: 'ko' },
-    { lang: 'ja' },
-    { lang: 'zh' },
   ]
 }
 

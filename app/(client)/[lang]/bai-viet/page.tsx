@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import { hasLocale } from '../dictionaries'
 import { BlogClient, type PostCard } from '@/components/client/blog/BlogClient'
 import type { LocaleKey } from '@/types/multilang'
@@ -10,9 +10,6 @@ const PER_PAGE = 13
 const HEADINGS: Record<LocaleKey, string> = {
   vi: 'TIN TỨC & TUYỂN DỤNG',
   en: 'NEWS & CAREERS',
-  ko: '뉴스 & 채용',
-  ja: 'ニュース & 採用',
-  zh: '新闻 & 招聘',
 }
 
 const LABELS: Record<LocaleKey, Record<string, string>> = {

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
   ImageIcon, InfoIcon, ClockIcon, HeartIcon, BriefcaseIcon,
-  SaveIcon, Loader2Icon, SparklesIcon,
+  SaveIcon, Loader2Icon, PlusIcon, Trash2Icon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
@@ -110,58 +110,21 @@ function SectionBox({ title, children }: { title: string; children: React.ReactN
   )
 }
 
-async function aiTranslate(fields: { title?: string; excerpt?: string; content?: string }) {
-  const res = await fetch('/api/ai/translate', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fields, targetLocales: ['en', 'ko', 'ja', 'zh'] }),
-  })
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.error ?? 'Lỗi AI')
-  return data.translations as Record<string, { title: string; excerpt: string; content: string }>
-}
-
-function applyAI(base: ML, translations: Record<string, { title?: string; excerpt?: string; content?: string }>, field: 'title' | 'excerpt' | 'content'): ML {
-  const result = { ...base }
-  for (const [lc, t] of Object.entries(translations)) {
-    if (t[field]) result[lc as LocaleKey] = t[field]!
-  }
-  return result
-}
-
 interface TabProps {
   form: AboutForm
   setForm: React.Dispatch<React.SetStateAction<AboutForm>>
   lang: LocaleKey; setLang: (l: LocaleKey) => void
   saving: boolean; onSave: () => void
-  onAI: (msg: string, type: 'success' | 'error') => void
 }
 
-function BannerTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabProps) {
-  const [tring, setTring] = useState(false)
-  async function translate() {
-    setTring(true)
-    try {
-      const t = await aiTranslate({ title: form.bannerTitle.vi, excerpt: form.bannerSubtitle.vi })
-      setForm(f => ({
-        ...f,
-        bannerTitle:    applyAI(f.bannerTitle,    t, 'title'),
-        bannerSubtitle: applyAI(f.bannerSubtitle,  t, 'excerpt'),
-      }))
-      onAI('Đã dịch Banner!', 'success')
-    } catch (e) { onAI(String(e), 'error') } finally { setTring(false) }
-  }
+function BannerTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ marginBottom: 4 }}>
         <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Banner trang giới thiệu</h3>
         <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Ảnh nền + tiêu đề hiển thị trên cùng trang</p>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <LangTabs active={lang} onChange={setLang} />
-        <button onClick={translate} disabled={tring} className="dh-btn dh-btn-secondary dh-btn-sm gap-2">
-          {tring ? <Loader2Icon size={13} className="animate-spin" /> : <SparklesIcon size={13} />}AI Dịch
-        </button>
-      </div>
+      <LangTabs active={lang} onChange={setLang} />
       <Field label="Dòng phụ (subtitle)" value={form.bannerSubtitle} onChange={v => setForm(f => ({ ...f, bannerSubtitle: v }))} lang={lang} />
       <Field label="Tiêu đề chính (title)" value={form.bannerTitle} onChange={v => setForm(f => ({ ...f, bannerTitle: v }))} lang={lang} />
       <div style={{ borderRadius: 10, overflow: 'hidden', position: 'relative', height: 160, background: 'linear-gradient(135deg, #1e293b, #0f172a)', display: 'flex', alignItems: 'flex-end', padding: 24, marginTop: 4 }}>
@@ -180,36 +143,14 @@ function BannerTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabPr
   )
 }
 
-function AboutTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabProps) {
-  const [tring, setTring] = useState(false)
-  async function translate() {
-    setTring(true)
-    try {
-      const t = await aiTranslate({
-        title: `${form.aboutTitleLine1.vi} ${form.aboutTitleHighlight.vi}`,
-        excerpt: `${form.aboutDesc1Prefix.vi} ${form.aboutDesc1Year.vi} ${form.aboutDesc1Suffix.vi}`,
-        content: form.aboutDesc2.vi,
-      })
-      setForm(f => ({
-        ...f,
-        aboutDesc2:       applyAI(f.aboutDesc2,       t, 'content'),
-        aboutDesc1Suffix: applyAI(f.aboutDesc1Suffix, t, 'excerpt'),
-      }))
-      onAI('Đã dịch phần Giới thiệu!', 'success')
-    } catch (e) { onAI(String(e), 'error') } finally { setTring(false) }
-  }
+function AboutTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
         <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Phần giới thiệu công ty</h3>
         <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Layout 2 cột: ảnh team + nội dung mô tả</p>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <LangTabs active={lang} onChange={setLang} />
-        <button onClick={translate} disabled={tring} className="dh-btn dh-btn-secondary dh-btn-sm gap-2">
-          {tring ? <Loader2Icon size={13} className="animate-spin" /> : <SparklesIcon size={13} />}AI Dịch
-        </button>
-      </div>
+      <LangTabs active={lang} onChange={setLang} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <Field label="Nhãn section" value={form.aboutLabel} onChange={v => setForm(f => ({ ...f, aboutLabel: v }))} lang={lang} />
         <Field label="Tiêu đề dòng 1" value={form.aboutTitleLine1} onChange={v => setForm(f => ({ ...f, aboutTitleLine1: v }))} lang={lang} />
@@ -237,27 +178,7 @@ function AboutTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabPro
   )
 }
 
-function TimelineTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabProps) {
-  const [tring, setTring] = useState<number | null>(null)
-
-  async function translateMilestone(idx: number) {
-    setTring(idx)
-    try {
-      const m = form.timelineMilestones[idx]
-      const t = await aiTranslate({ title: m.title.vi, excerpt: m.line1.vi, content: m.line2.vi })
-      setForm(f => {
-        const ms = [...f.timelineMilestones]
-        ms[idx] = {
-          title: applyAI(ms[idx].title, t, 'title'),
-          line1: applyAI(ms[idx].line1, t, 'excerpt'),
-          line2: applyAI(ms[idx].line2, t, 'content'),
-        }
-        return { ...f, timelineMilestones: ms }
-      })
-      onAI(`Đã dịch mốc ${idx + 1}!`, 'success')
-    } catch (e) { onAI(String(e), 'error') } finally { setTring(null) }
-  }
-
+function TimelineTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
   function updateMilestone(idx: number, field: 'title' | 'line1' | 'line2', v: ML) {
     setForm(f => {
       const ms = [...f.timelineMilestones]
@@ -277,12 +198,7 @@ function TimelineTab({ form, setForm, lang, setLang, saving, onSave, onAI }: Tab
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {form.timelineMilestones.map((m, i) => (
           <div key={i} style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', padding: 16, background: 'white', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Mốc {i + 1}</span>
-              <button onClick={() => translateMilestone(i)} disabled={tring === i} className="dh-btn dh-btn-secondary dh-btn-sm gap-2" style={{ height: 28, fontSize: 11 }}>
-                {tring === i ? <Loader2Icon size={11} className="animate-spin" /> : <SparklesIcon size={11} />}AI Dịch
-              </button>
-            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Mốc {i + 1}</span>
             <Field label="Tiêu đề mốc" value={m.title} onChange={v => updateMilestone(i, 'title', v)} lang={lang} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Field label="Nội dung dòng 1" value={m.line1} onChange={v => updateMilestone(i, 'line1', v)} lang={lang} />
@@ -300,23 +216,7 @@ function TimelineTab({ form, setForm, lang, setLang, saving, onSave, onAI }: Tab
   )
 }
 
-function WhyUsTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabProps) {
-  const [tring, setTring] = useState<number | null>(null)
-
-  async function translateReason(idx: number) {
-    setTring(idx)
-    try {
-      const r = form.whyUsReasons[idx]
-      const t = await aiTranslate({ title: r.title.vi, content: r.desc.vi })
-      setForm(f => {
-        const rs = [...f.whyUsReasons]
-        rs[idx] = { title: applyAI(rs[idx].title, t, 'title'), desc: applyAI(rs[idx].desc, t, 'content') }
-        return { ...f, whyUsReasons: rs }
-      })
-      onAI(`Đã dịch lý do ${idx + 1}!`, 'success')
-    } catch (e) { onAI(String(e), 'error') } finally { setTring(null) }
-  }
-
+function WhyUsTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
   function updateReason(idx: number, field: 'title' | 'desc', v: ML) {
     setForm(f => {
       const rs = [...f.whyUsReasons]
@@ -325,13 +225,24 @@ function WhyUsTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabPro
     })
   }
 
-  const LABELS = ['Đội ngũ chuyên nghiệp', 'Con người là yếu tố quyết định', 'Tập thể thống nhất', 'Không ngừng thay đổi']
+  function addReason() {
+    setForm(f => ({ ...f, whyUsReasons: [...f.whyUsReasons, { title: emptyMultiLang(), desc: emptyMultiLang() }] }))
+  }
+
+  function removeReason(idx: number) {
+    setForm(f => ({ ...f, whyUsReasons: f.whyUsReasons.filter((_, i) => i !== idx) }))
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div>
-        <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Tại sao chọn chúng tôi</h3>
-        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>4 lý do hiển thị dạng grid xen kẽ với hình ảnh</p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Tại sao chọn chúng tôi</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Hiển thị dạng grid — {form.whyUsReasons.length} lý do</p>
+        </div>
+        <button onClick={addReason} className="dh-btn dh-btn-secondary dh-btn-sm gap-2" style={{ flexShrink: 0 }}>
+          <PlusIcon size={13} />Thêm lý do
+        </button>
       </div>
       <LangTabs active={lang} onChange={setLang} />
       <Field label="Tiêu đề section" value={form.whyUsHeading} onChange={v => setForm(f => ({ ...f, whyUsHeading: v }))} lang={lang} />
@@ -339,17 +250,22 @@ function WhyUsTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabPro
         {form.whyUsReasons.map((r, i) => (
           <div key={i} style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', padding: 16, background: 'white', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>#{i + 1} · {LABELS[i]}</span>
-              <button onClick={() => translateReason(i)} disabled={tring === i} className="dh-btn dh-btn-secondary dh-btn-sm gap-2" style={{ height: 28, fontSize: 11 }}>
-                {tring === i ? <Loader2Icon size={11} className="animate-spin" /> : <SparklesIcon size={11} />}AI Dịch
-              </button>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Lý do #{i + 1}</span>
+              {form.whyUsReasons.length > 1 && (
+                <button onClick={() => removeReason(i)} className="dh-btn dh-btn-sm gap-1" style={{ height: 28, fontSize: 11, background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, padding: '0 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <Trash2Icon size={11} />
+                </button>
+              )}
             </div>
             <Field label="Tiêu đề" value={r.title} onChange={v => updateReason(i, 'title', v)} lang={lang} />
             <Field label="Mô tả" value={r.desc} onChange={v => updateReason(i, 'desc', v)} lang={lang} multi rows={4} />
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <button onClick={addReason} className="dh-btn dh-btn-secondary dh-btn-sm gap-2">
+          <PlusIcon size={13} />Thêm lý do
+        </button>
         <button onClick={onSave} disabled={saving} className="dh-btn dh-btn-primary gap-2">
           {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu &ldquo;Tại sao chọn&rdquo;
         </button>
@@ -358,23 +274,7 @@ function WhyUsTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabPro
   )
 }
 
-function ServicesTab({ form, setForm, lang, setLang, saving, onSave, onAI }: TabProps) {
-  const [tring, setTring] = useState<number | null>(null)
-
-  async function translateService(idx: number) {
-    setTring(idx)
-    try {
-      const s = form.servicesItems[idx]
-      const t = await aiTranslate({ title: s.title.vi, content: s.desc.vi })
-      setForm(f => {
-        const ss = [...f.servicesItems]
-        ss[idx] = { title: applyAI(ss[idx].title, t, 'title'), desc: applyAI(ss[idx].desc, t, 'content') }
-        return { ...f, servicesItems: ss }
-      })
-      onAI(`Đã dịch dịch vụ ${idx + 1}!`, 'success')
-    } catch (e) { onAI(String(e), 'error') } finally { setTring(null) }
-  }
-
+function ServicesTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
   function updateService(idx: number, field: 'title' | 'desc', v: ML) {
     setForm(f => {
       const ss = [...f.servicesItems]
@@ -394,12 +294,7 @@ function ServicesTab({ form, setForm, lang, setLang, saving, onSave, onAI }: Tab
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {form.servicesItems.map((s, i) => (
           <div key={i} style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', padding: 16, background: 'white', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dịch vụ {i + 1}</span>
-              <button onClick={() => translateService(i)} disabled={tring === i} className="dh-btn dh-btn-secondary dh-btn-sm gap-2" style={{ height: 28, fontSize: 11 }}>
-                {tring === i ? <Loader2Icon size={11} className="animate-spin" /> : <SparklesIcon size={11} />}AI Dịch
-              </button>
-            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dịch vụ {i + 1}</span>
             <Field label="Tên dịch vụ" value={s.title} onChange={v => updateService(i, 'title', v)} lang={lang} />
             <Field label="Mô tả" value={s.desc} onChange={v => updateService(i, 'desc', v)} lang={lang} multi rows={4} />
           </div>
@@ -444,9 +339,9 @@ function GioiThieuAdminInner() {
             timelineMilestones: r.data.timelineMilestones?.length === 6
               ? r.data.timelineMilestones
               : DEFAULT_MILESTONES.map((def: typeof DEFAULT_MILESTONES[0], i: number) => r.data.timelineMilestones?.[i] ?? def),
-            whyUsReasons: r.data.whyUsReasons?.length === 4
+            whyUsReasons: r.data.whyUsReasons?.length > 0
               ? r.data.whyUsReasons
-              : DEFAULT_WHY.map((def: typeof DEFAULT_WHY[0], i: number) => r.data.whyUsReasons?.[i] ?? def),
+              : DEFAULT_WHY.map((def: typeof DEFAULT_WHY[0]) => ({ ...def })),
             servicesItems: r.data.servicesItems?.length === 4
               ? r.data.servicesItems
               : DEFAULT_SERVICES.map((def: typeof DEFAULT_SERVICES[0], i: number) => r.data.servicesItems?.[i] ?? def),
@@ -468,7 +363,7 @@ function GioiThieuAdminInner() {
     } finally { setSaving(false) }
   }
 
-  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save, onAI: (m, t) => t === 'success' ? toast.success(m) : toast.error(m) }
+  const tabProps: TabProps = { form, setForm, lang, setLang, saving, onSave: save }
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 256, gap: 8, color: 'var(--color-gray-text)' }}>

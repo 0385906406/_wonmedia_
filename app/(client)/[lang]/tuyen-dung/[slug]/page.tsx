@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { hasLocale } from '../../dictionaries'
 import { sanitizeHtml } from '@/lib/sanitize-html'
@@ -9,7 +9,6 @@ import Post from '@/models/Post'
 
 const BACK_LABELS: Record<LocaleKey, string> = {
   vi: 'Quay lại Tuyển dụng', en: 'Back to Careers',
-  ko: '채용으로 돌아가기', ja: '採用情報に戻る', zh: '返回招聘',
 }
 
 export async function generateMetadata({
