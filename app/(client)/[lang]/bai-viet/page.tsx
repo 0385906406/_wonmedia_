@@ -15,9 +15,6 @@ const HEADINGS: Record<LocaleKey, string> = {
 const LABELS: Record<LocaleKey, Record<string, string>> = {
   vi: { all: 'Tất cả', blog: 'Tin tức', career: 'Tuyển dụng', articles: 'bài', empty: 'Chưa có bài viết.', prev: 'Trước', next: 'Tiếp', latest: 'Bài viết mới nhất' },
   en: { all: 'All',    blog: 'News',     career: 'Careers',    articles: 'posts', empty: 'No posts yet.',   prev: 'Prev',   next: 'Next', latest: 'Latest Posts' },
-  ko: { all: '전체',   blog: '뉴스',      career: '채용',        articles: '개',    empty: '게시물 없음.',     prev: '이전',   next: '다음', latest: '최신 게시물' },
-  ja: { all: 'すべて', blog: 'ニュース',   career: '採用',         articles: '件',    empty: '記事なし。',       prev: '前へ',   next: '次へ', latest: '最新記事' },
-  zh: { all: '全部',   blog: '新闻',      career: '招聘',         articles: '篇',    empty: '暂无文章。',       prev: '上一页', next: '下一页', latest: '最新文章' },
 }
 
 export default async function BaiVietPage({

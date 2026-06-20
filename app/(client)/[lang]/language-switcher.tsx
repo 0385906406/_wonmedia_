@@ -7,9 +7,6 @@ import { useState, useRef, useEffect } from 'react'
 const LANG_LABELS: Record<Locale, { label: string; short: string; flagUrl: string }> = {
   vi: { label: 'Tiếng Việt', short: 'VI', flagUrl: 'https://flagcdn.com/w20/vn.png' },
   en: { label: 'English',    short: 'EN', flagUrl: 'https://flagcdn.com/w20/us.png' },
-  ko: { label: '한국어',       short: 'KO', flagUrl: 'https://flagcdn.com/w20/kr.png' },
-  ja: { label: '日本語',       short: 'JA', flagUrl: 'https://flagcdn.com/w20/jp.png' },
-  zh: { label: '中文',        short: 'ZH', flagUrl: 'https://flagcdn.com/w20/cn.png' },
 }
 
 interface Props {

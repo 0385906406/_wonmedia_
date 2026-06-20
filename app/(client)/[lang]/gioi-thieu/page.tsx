@@ -43,8 +43,8 @@ function mlArr<T>(cfg: Cfg, key: string): T[] {
   return Array.isArray(v) && v.length > 0 ? (v as T[]) : []
 }
 
-type L = Record<LocaleKey, string>
-const t = (vi: string, en: string, ko: string, ja: string, zh: string): L => ({ vi, en, ko, ja, zh })
+type L = Record<string, string>
+const t = (vi: string, en: string, ko?: string, ja?: string, zh?: string): L => ({ vi, en, ...(ko ? { ko } : {}), ...(ja ? { ja } : {}), ...(zh ? { zh } : {}) })
 
 const FALLBACK_WHY = [
   {
