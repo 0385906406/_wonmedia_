@@ -74,12 +74,13 @@ export default function SettingsPage() {
         }).finally(() => setLoading(false))
     }, [])
 
-    async function saveSettings(group: 'general' | 'header') {
+    async function saveSettings(group: 'general' | 'header', overrides?: Record<string, string>) {
         setSettingsSaving(true)
         try {
+            const data = overrides ? { ...settingsData[group], ...overrides } : settingsData[group]
             const res = await fetch('/api/settings', {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ [group]: settingsData[group] }),
+                body: JSON.stringify({ [group]: data }),
             })
             if ((await res.json()).success) toast.success('Đã lưu!')
             else toast.error('Lưu thất bại')
@@ -266,6 +267,7 @@ export default function SettingsPage() {
                                         accept=".png,.svg,.jpg,.jpeg,.webp"
                                         uploadField="logoImageUrl"
                                         onChange={v => setSettingsData(d => ({ ...d, header: { ...d.header, logoImageUrl: v } }))}
+                                        onAutoSave={url => saveSettings('header', { logoImageUrl: url })}
                                     />
                                     <ImageUploadField
                                         label="Favicon"
@@ -274,6 +276,7 @@ export default function SettingsPage() {
                                         accept=".ico,.png,.svg"
                                         uploadField="faviconUrl"
                                         onChange={v => setSettingsData(d => ({ ...d, header: { ...d.header, faviconUrl: v } }))}
+                                        onAutoSave={url => saveSettings('header', { faviconUrl: url })}
                                     />
                                 </div>
                             </div>
@@ -571,9 +574,12 @@ function MLField({ label, fKey, multi = false, form, setForm, lang }: {
     )
 }
 
-function ImageUploadField({ label, hint, value, accept, uploadField, onChange }: {
-    label: string; hint: string; value: string; accept: string; uploadField: string; onChange: (v: string) => void
+function ImageUploadField({ label, hint, value, accept, uploadField, onChange, onAutoSave }: {
+    label: string; hint: string; value: string; accept: string; uploadField: string
+    onChange: (v: string) => void
+    onAutoSave?: (url: string) => Promise<void>
 }) {
+    const toast = useToast()
     const [uploading, setUploading] = useState(false)
     const [saved, setSaved]         = useState(false)
 
@@ -583,7 +589,16 @@ function ImageUploadField({ label, hint, value, accept, uploadField, onChange }:
         try {
             const res  = await fetch(`/api/settings/upload?field=${uploadField}`, { method: 'POST', body: form })
             const json = await res.json()
-            if (json.url) { onChange(json.url); setSaved(true); setTimeout(() => setSaved(false), 2000) }
+            if (json.url) {
+                onChange(json.url)
+                await onAutoSave?.(json.url)
+                setSaved(true)
+                setTimeout(() => setSaved(false), 2000)
+            } else {
+                toast.error(json.error || 'Tải lên thất bại')
+            }
+        } catch {
+            toast.error('Lỗi kết nối, thử lại')
         } finally { setUploading(false) }
     }
 
