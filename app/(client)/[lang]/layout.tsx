@@ -10,6 +10,8 @@ import { connectDB } from '@/lib/mongodb'
 import ContactConfig from '@/models/ContactConfig'
 import Setting from '@/models/Setting'
 
+export const dynamic = 'force-dynamic'
+
 export function generateStaticParams() {
   return [
     { lang: 'vi' },
