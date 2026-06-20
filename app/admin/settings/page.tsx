@@ -420,7 +420,7 @@ export default function SettingsPage() {
                         <SettingsCard
                             icon={<MailIcon size={15} style={{ color: 'var(--color-indigo)' }} />}
                             title="Email thông báo"
-                            desc="Cấu hình địa chỉ nhận email khi có liên hệ từ website"
+                            desc="Cấu hình EmailJS để nhận thông báo khi có liên hệ từ website"
                             action={
                                 <button onClick={() => saveSettings('integrations')} disabled={settingsSaving} className="dh-btn dh-btn-sm dh-btn-primary">
                                     {settingsSaving ? <Loader2Icon size={12} className="animate-spin" /> : <SaveIcon size={12} />}
@@ -429,23 +429,35 @@ export default function SettingsPage() {
                             }
                         >
                             <div className="s-form-grid">
-                                <FormField label="Email nhận liên hệ" hint="Mỗi khi có form liên hệ mới, thông báo sẽ gửi đến địa chỉ này">
+                                <FormField label="Email nhận thông báo" hint="Địa chỉ email sẽ nhận thông báo khi có liên hệ mới">
                                     <input className="dh-input" type="email"
-                                        value={settingsData.integrations.resendToEmail ?? ''}
-                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendToEmail: e.target.value } }))}
+                                        value={settingsData.integrations.emailjsToEmail ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, emailjsToEmail: e.target.value } }))}
                                         placeholder="contact@wonmedia.vn" />
                                 </FormField>
-                                <FormField label="Email gửi (From)" hint="Địa chỉ xuất hiện ở ô 'Từ' trong email — phải được xác minh trên Resend">
-                                    <input className="dh-input" type="email"
-                                        value={settingsData.integrations.resendFromEmail ?? ''}
-                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendFromEmail: e.target.value } }))}
-                                        placeholder="no-reply@wonmedia.vn" />
+                                <FormField label="Service ID" hint="Lấy tại emailjs.com → Email Services">
+                                    <input className="dh-input"
+                                        value={settingsData.integrations.emailjsServiceId ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, emailjsServiceId: e.target.value } }))}
+                                        placeholder="service_xxxxxxx" />
                                 </FormField>
-                                <FormField label="Resend API Key" hint="Lấy tại resend.com → API Keys. Để trống nếu dùng biến môi trường RESEND_API_KEY">
+                                <FormField label="Template ID" hint="Lấy tại emailjs.com → Email Templates">
+                                    <input className="dh-input"
+                                        value={settingsData.integrations.emailjsTemplateId ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, emailjsTemplateId: e.target.value } }))}
+                                        placeholder="template_xxxxxxx" />
+                                </FormField>
+                                <FormField label="Public Key" hint="Lấy tại emailjs.com → Account → API Keys">
+                                    <input className="dh-input"
+                                        value={settingsData.integrations.emailjsPublicKey ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, emailjsPublicKey: e.target.value } }))}
+                                        placeholder="xxxxxxxxxxxxxxxxxxxxxx" />
+                                </FormField>
+                                <FormField label="Private Key" hint="Lấy tại emailjs.com → Account → API Keys (dùng cho server-side)">
                                     <input className="dh-input" type="password"
-                                        value={settingsData.integrations.resendApiKey ?? ''}
-                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, resendApiKey: e.target.value } }))}
-                                        placeholder="re_xxxxxxxxxxxxxxxx" />
+                                        value={settingsData.integrations.emailjsPrivateKey ?? ''}
+                                        onChange={e => setSettingsData(d => ({ ...d, integrations: { ...d.integrations, emailjsPrivateKey: e.target.value } }))}
+                                        placeholder="xxxxxxxxxxxxxxxxxxxxxx" />
                                 </FormField>
                             </div>
                         </SettingsCard>

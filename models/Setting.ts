@@ -23,6 +23,11 @@ export interface ISettingIntegrations {
     resendApiKey: string
     resendFromEmail: string
     resendToEmail: string
+    emailjsServiceId: string
+    emailjsTemplateId: string
+    emailjsPublicKey: string
+    emailjsPrivateKey: string
+    emailjsToEmail: string
 }
 
 export interface ISetting extends Document {
@@ -54,9 +59,14 @@ const SettingSchema = new Schema<ISetting>(
             geminiModel:      { type: String, default: 'gemini-1.5-flash' },
             newsApiKey:       { type: String, default: '' },
             newsApiUrl:       { type: String, default: '' },
-            resendApiKey:     { type: String, default: '' },
-            resendFromEmail:  { type: String, default: '' },
-            resendToEmail:    { type: String, default: '' },
+            resendApiKey:       { type: String, default: '' },
+            resendFromEmail:    { type: String, default: '' },
+            resendToEmail:      { type: String, default: '' },
+            emailjsServiceId:   { type: String, default: '' },
+            emailjsTemplateId:  { type: String, default: '' },
+            emailjsPublicKey:   { type: String, default: '' },
+            emailjsPrivateKey:  { type: String, default: '' },
+            emailjsToEmail:     { type: String, default: '' },
         },
     },
     { timestamps: true }
