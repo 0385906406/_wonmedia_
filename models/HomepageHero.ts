@@ -6,6 +6,18 @@ export interface IHomepageHero extends Document {
   title: MultiLang
   title2: MultiLang
   subtitle: MultiLang
+  heroImageUrl: string
+  ctaPrimary: MultiLang
+  ctaSecondary: MultiLang
+  servicesHeading: MultiLang
+  achievementsHeading: MultiLang
+  achievementsSubheading: MultiLang
+  partnersHeading: MultiLang
+  partnersSubheading: MultiLang
+  postsHeading: MultiLang
+  postsSubheading: MultiLang
+  postsSeeMore: MultiLang
+  postsReadMore: MultiLang
   updatedAt: Date
 }
 
@@ -23,12 +35,26 @@ const HomepageHeroSchema = new Schema<IHomepageHero>(
     title:    { ...MLSchema },
     title2:   { ...MLSchema },
     subtitle: { ...MLSchema },
+    heroImageUrl: { type: String, default: '' },
+    ctaPrimary:   { ...MLSchema },
+    ctaSecondary: { ...MLSchema },
+    servicesHeading:        { ...MLSchema },
+    achievementsHeading:    { ...MLSchema },
+    achievementsSubheading: { ...MLSchema },
+    partnersHeading:        { ...MLSchema },
+    partnersSubheading:     { ...MLSchema },
+    postsHeading:           { ...MLSchema },
+    postsSubheading:        { ...MLSchema },
+    postsSeeMore:           { ...MLSchema },
+    postsReadMore:          { ...MLSchema },
   },
   { timestamps: true }
 )
 
+// Delete cached model so schema changes take effect on hot reload
+if (mongoose.models.HomepageHero) delete (mongoose.models as Record<string, unknown>).HomepageHero
+
 const HomepageHero: Model<IHomepageHero> =
-  mongoose.models.HomepageHero ||
   mongoose.model<IHomepageHero>('HomepageHero', HomepageHeroSchema)
 
 export default HomepageHero

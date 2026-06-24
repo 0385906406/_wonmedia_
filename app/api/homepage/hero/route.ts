@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { connectDB } from '@/lib/mongodb'
 import HomepageHero from '@/models/HomepageHero'
 import { getAuthUser, requireAdmin } from '@/lib/auth-api'
@@ -40,6 +41,7 @@ export async function PUT(req: NextRequest) {
       { $set: body },
       { upsert: true, new: true }
     ).lean()
+    revalidatePath('/', 'layout')
     return NextResponse.json({ success: true, data: hero })
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   LayoutDashboard, FileText, Home, LogOut,
-  Settings, Phone, Info, Users, MessageSquare, Tag,
+  Settings, Phone, Info, Users, Tag,
 } from 'lucide-react'
 
 type NavItem =
@@ -17,8 +17,7 @@ const NAV_ITEMS: NavItem[] = [
   { divider: true, label: 'NỘI DUNG' },
   { icon: <FileText size={16} />,       label: 'Bài viết',     href: '/admin/posts' },
   { icon: <Tag size={16} />,           label: 'Danh mục',     href: '/admin/categories' },
-  { icon: <MessageSquare size={16} />, label: 'Bình luận',    href: '/admin/comments' },
-  { divider: true, label: 'TRANG WEB' },
+{ divider: true, label: 'TRANG WEB' },
   { icon: <Home size={16} />,           label: 'Trang chủ',    href: '/admin/homepage' },
   { icon: <Info size={16} />,           label: 'Giới thiệu',   href: '/admin/gioi-thieu' },
   { icon: <Phone size={16} />,          label: 'Liên hệ',      href: '/admin/lien-he' },

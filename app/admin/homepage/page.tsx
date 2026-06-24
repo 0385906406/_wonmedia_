@@ -11,7 +11,15 @@ import {
 import { useToast } from '@/components/admin/toast-provider'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
 
-interface HeroData { _id?: string; title: MultiLang; title2: MultiLang; subtitle: MultiLang }
+interface HeroData {
+  _id?: string
+  title: MultiLang; title2: MultiLang; subtitle: MultiLang
+  heroImageUrl?: string
+  ctaPrimary?: MultiLang; ctaSecondary?: MultiLang
+  servicesHeading?: MultiLang; achievementsHeading?: MultiLang; achievementsSubheading?: MultiLang
+  partnersHeading?: MultiLang; partnersSubheading?: MultiLang
+  postsHeading?: MultiLang; postsSubheading?: MultiLang; postsSeeMore?: MultiLang; postsReadMore?: MultiLang
+}
 interface ServiceItem { _id: string; order: number; iconKey: string; title: MultiLang; desc: MultiLang; active: boolean }
 interface AchievementItem { _id: string; order: number; value: number; label: MultiLang; active: boolean }
 interface PartnerItem { _id: string; order: number; name: string; logo: string; active: boolean }
@@ -93,24 +101,53 @@ function ImageUpload({ value, onChange, label }: { value: string; onChange: (url
   )
 }
 
+function emptyHero(): HeroData {
+  return {
+    title: emptyMultiLang(), title2: emptyMultiLang(), subtitle: emptyMultiLang(),
+    heroImageUrl: '',
+    ctaPrimary: emptyMultiLang(), ctaSecondary: emptyMultiLang(),
+    servicesHeading: emptyMultiLang(), achievementsHeading: emptyMultiLang(), achievementsSubheading: emptyMultiLang(),
+    partnersHeading: emptyMultiLang(), partnersSubheading: emptyMultiLang(),
+    postsHeading: emptyMultiLang(), postsSubheading: emptyMultiLang(), postsSeeMore: emptyMultiLang(), postsReadMore: emptyMultiLang(),
+  }
+}
+
 function HeroEditor() {
-  const [data, setData] = useState<HeroData>({ title: emptyMultiLang(), title2: emptyMultiLang(), subtitle: emptyMultiLang() })
+  const [data, setData] = useState<HeroData>(emptyHero)
   const [lang, setLang] = useState<LocaleKey>('vi')
+  const [heroTab, setHeroTab] = useState<'text' | 'image' | 'headings'>('text')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   const toast = useToast()
 
   useEffect(() => {
-    fetch('/api/homepage/hero').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => { if (r.data) setData(r.data) }).catch(() => {}).finally(() => setLoading(false))
+    fetch('/api/homepage/hero').then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r => {
+      if (r.data) setData(prev => ({ ...prev, ...r.data }))
+    }).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   async function save() {
     setSaving(true)
     try {
-      const res = await fetch('/api/homepage/hero', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: data.title, title2: data.title2, subtitle: data.subtitle }) })
+      const res = await fetch('/api/homepage/hero', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       if (res.ok) toast.success('Đã lưu banner!')
       else toast.error('Lỗi lưu banner')
     } finally { setSaving(false) }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData(); fd.append('file', file)
+      const res = await fetch('/api/homepage/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (json.url) { setData(d => ({ ...d, heroImageUrl: json.url })); toast.success('Đã tải ảnh lên!') }
+      else toast.error('Lỗi tải ảnh')
+    } finally { setUploading(false) }
   }
 
   if (loading) return (
@@ -119,30 +156,108 @@ function HeroEditor() {
     </div>
   )
 
+  const HERO_TABS = [
+    { id: 'text' as const, label: 'Văn bản' },
+    { id: 'image' as const, label: 'Ảnh nền & CTA' },
+    { id: 'headings' as const, label: 'Heading sections' },
+  ]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Header + Save */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Banner trang chủ</h3>
-          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Chỉnh sửa nội dung hiển thị trên banner chính</p>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Nội dung, ảnh nền và heading toàn trang chủ</p>
         </div>
         <button onClick={save} disabled={saving} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
           {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu thay đổi
         </button>
       </div>
-      <div style={{ borderRadius: 10, overflow: 'hidden', background: 'linear-gradient(135deg, #1a2030, #2f3441)', padding: 32, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <p style={{ color: 'white', fontWeight: 900, fontSize: 24, letterSpacing: '-0.03em' }}>{data.title[lang] || 'BRINGING MUSIC'}</p>
-        <p style={{ fontWeight: 900, fontSize: 24, letterSpacing: '-0.03em', background: 'linear-gradient(90deg,#ff6900,#ffaa44)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          {data.title2[lang] || 'TO THE WORLD'}
-        </p>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, maxWidth: 400, margin: '0 auto' }}>{data.subtitle[lang] || 'Subtitle...'}</p>
+
+      {/* Preview */}
+      <div style={{ borderRadius: 10, overflow: 'hidden', position: 'relative', height: 140 }}>
+        {data.heroImageUrl && (
+          <img src={data.heroImageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.55)' }} />
+        )}
+        <div style={{ position: 'absolute', inset: 0, background: data.heroImageUrl ? 'transparent' : 'linear-gradient(135deg,#1a2030,#2f3441)' }} />
+        <div style={{ position: 'relative', zIndex: 1, padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <p style={{ color: 'white', fontWeight: 900, fontSize: 22, letterSpacing: '-0.03em', margin: 0 }}>{data.title[lang] || 'BRINGING MUSIC'}</p>
+          <p style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-0.03em', background: 'linear-gradient(90deg,#ff6900,#ffaa44)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
+            {data.title2[lang] || 'TO THE WORLD'}
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, margin: 0, maxWidth: 380 }}>{data.subtitle[lang] || 'Subtitle...'}</p>
+          <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+            <span style={{ padding: '5px 14px', borderRadius: 8, background: '#00A98F', color: '#fff', fontSize: 11, fontWeight: 700 }}>{data.ctaPrimary?.[lang] || 'Khám phá dịch vụ'}</span>
+            <span style={{ padding: '5px 14px', borderRadius: 100, border: '1px solid rgba(255,255,255,0.4)', color: '#fff', fontSize: 11, fontWeight: 700 }}>{data.ctaSecondary?.[lang] || 'Liên hệ ngay'}</span>
+          </div>
+        </div>
       </div>
+
+      {/* Sub-tabs */}
+      <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--color-gray-light)', borderRadius: 8, width: 'fit-content' }}>
+        {HERO_TABS.map(t => (
+          <button key={t.id} onClick={() => setHeroTab(t.id)} style={{
+            padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+            background: heroTab === t.id ? 'white' : 'transparent',
+            color: heroTab === t.id ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+            boxShadow: heroTab === t.id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+          }}>{t.label}</button>
+        ))}
+      </div>
+
       <LangTabs activeLang={lang} onChange={setLang} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <MLField label="Tiêu đề dòng 1 (màu trắng)" value={data.title} onChange={(v) => setData(d => ({ ...d, title: v }))} lang={lang} />
-        <MLField label="Tiêu đề dòng 2 (màu cam)" value={data.title2} onChange={(v) => setData(d => ({ ...d, title2: v }))} lang={lang} />
-        <MLField label="Phụ đề" value={data.subtitle} onChange={(v) => setData(d => ({ ...d, subtitle: v }))} multiline lang={lang} />
-      </div>
+
+      {/* Text tab */}
+      {heroTab === 'text' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <MLField label="Tiêu đề dòng 1 (màu trắng)" value={data.title} onChange={v => setData(d => ({ ...d, title: v }))} lang={lang} />
+          <MLField label="Tiêu đề dòng 2 (màu cam)" value={data.title2} onChange={v => setData(d => ({ ...d, title2: v }))} lang={lang} />
+          <MLField label="Phụ đề" value={data.subtitle} onChange={v => setData(d => ({ ...d, subtitle: v }))} multiline lang={lang} />
+        </div>
+      )}
+
+      {/* Image & CTA tab */}
+      {heroTab === 'image' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <label className="dh-label">Ảnh nền Hero</label>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input value={data.heroImageUrl || ''} onChange={e => setData(d => ({ ...d, heroImageUrl: e.target.value }))}
+                placeholder="https://... hoặc /banners/banner.png" className="dh-input" style={{ flex: 1 }} />
+              <button type="button" className="dh-btn dh-btn-secondary dh-btn-sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+                {uploading ? <Loader2Icon size={14} className="animate-spin" /> : <UploadIcon size={14} />}
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--color-gray-text)' }}>Để trống → dùng ảnh mặc định <code>/banners/banner.png</code></p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <MLField label='Nút CTA chính (xanh lá)' value={data.ctaPrimary ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, ctaPrimary: v }))} lang={lang} />
+            <MLField label='Nút CTA phụ (viền trắng)' value={data.ctaSecondary ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, ctaSecondary: v }))} lang={lang} />
+          </div>
+        </div>
+      )}
+
+      {/* Headings tab */}
+      {heroTab === 'headings' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', padding: '8px 12px', background: 'var(--color-gray-light)', borderRadius: 8 }}>
+            Để trống → dùng nhãn mặc định theo ngôn ngữ. Nhãn HEADING viết HOA, subheading thường.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <MLField label="Heading — Dịch vụ" value={data.servicesHeading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, servicesHeading: v }))} lang={lang} />
+            <MLField label="Heading — Thành tựu" value={data.achievementsHeading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, achievementsHeading: v }))} lang={lang} />
+            <MLField label="Subheading — Thành tựu" value={data.achievementsSubheading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, achievementsSubheading: v }))} lang={lang} />
+            <MLField label="Heading — Đối tác" value={data.partnersHeading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, partnersHeading: v }))} lang={lang} />
+            <MLField label="Subheading — Đối tác" value={data.partnersSubheading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, partnersSubheading: v }))} lang={lang} />
+            <MLField label="Heading — Bài viết" value={data.postsHeading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, postsHeading: v }))} lang={lang} />
+            <MLField label="Subheading — Bài viết" value={data.postsSubheading ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, postsSubheading: v }))} lang={lang} />
+            <MLField label='Nút "Xem thêm" (section posts)' value={data.postsSeeMore ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, postsSeeMore: v }))} lang={lang} />
+            <MLField label='Nút "Đọc thêm" (từng bài)' value={data.postsReadMore ?? emptyMultiLang()} onChange={v => setData(d => ({ ...d, postsReadMore: v }))} lang={lang} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

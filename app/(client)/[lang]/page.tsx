@@ -66,6 +66,11 @@ const SECTION_LABELS: Record<string, { achievements: string; partners: string }>
   en: { achievements: 'Our Impressive Numbers', partners: 'Our Partners' },
 }
 
+function mlVal(obj: Record<string, string> | undefined | null, lang: string): string {
+  if (!obj) return ''
+  return obj[lang] || obj.vi || ''
+}
+
 async function fetchHomepageData(lang: LocaleKey) {
   try {
     await connectDB()
@@ -155,11 +160,18 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
   const dict = await getDictionary(lang as Locale)
   const db = await fetchHomepageData(lang as LocaleKey)
 
-  const cta = CTA_LABELS[lang] ?? CTA_LABELS.en
-  const hero = db.hero as typeof DEFAULT_HERO
-  const heroTitle    = (hero.title    as Record<string, string>)[lang] || (hero.title    as Record<string, string>).vi
-  const heroTitle2   = (hero.title2   as Record<string, string>)[lang] || (hero.title2   as Record<string, string>).vi
-  const heroSubtitle = (hero.subtitle as Record<string, string>)[lang] || (hero.subtitle as Record<string, string>).vi
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hero = db.hero as any
+  const heroTitle    = mlVal(hero?.title,    lang) || (DEFAULT_HERO.title    as Record<string, string>)[lang]
+  const heroTitle2   = mlVal(hero?.title2,   lang) || (DEFAULT_HERO.title2   as Record<string, string>)[lang]
+  const heroSubtitle = mlVal(hero?.subtitle, lang) || (DEFAULT_HERO.subtitle as Record<string, string>)[lang]
+  const heroImageUrl = hero?.heroImageUrl || '/banners/banner.png'
+
+  const fallbackCta = CTA_LABELS[lang] ?? CTA_LABELS.en
+  const cta = {
+    primary:   mlVal(hero?.ctaPrimary,   lang) || fallbackCta.primary,
+    secondary: mlVal(hero?.ctaSecondary, lang) || fallbackCta.secondary,
+  }
 
   const services     = db.services     ?? (dict.services.items     as Array<{ title: string; desc: string }>)
   const achievements = db.achievements ?? (dict.achievements.items as Array<{ value: number; label: string }>)
@@ -168,19 +180,21 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = dict as any
-  const postsHeading        = d.posts?.heading          ?? 'BÀI VIẾT'
-  const postsSeeMore        = d.posts?.see_more         ?? 'Xem thêm'
-  const achievementsHeading = d.achievements?.heading   ?? 'THÀNH TỰU'
-  const servicesHeading     = d.services?.heading       ?? 'DỊCH VỤ'
-  const partnersHeading     = d.partners?.heading       ?? 'ĐỐI TÁC'
-  const postsL              = POSTS_LABELS[lang]         ?? POSTS_LABELS.vi
-  const sectionL            = SECTION_LABELS[lang]       ?? SECTION_LABELS.vi
+  const postsHeading        = mlVal(hero?.postsHeading,           lang) || d.posts?.heading          || 'BÀI VIẾT'
+  const postsSeeMore        = mlVal(hero?.postsSeeMore,           lang) || d.posts?.see_more         || 'Xem thêm'
+  const postsReadMore       = mlVal(hero?.postsReadMore,          lang) || POSTS_LABELS[lang]?.readMore || 'Xem thêm'
+  const postsSubheading     = mlVal(hero?.postsSubheading,        lang) || POSTS_LABELS[lang]?.subheading || ''
+  const achievementsHeading = mlVal(hero?.achievementsHeading,    lang) || d.achievements?.heading   || 'THÀNH TỰU'
+  const achievementsSub     = mlVal(hero?.achievementsSubheading, lang) || SECTION_LABELS[lang]?.achievements || ''
+  const servicesHeading     = mlVal(hero?.servicesHeading,        lang) || d.services?.heading       || 'DỊCH VỤ'
+  const partnersHeading     = mlVal(hero?.partnersHeading,        lang) || d.partners?.heading       || 'ĐỐI TÁC'
+  const partnersSub         = mlVal(hero?.partnersSubheading,     lang) || SECTION_LABELS[lang]?.partners   || ''
 
   return (
     <>
       <section style={{ position: 'relative', width: '100%', minHeight: '100vh', marginTop: 'calc(-1 * var(--topbar-height))', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', color: '#fff', userSelect: 'none' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img src="/banners/banner.png" alt="WON Media" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', filter: 'brightness(0.95) contrast(1.05) saturate(1.1)' }} />
+          <img src={heroImageUrl} alt="WON Media" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', filter: 'brightness(0.95) contrast(1.05) saturate(1.1)' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.10)' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 30%, rgba(25,27,36,0.40) 100%)' }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.5, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)', backgroundSize: '3px 3px' }} />
@@ -211,11 +225,11 @@ export default async function ClientHomePage({ params }: PageProps<'/[lang]'>) {
 
       <ServicesCarousel items={services} heading={servicesHeading} lang={lang} />
 
-      <AchievementsSection heading={achievementsHeading} subheading={sectionL.achievements} items={achievements} />
+      <AchievementsSection heading={achievementsHeading} subheading={achievementsSub} items={achievements} />
 
-      <PartnersSection heading={partnersHeading} subheading={sectionL.partners} items={partners} />
+      <PartnersSection heading={partnersHeading} subheading={partnersSub} items={partners} />
 
-      <PostsCarousel posts={posts} heading={postsHeading} subheading={postsL.subheading} seeMore={postsSeeMore} readMore={postsL.readMore} lang={lang} />
+      <PostsCarousel posts={posts} heading={postsHeading} subheading={postsSubheading} seeMore={postsSeeMore} readMore={postsReadMore} lang={lang} />
 
       <style>{`
         /* Hero — desktop */
