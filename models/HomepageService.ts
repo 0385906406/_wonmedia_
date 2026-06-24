@@ -7,6 +7,7 @@ export interface IHomepageService extends Document {
   title: MultiLang
   desc: MultiLang
   active: boolean
+  link: string
   createdAt: Date
   updatedAt: Date
 }
@@ -26,6 +27,7 @@ const HomepageServiceSchema = new Schema<IHomepageService>(
     title:   { ...MLSchema },
     desc:    { ...MLSchema },
     active:  { type: Boolean, default: true },
+    link:    { type: String, default: '' },
   },
   { timestamps: true }
 )

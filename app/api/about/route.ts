@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { connectDB } from '@/lib/mongodb'
 import AboutConfig from '@/models/AboutConfig'
 import { getAuthUser, requireAdmin } from '@/lib/auth-api'
@@ -24,8 +25,9 @@ export async function PUT(req: NextRequest) {
     const cfg = await AboutConfig.findOneAndUpdate(
       { key: 'global' },
       { $set: body },
-      { new: true, upsert: true }
+      { new: true, upsert: true, strict: false }
     )
+    revalidatePath('/[lang]/gioi-thieu', 'page')
     return NextResponse.json({ success: true, data: cfg })
   } catch (e) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

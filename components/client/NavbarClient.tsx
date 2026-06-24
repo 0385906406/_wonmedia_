@@ -101,7 +101,7 @@ export function NavbarClient({ lang, navItems, logoUrl, brandName }: Props) {
                   width: 120,
                   height: 'auto',
                   objectFit: 'contain',
-                  filter: transparent ? 'brightness(0) invert(1)' : 'none',
+                  filter: transparent ? 'drop-shadow(0 0 6px rgba(0,0,0,0.4)) brightness(1.05)' : 'none',
                   transition: 'filter 0.3s ease',
                 }}
               />

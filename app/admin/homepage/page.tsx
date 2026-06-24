@@ -6,7 +6,9 @@ import {
   LayoutIcon, BriefcaseIcon, TrophyIcon, UsersIcon, FileTextIcon,
   PlusIcon, PencilIcon, Trash2Icon, SaveIcon, UploadIcon, GlobeIcon,
   CheckCircle2Icon, Loader2Icon, ImageIcon,
-  ZapIcon, ListIcon, CheckSquareIcon, SquareIcon, ExternalLinkIcon,
+  ZapIcon, ListIcon, CheckSquareIcon, SquareIcon, ExternalLinkIcon, Link2Icon,
+  MusicIcon, StarIcon, HeartIcon, AwardIcon, MicIcon, TrendingUpIcon,
+  PlayCircleIcon, HeadphonesIcon, RadioIcon, BadgeCheckIcon, ThumbsUpIcon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
@@ -20,8 +22,8 @@ interface HeroData {
   partnersHeading?: MultiLang; partnersSubheading?: MultiLang
   postsHeading?: MultiLang; postsSubheading?: MultiLang; postsSeeMore?: MultiLang; postsReadMore?: MultiLang
 }
-interface ServiceItem { _id: string; order: number; iconKey: string; title: MultiLang; desc: MultiLang; active: boolean }
-interface AchievementItem { _id: string; order: number; value: number; label: MultiLang; active: boolean }
+interface ServiceItem { _id: string; order: number; iconKey: string; title: MultiLang; desc: MultiLang; link: string; active: boolean }
+interface AchievementItem { _id: string; order: number; value: number; iconKey: string; label: MultiLang; active: boolean; color?: string }
 interface PartnerItem { _id: string; order: number; name: string; logo: string; active: boolean }
 interface PostItem {
   _id: string; slug: string; type: 'blog' | 'tuyen-dung'; thumbnail: string; date: string
@@ -269,8 +271,20 @@ function ServicesEditor() {
   const [editItem, setEditItem] = useState<ServiceItem | null>(null)
   const [lang, setLang] = useState<LocaleKey>('vi')
   const [saving, setSaving] = useState(false)
+  const [linkMode, setLinkMode] = useState<'post' | 'external'>('external')
+  const [posts, setPosts] = useState<{ _id: string; slug: string; type: string; title: MultiLang }[]>([])
+  const [postsLoaded, setPostsLoaded] = useState(false)
+  const [postSearch, setPostSearch] = useState('')
 
   const ICON_KEYS = ['play', 'music', 'youtube', 'shield', 'star', 'globe']
+
+  async function loadPosts() {
+    if (postsLoaded) return
+    const res = await fetch('/api/posts')
+    const data = await res.json()
+    if (data.data) setPosts(data.data)
+    setPostsLoaded(true)
+  }
 
   useEffect(() => { fetchItems() }, [])
   function fetchItems() {
@@ -279,7 +293,8 @@ function ServicesEditor() {
   }
 
   function openNew() {
-    setEditItem({ _id: '', order: items.length, iconKey: 'play', title: emptyMultiLang(), desc: emptyMultiLang(), active: true })
+    setEditItem({ _id: '', order: items.length, iconKey: 'play', title: emptyMultiLang(), desc: emptyMultiLang(), link: '', active: true })
+    setLinkMode('external')
   }
 
   async function saveItem() {
@@ -330,7 +345,12 @@ function ServicesEditor() {
               </div>
               <span className={`dh-badge ${item.active ? 'dh-badge-green' : 'dh-badge-gray'}`}>{item.active ? 'Hiện' : 'Ẩn'}</span>
               <button onClick={() => toggleActive(item)} className={`dh-toggle ${item.active ? 'on' : 'off'}`}><span className="dh-toggle-knob" /></button>
-              <button className="dh-btn-icon" onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={14} /></button>
+              <button className="dh-btn-icon" onClick={() => {
+                setEditItem(item); setLang('vi')
+                const lk = item.link || ''
+                setLinkMode(lk && !lk.startsWith('http') ? 'post' : 'external')
+                if (lk && !lk.startsWith('http')) loadPosts()
+              }}><PencilIcon size={14} /></button>
               <button className="dh-btn-icon" onClick={() => deleteItem(item._id)} style={{ color: '#ef4444' }}><Trash2Icon size={14} /></button>
             </div>
           ))}
@@ -361,6 +381,83 @@ function ServicesEditor() {
               <LangTabs activeLang={lang} onChange={setLang} />
               <MLField label="Tên dịch vụ" value={editItem.title} onChange={(v) => setEditItem(i => i ? { ...i, title: v } : i)} lang={lang} />
               <MLField label="Mô tả" value={editItem.desc} onChange={(v) => setEditItem(i => i ? { ...i, desc: v } : i)} multiline lang={lang} />
+
+              {/* Link section */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <label className="dh-label">Link khi bấm vào (tùy chọn)</label>
+                <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--color-gray-light)', borderRadius: 8, width: 'fit-content' }}>
+                  {([['post', 'Bài viết'], ['external', 'Link ngoài']] as const).map(([mode, label]) => (
+                    <button key={mode} type="button"
+                      onClick={() => {
+                        setLinkMode(mode)
+                        setEditItem(i => i ? { ...i, link: '' } : i)
+                        if (mode === 'post') loadPosts()
+                      }}
+                      style={{
+                        padding: '5px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                        border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+                        background: linkMode === mode ? 'white' : 'transparent',
+                        color: linkMode === mode ? 'var(--color-navy-deep)' : 'var(--color-gray-text)',
+                        boxShadow: linkMode === mode ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                      }}>{label}</button>
+                  ))}
+                </div>
+
+                {linkMode === 'post' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <input value={postSearch} onChange={e => setPostSearch(e.target.value)}
+                      placeholder="Tìm kiếm bài viết..." className="dh-input" />
+                    <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid var(--color-gray-border)', borderRadius: 8, background: 'white' }}>
+                      {posts.filter(p => {
+                        const q = postSearch.toLowerCase()
+                        return !q || (p.title.vi || '').toLowerCase().includes(q) || p.slug.includes(q)
+                      }).map(p => {
+                        const linkVal = `bai-viet/${p.slug}`
+                        const selected = editItem.link === linkVal
+                        return (
+                          <div key={p._id} onClick={() => setEditItem(i => i ? { ...i, link: linkVal } : i)}
+                            style={{
+                              padding: '9px 14px', cursor: 'pointer', fontSize: 13,
+                              borderBottom: '1px solid var(--color-gray-border)',
+                              background: selected ? 'var(--color-navy-pale)' : 'white',
+                              color: selected ? 'var(--color-navy)' : 'var(--color-navy-deep)',
+                              display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.1s',
+                            }}>
+                            <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 600, letterSpacing: '0.05em', flexShrink: 0,
+                              background: p.type === 'blog' ? 'var(--color-indigo-pale)' : 'var(--color-yellow-light)',
+                              color: p.type === 'blog' ? 'var(--color-indigo-dark)' : 'var(--color-yellow-dark)',
+                            }}>{p.type === 'blog' ? 'Blog' : 'Tuyển dụng'}</span>
+                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title.vi || p.slug}</span>
+                            {selected && <CheckCircle2Icon size={14} style={{ color: 'var(--color-navy)', flexShrink: 0 }} />}
+                          </div>
+                        )
+                      })}
+                      {posts.length === 0 && <p style={{ padding: 16, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>{postsLoaded ? 'Không có bài viết nào' : 'Đang tải...'}</p>}
+                    </div>
+                    {editItem.link && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--color-teal-dark)' }}>
+                        <Link2Icon size={12} />
+                        <span style={{ fontFamily: 'monospace' }}>/{editItem.link}</span>
+                        <button type="button" onClick={() => setEditItem(i => i ? { ...i, link: '' } : i)}
+                          style={{ marginLeft: 'auto', fontSize: 11, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer' }}>✕ Xóa</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {linkMode === 'external' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <input value={editItem.link || ''} onChange={e => setEditItem(i => i ? { ...i, link: e.target.value } : i)}
+                        placeholder="https://..." className="dh-input" style={{ flex: 1 }} />
+                      {editItem.link && <button type="button" onClick={() => setEditItem(i => i ? { ...i, link: '' } : i)}
+                        style={{ fontSize: 12, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}>✕</button>}
+                    </div>
+                    <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>Link mở trong tab mới. Để trống nếu không cần link.</p>
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <button onClick={() => setEditItem(i => i ? { ...i, active: !i.active } : i)} className={`dh-toggle ${editItem.active ? 'on' : 'off'}`}><span className="dh-toggle-knob" /></button>
                 <label className="dh-label" style={{ marginBottom: 0 }}>Hiển thị</label>
@@ -378,6 +475,45 @@ function ServicesEditor() {
     </div>
   )
 }
+
+const ACHIEVEMENT_ICON_LIST = [
+  { key: '', label: '— Không có' },
+  { key: 'trophy',       label: 'Trophy (cúp)' },
+  { key: 'users',        label: 'Users (người dùng)' },
+  { key: 'music',        label: 'Music (âm nhạc)' },
+  { key: 'star',         label: 'Star (ngôi sao)' },
+  { key: 'globe',        label: 'Globe (toàn cầu)' },
+  { key: 'heart',        label: 'Heart (trái tim)' },
+  { key: 'zap',          label: 'Zap (tia sét)' },
+  { key: 'award',        label: 'Award (giải thưởng)' },
+  { key: 'mic',          label: 'Mic (micro)' },
+  { key: 'trending-up',  label: 'Trending Up (tăng trưởng)' },
+  { key: 'play-circle',  label: 'Play Circle (phát nhạc)' },
+  { key: 'headphones',   label: 'Headphones (tai nghe)' },
+  { key: 'radio',        label: 'Radio' },
+  { key: 'badge-check',  label: 'Badge Check (xác nhận)' },
+  { key: 'thumbs-up',    label: 'Thumbs Up (thích)' },
+]
+
+const ACHIEVEMENT_ICON_MAP: Record<string, React.ElementType> = {
+  trophy:        TrophyIcon,
+  users:         UsersIcon,
+  music:         MusicIcon,
+  star:          StarIcon,
+  globe:         GlobeIcon,
+  heart:         HeartIcon,
+  zap:           ZapIcon,
+  award:         AwardIcon,
+  mic:           MicIcon,
+  'trending-up': TrendingUpIcon,
+  'play-circle': PlayCircleIcon,
+  headphones:    HeadphonesIcon,
+  radio:         RadioIcon,
+  'badge-check': BadgeCheckIcon,
+  'thumbs-up':   ThumbsUpIcon,
+}
+
+const ACH_COLORS = ['#f97316', '#00A98F', '#6366f1', '#0f4c81']
 
 function AchievementsEditor() {
   const toast = useToast()
@@ -411,8 +547,6 @@ function AchievementsEditor() {
     if (res.ok) { toast.success('Đã xóa!'); fetchItems() }
   }
 
-  const BAR_COLORS = ['#f97316', '#00A98F', 'var(--color-indigo)', 'var(--color-navy)']
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -420,7 +554,7 @@ function AchievementsEditor() {
           <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Thành tựu</h3>
           <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Quản lý các chỉ số thành tựu</p>
         </div>
-        <button onClick={() => setEditItem({ _id: '', order: items.length, value: 0, label: emptyMultiLang(), active: true })} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
+        <button onClick={() => setEditItem({ _id: '', order: items.length, value: 0, iconKey: '', label: emptyMultiLang(), active: true, color: '' })} className="dh-btn dh-btn-primary dh-btn-sm gap-2">
           <PlusIcon size={14} />Thêm
         </button>
       </div>
@@ -431,24 +565,37 @@ function AchievementsEditor() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-          {items.map((item, i) => (
-            <div key={item._id} style={{ position: 'relative', border: '1px solid var(--color-gray-border)', borderRadius: 10, padding: 16, background: 'white', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}
-              className="group">
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: '10px 10px 0 0', background: BAR_COLORS[i % 4] }} />
-              <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'monospace', color: 'var(--color-navy-deep)' }}>{item.value}<span style={{ color: 'var(--color-navy)', fontSize: 16 }}>+</span></p>
-              <p style={{ fontSize: 10, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{item.label.vi}</p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 4, opacity: 0, transition: 'opacity 0.15s' }} className="group-hover-show">
-                <button className="dh-btn-icon" style={{ width: 24, height: 24 }} onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={12} /></button>
-                <button className="dh-btn-icon" style={{ width: 24, height: 24, color: '#ef4444' }} onClick={() => deleteItem(item._id)}><Trash2Icon size={12} /></button>
+          {items.map((item, i) => {
+            const accent = item.color || ACH_COLORS[i % 4]
+            const IconComp = item.iconKey ? ACHIEVEMENT_ICON_MAP[item.iconKey] : null
+            return (
+              <div key={item._id} style={{ position: 'relative', border: '1px solid var(--color-gray-border)', borderRadius: 10, padding: 16, background: 'white', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
+                className="group">
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: '10px 10px 0 0', background: accent }} />
+                {IconComp ? (
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `${accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>
+                    <IconComp size={18} style={{ color: accent }} />
+                  </div>
+                ) : (
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--color-gray-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>
+                    <TrophyIcon size={16} style={{ color: '#CBD5E1' }} />
+                  </div>
+                )}
+                <p style={{ fontSize: 24, fontWeight: 700, fontFamily: 'monospace', color: 'var(--color-navy-deep)', margin: 0 }}>{item.value}<span style={{ color: accent, fontSize: 14 }}>+</span></p>
+                <p style={{ fontSize: 10, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, margin: 0 }}>{item.label.vi}</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 4, opacity: 0, transition: 'opacity 0.15s' }} className="group-hover-show">
+                  <button className="dh-btn-icon" style={{ width: 24, height: 24 }} onClick={() => { setEditItem(item); setLang('vi') }}><PencilIcon size={12} /></button>
+                  <button className="dh-btn-icon" style={{ width: 24, height: 24, color: '#ef4444' }} onClick={() => deleteItem(item._id)}><Trash2Icon size={12} /></button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
       {editItem && (
         <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setEditItem(null) }}>
-          <div className="dh-modal" style={{ maxWidth: 480 }}>
+          <div className="dh-modal" style={{ maxWidth: 520 }}>
             <div className="dh-modal-header">
               <h3 className="dh-modal-title">{editItem._id ? 'Chỉnh sửa thành tựu' : 'Thêm thành tựu mới'}</h3>
             </div>
@@ -463,6 +610,61 @@ function AchievementsEditor() {
                   <input type="number" value={editItem.order} onChange={(e) => setEditItem(i => i ? { ...i, order: +e.target.value } : i)} className="dh-input" />
                 </div>
               </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label className="dh-label">Icon hiển thị</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {ACHIEVEMENT_ICON_LIST.map(({ key, label }) => {
+                    const IC = key ? ACHIEVEMENT_ICON_MAP[key] : null
+                    const selected = editItem.iconKey === key
+                    return (
+                      <button key={key} type="button" onClick={() => setEditItem(i => i ? { ...i, iconKey: key } : i)}
+                        title={label}
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                          gap: 4, padding: '10px 6px', borderRadius: 8, fontSize: 10, fontWeight: 500,
+                          border: `2px solid ${selected ? 'var(--color-navy)' : 'var(--color-gray-border)'}`,
+                          background: selected ? 'var(--color-navy-pale)' : 'white',
+                          color: selected ? 'var(--color-navy)' : 'var(--color-gray-text)',
+                          cursor: 'pointer', transition: 'all 0.12s',
+                        }}>
+                        {IC ? <IC size={18} /> : <span style={{ fontSize: 16, lineHeight: 1 }}>—</span>}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                          {key || 'Không'}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label className="dh-label">Màu hiển thị</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  {ACH_COLORS.concat(['#e11d48', '#0891b2', '#7c3aed', '#16a34a']).map(c => (
+                    <button key={c} type="button" onClick={() => setEditItem(i => i ? { ...i, color: c } : i)}
+                      style={{
+                        width: 28, height: 28, borderRadius: '50%', background: c, border: 'none',
+                        cursor: 'pointer', flexShrink: 0,
+                        outline: editItem.color === c ? `3px solid ${c}` : '2px solid transparent',
+                        outlineOffset: 2,
+                        transition: 'outline 0.15s, transform 0.15s',
+                        transform: editItem.color === c ? 'scale(1.2)' : 'scale(1)',
+                      }}
+                    />
+                  ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 4 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: editItem.color || '#E2E8F0', border: '1px solid #CBD5E1', flexShrink: 0 }} />
+                    <input
+                      type="text" placeholder="#HEX hoặc để trống = tự động"
+                      value={editItem.color || ''}
+                      onChange={e => setEditItem(i => i ? { ...i, color: e.target.value } : i)}
+                      className="dh-input" style={{ width: 180, fontSize: 12 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <LangTabs activeLang={lang} onChange={setLang} />
               <MLField label="Nhãn" value={editItem.label} onChange={(v) => setEditItem(i => i ? { ...i, label: v } : i)} lang={lang} />
             </div>

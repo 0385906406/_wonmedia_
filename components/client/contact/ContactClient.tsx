@@ -69,7 +69,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 
 function BannerSection({ t }: { t: ContactT }) {
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: 220, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff', marginTop: 'calc(-1 * var(--topbar-height))' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: 240, overflow: 'hidden', display: 'flex', alignItems: 'center', color: '#fff', marginTop: 'calc(-1 * var(--topbar-height))' }}>
       <motion.div
         initial={{ scale: 1.1 }} whileInView={{ scale: 1 }} viewport={VP}
         transition={{ duration: 1.5, ease: 'easeOut' }}
@@ -82,7 +82,7 @@ function BannerSection({ t }: { t: ContactT }) {
         <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.7, delay: 0.1 }}
           style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <span style={{ width: 40, height: 3, background: 'var(--color-teal)', borderRadius: 2, display: 'block' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#00A98F', fontFamily: 'var(--font-primary)' }}>{t.bannerSubtitle}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#00A98F', fontFamily: 'var(--font-primary)' }}>{t.bannerSubtitle}</span>
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }} whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} viewport={VP}
@@ -98,60 +98,67 @@ function BannerSection({ t }: { t: ContactT }) {
 
 function InfoSection({ t }: { t: ContactT }) {
   const cards = [
-    { icon: <IPhone />, color: 'var(--color-teal)', bg: 'var(--color-teal-pale)',   label: lb(t.lang, 'hotlineLabel'), value: t.hotline || t.phone, href: `tel:${(t.hotline || t.phone).replace(/\s/g, '')}` },
+    { icon: <IPhone />, color: 'var(--color-teal)',   bg: 'var(--color-teal-pale)',   label: lb(t.lang, 'hotlineLabel'), value: t.hotline || t.phone, href: `tel:${(t.hotline || t.phone).replace(/\s/g, '')}` },
     { icon: <IMail />,  color: 'var(--color-indigo)', bg: 'var(--color-indigo-pale)', label: lb(t.lang, 'emailLabel'),   value: t.email,              href: `mailto:${t.email}` },
-    { icon: <IPin />,   color: 'var(--color-navy)',  bg: 'var(--color-navy-pale)',   label: lb(t.lang, 'addressLabel'), value: t.address,            href: t.googleMapsUrl || undefined },
+    { icon: <IPin />,   color: 'var(--color-navy)',   bg: 'var(--color-navy-pale)',   label: lb(t.lang, 'addressLabel'), value: t.address,            href: t.googleMapsUrl || undefined },
   ]
 
   return (
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)', overflow: 'hidden' }}>
       <div className="container">
-        <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
-            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{lb(t.lang, 'headquarters')}</span>
-            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>WON Media</h2>
-          </div>
-        </motion.div>
+        <div className="won-info-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'stretch' }}>
 
-        <div className="won-info-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 40 }}>
-          {cards.map((c, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={VP}
-              transition={{ duration: 0.55, delay: i * 0.1 }}
-              whileHover={{ y: -5, transition: { duration: 0.22 } }}
-              onClick={() => c.href && window.open(c.href, '_blank')}
-              style={{ background: '#fff', borderRadius: 'var(--radius-lg)', border: '1.5px solid var(--color-gray-border)', padding: '28px 24px', boxShadow: 'var(--shadow-card)', cursor: c.href ? 'pointer' : 'default', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.color}, transparent)`, borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0' }} />
-              <div style={{ width: 48, height: 48, borderRadius: 'var(--radius-md)', background: c.bg, color: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                {c.icon}
-              </div>
-              <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--color-gray-text)', marginBottom: 8, fontFamily: 'var(--font-primary)' }}>{c.label}</p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-navy-deep)', lineHeight: 1.6, fontFamily: 'var(--font-primary)', margin: 0 }}>{c.value}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lift)', border: '1.5px solid var(--color-gray-border)', height: 380 }}>
-          {t.googleMapsEmbed && /^https:\/\/(www\.)?google\.com\/maps\//.test(t.googleMapsEmbed) ? (
-            <iframe src={t.googleMapsEmbed} style={{ width: '100%', height: '100%', border: 'none', display: 'block' }} allowFullScreen loading="lazy" title="WON Media Map" />
-          ) : (
-            <div style={{ width: '100%', height: '100%', background: 'var(--color-navy-pale)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-              <div style={{ color: 'var(--color-navy)', opacity: 0.35, transform: 'scale(2)' }}><IPin /></div>
-              {t.googleMapsUrl && (
-                <a href={t.googleMapsUrl} target="_blank" rel="noreferrer" className="qp-btn-secondary" style={{ marginTop: 8, fontSize: 12 }}>
-                  {lb(t.lang, 'openMap')} <span className="qp-arrow">→</span>
-                </a>
-              )}
+          {/* Left: heading + cards */}
+          <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeLeft}
+            style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div>
+              <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 16, letterSpacing: '1.5px' }}>{lb(t.lang, 'headquarters')}</span>
+              <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: '8px 0 0' }}>WON Media</h2>
             </div>
-          )}
-        </motion.div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {cards.map((c, i) => (
+                <motion.div key={i}
+                  initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  onClick={() => c.href && window.open(c.href, '_blank')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 16, background: '#fff', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--color-gray-border)', padding: '16px 20px', boxShadow: 'var(--shadow-card)', cursor: c.href ? 'pointer' : 'default', transition: 'box-shadow 0.2s, transform 0.2s' }}
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                >
+                  <div style={{ width: 42, height: 42, borderRadius: 'var(--radius-sm)', background: c.bg, color: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {c.icon}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--color-gray-text)', margin: '0 0 3px', fontFamily: 'var(--font-primary)' }}>{c.label}</p>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-navy-deep)', lineHeight: 1.5, fontFamily: 'var(--font-primary)', margin: 0 }}>{c.value}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right: map */}
+          <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeRight}
+            style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lift)', border: '1.5px solid var(--color-gray-border)', minHeight: 280 }}>
+            {t.googleMapsEmbed && /^https:\/\/(www\.)?google\.com\/maps\//.test(t.googleMapsEmbed) ? (
+              <iframe src={t.googleMapsEmbed} style={{ width: '100%', height: '100%', minHeight: 280, border: 'none', display: 'block' }} allowFullScreen loading="lazy" title="WON Media Map" />
+            ) : (
+              <div style={{ width: '100%', height: '100%', background: 'var(--color-navy-pale)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <div style={{ color: 'var(--color-navy)', opacity: 0.35, transform: 'scale(2)' }}><IPin /></div>
+                {t.googleMapsUrl && (
+                  <a href={t.googleMapsUrl} target="_blank" rel="noreferrer" className="qp-btn-secondary" style={{ marginTop: 8, fontSize: 12 }}>
+                    {lb(t.lang, 'openMap')} <span className="qp-arrow">→</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </motion.div>
+
+        </div>
       </div>
 
       <style>{`
-        @media (max-width: 640px) { .won-info-cards { grid-template-columns: 1fr !important; } }
-        @media (min-width: 641px) and (max-width: 900px) { .won-info-cards { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 768px) { .won-info-layout { grid-template-columns: 1fr !important; } }
       `}</style>
     </section>
   )
@@ -210,112 +217,125 @@ function FormSection({ t }: { t: ContactT }) {
   }
 
   const inp = (hasErr?: string): React.CSSProperties => ({
-    width: '100%', padding: '13px 16px 13px 44px',
-    background: 'var(--color-gray-light)',
-    border: `1.5px solid ${hasErr ? 'var(--color-error)' : 'var(--color-gray-border)'}`,
-    borderRadius: 'var(--radius-md)',
-    fontSize: 14, color: 'var(--color-navy-deep)', fontFamily: 'var(--font-primary)',
-    outline: 'none', transition: 'border-color 0.2s ease', boxSizing: 'border-box' as const,
+    width: '100%', padding: '12px 16px',
+    background: hasErr ? '#FEF2F2' : '#F8FAFC',
+    border: `1.5px solid ${hasErr ? '#fca5a5' : '#E2E8F0'}`,
+    borderRadius: 10, fontSize: 14,
+    color: 'var(--color-navy-deep)', fontFamily: 'var(--font-primary)',
+    outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
+    boxSizing: 'border-box' as const,
   })
-  const ic = (hasErr?: string) => ({ position: 'absolute' as const, left: 14, top: '50%', transform: 'translateY(-50%)', color: hasErr ? 'var(--color-error)' : 'var(--color-gray-border)', display: 'flex' as const })
 
   const disabled = submitting || countdown > 0
 
   return (
-    <section style={{ background: '#fff', paddingBlock: 'var(--space-20)' }}>
+    <section style={{ background: '#F8F9FB', paddingBlock: 'var(--space-20)' }}>
       <div className="container">
+
+        {/* Header */}
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
-          className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left', marginBottom: 48 }}>
-          <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
-            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{lb(lang, 'support')}</span>
-            <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.formTitle}</h2>
-          </div>
+          style={{ textAlign: 'center', marginBottom: 52 }}>
+          <span className="type-tag" style={{ fontSize: 14, letterSpacing: '2px', color: '#00A98F', fontWeight: 700, display: 'block', marginBottom: 12 }}>{lb(lang, 'support')}</span>
+          <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 900, letterSpacing: '-0.5px', color: '#062340', margin: '0 0 14px', fontFamily: 'var(--font-primary)' }}>{t.formTitle}</h2>
+          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7, margin: '0 auto', maxWidth: 520, fontFamily: 'var(--font-primary)' }}>{t.formSubtitle}</p>
+          <div style={{ width: 56, height: 4, background: 'linear-gradient(90deg, #00A98F, #6366f1)', borderRadius: 2, margin: '20px auto 0' }} />
         </motion.div>
 
-        <div className="won-form-wrap" style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-lift)', border: '1px solid var(--color-gray-border)' }}>
+        <div className="won-form-wrap" style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 0, borderRadius: 20, overflow: 'hidden', boxShadow: '0 12px 48px rgba(6,35,64,0.13)', border: '1px solid #E2E8F0' }}>
 
+          {/* Left panel */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeLeft}
-            style={{ background: 'var(--gradient-g3)', padding: '48px 36px', display: 'flex', flexDirection: 'column', gap: 32, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(0,169,143,0.14)', filter: 'blur(50px)' }} />
-            <div style={{ position: 'absolute', bottom: -40, left: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(99,102,241,0.1)', filter: 'blur(36px)' }} />
+            style={{ background: 'linear-gradient(160deg, #062340 0%, #0a3d6b 55%, #00534a 100%)', padding: '52px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+
+            {/* Decorative blobs */}
+            <div style={{ position: 'absolute', top: -80, right: -80, width: 260, height: 260, borderRadius: '50%', background: 'rgba(0,169,143,0.18)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(99,102,241,0.14)', filter: 'blur(48px)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.06, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 0)', backgroundSize: '24px 24px', pointerEvents: 'none' }} />
 
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', background: 'rgba(0,169,143,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-teal-light)', marginBottom: 20 }}>
+              {/* Icon */}
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(0,169,143,0.22)', border: '1px solid rgba(0,169,143,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34D4B8', marginBottom: 28 }}>
                 <IMsg />
               </div>
-              <h3 style={{ fontSize: 'clamp(18px, 2.2vw, 26px)', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', fontFamily: 'var(--font-primary)', lineHeight: 1.25, marginBottom: 14 }}>{t.formTitle}</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, fontFamily: 'var(--font-primary)', margin: 0 }}>{t.formSubtitle}</p>
+              <h3 style={{ fontSize: 'clamp(20px, 2vw, 28px)', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', fontFamily: 'var(--font-primary)', lineHeight: 1.2, margin: '0 0 16px' }}>{t.formTitle}</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', lineHeight: 1.85, fontFamily: 'var(--font-primary)', margin: 0 }}>{t.formSubtitle}</p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
-              {[{ icon: <IPhone />, text: t.hotline || t.phone }, { icon: <IMail />, text: t.email }].map((row, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-teal-light)', flexShrink: 0 }}>{row.icon}</div>
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-primary)', fontWeight: 500 }}>{row.text}</span>
-                </div>
+            {/* Contact rows */}
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: '40px 0' }}>
+              {[
+                { icon: <IPhone />, label: lb(lang, 'hotlineLabel'), value: t.hotline || t.phone, href: `tel:${(t.hotline || t.phone).replace(/\s/g, '')}` },
+                { icon: <IMail />,  label: lb(lang, 'emailLabel'),   value: t.email,              href: `mailto:${t.email}` },
+              ].map((row, i) => (
+                <a key={i} href={row.href}
+                  style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0', borderBottom: i === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none', textDecoration: 'none' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34D4B8', flexShrink: 0 }}>{row.icon}</div>
+                  <div>
+                    <p style={{ margin: '0 0 2px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: 'var(--font-primary)' }}>{row.label}</p>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#fff', fontFamily: 'var(--font-primary)' }}>{row.value}</p>
+                  </div>
+                </a>
               ))}
             </div>
 
-            <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Live badge */}
+            <div style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(0,169,143,0.15)', border: '1px solid rgba(0,169,143,0.3)', borderRadius: 100, padding: '8px 16px', alignSelf: 'flex-start' }}>
               <span className="qp-dot is-live" />
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-teal-light)', fontFamily: 'var(--font-primary)' }}>{lb(lang, 'support')}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#34D4B8', fontFamily: 'var(--font-primary)' }}>{lb(lang, 'support')}</span>
             </div>
           </motion.div>
 
+          {/* Right panel: form */}
           <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeRight}
-            className="won-form-body" style={{ background: '#fff', padding: '48px 40px' }}>
+            className="won-form-body" style={{ background: '#fff', padding: '52px 48px' }}>
 
             {flash && (
-              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-                style={{ marginBottom: 24, padding: '12px 16px', borderRadius: 'var(--radius-md)', fontSize: 14, fontWeight: 500, fontFamily: 'var(--font-primary)', background: flash.ok ? 'var(--color-teal-pale)' : '#FEF2F2', color: flash.ok ? 'var(--color-teal-dark)' : 'var(--color-error)', border: `1px solid ${flash.ok ? 'rgba(0,169,143,0.25)' : 'rgba(220,38,38,0.2)'}` }}>
-                {flash.ok ? '✅ ' : '❌ '}{flash.msg}
+              <motion.div initial={{ opacity: 0, y: -10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+                style={{ marginBottom: 28, padding: '14px 18px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: 'var(--font-primary)', display: 'flex', alignItems: 'center', gap: 10, background: flash.ok ? '#F0FDF9' : '#FEF2F2', color: flash.ok ? '#065f46' : '#991b1b', border: `1.5px solid ${flash.ok ? '#6ee7b7' : '#fca5a5'}` }}>
+                {flash.ok
+                  ? <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#10b981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>}
+                {flash.msg}
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div className="won-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <Field label={lb(lang, 'name')} error={errors.name}>
-                  <div style={{ position: 'relative' }}>
-                    <span style={ic(errors.name)}><IUser /></span>
-                    <input type="text" value={form.name} placeholder={lb(lang, 'namePh')} style={inp(errors.name)}
-                      onChange={e => { setForm(f => ({ ...f, name: e.target.value })); if (errors.name) setErrors(r => ({ ...r, name: '' })) }} />
-                  </div>
+                <Field label={`${lb(lang, 'name')} *`} error={errors.name}>
+                  <input type="text" value={form.name} placeholder={lb(lang, 'namePh')} className="won-inp"
+                    style={inp(errors.name)}
+                    onChange={e => { setForm(f => ({ ...f, name: e.target.value })); if (errors.name) setErrors(r => ({ ...r, name: '' })) }} />
                 </Field>
-                <Field label={lb(lang, 'email')} error={errors.email}>
-                  <div style={{ position: 'relative' }}>
-                    <span style={ic(errors.email)}><IMail /></span>
-                    <input type="email" value={form.email} placeholder="example@gmail.com" style={inp(errors.email)}
-                      onChange={e => { setForm(f => ({ ...f, email: e.target.value })); if (errors.email) setErrors(r => ({ ...r, email: '' })) }} />
-                  </div>
+                <Field label={`${lb(lang, 'email')} *`} error={errors.email}>
+                  <input type="email" value={form.email} placeholder="example@gmail.com" className="won-inp"
+                    style={inp(errors.email)}
+                    onChange={e => { setForm(f => ({ ...f, email: e.target.value })); if (errors.email) setErrors(r => ({ ...r, email: '' })) }} />
                 </Field>
               </div>
 
-              <Field label={lb(lang, 'subject')} error={errors.subject}>
-                <div style={{ position: 'relative' }}>
-                  <span style={ic(errors.subject)}><IEdit /></span>
-                  <input type="text" value={form.subject} placeholder={lb(lang, 'subjectPh')} style={inp(errors.subject)}
-                    onChange={e => { setForm(f => ({ ...f, subject: e.target.value })); if (errors.subject) setErrors(r => ({ ...r, subject: '' })) }} />
-                </div>
+              <Field label={`${lb(lang, 'subject')} *`} error={errors.subject}>
+                <input type="text" value={form.subject} placeholder={lb(lang, 'subjectPh')} className="won-inp"
+                  style={inp(errors.subject)}
+                  onChange={e => { setForm(f => ({ ...f, subject: e.target.value })); if (errors.subject) setErrors(r => ({ ...r, subject: '' })) }} />
               </Field>
 
-              <Field label={lb(lang, 'message')} error={errors.message}>
-                <textarea rows={4} value={form.message} placeholder={lb(lang, 'messagePh')}
-                  style={{ ...inp(errors.message), padding: '13px 16px', resize: 'none', height: 120 }}
+              <Field label={`${lb(lang, 'message')} *`} error={errors.message}>
+                <textarea rows={5} value={form.message} placeholder={lb(lang, 'messagePh')} className="won-inp"
+                  style={{ ...inp(errors.message), resize: 'vertical', minHeight: 130 }}
                   onChange={e => { setForm(f => ({ ...f, message: e.target.value })); if (errors.message) setErrors(r => ({ ...r, message: '' })) }} />
               </Field>
 
               <motion.button type="submit" disabled={disabled}
-                whileHover={!disabled ? { y: -2, boxShadow: 'var(--shadow-cta)' } : {}}
+                whileHover={!disabled ? { y: -2 } : {}}
                 style={{
-                  width: '100%', padding: '15px 24px',
-                  background: disabled ? 'var(--color-gray-border)' : 'var(--gradient-primary)',
-                  color: disabled ? 'var(--color-gray-text)' : '#fff',
-                  border: 'none', borderRadius: 'var(--radius-md)',
-                  fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-primary)', letterSpacing: '0.3px',
+                  width: '100%', padding: '15px 28px', marginTop: 4,
+                  background: disabled ? '#cbd5e1' : 'linear-gradient(135deg, #00A98F, #0a6be6)',
+                  color: disabled ? '#94a3b8' : '#fff', border: 'none', borderRadius: 12,
+                  fontSize: 15, fontWeight: 800, fontFamily: 'var(--font-primary)', letterSpacing: '0.2px',
                   cursor: disabled ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  transition: 'background 0.2s ease',
-                  boxShadow: disabled ? 'none' : 'var(--shadow-cta)',
+                  boxShadow: disabled ? 'none' : '0 8px 24px -4px rgba(0,169,143,0.4)',
+                  transition: 'box-shadow 0.2s, background 0.2s',
                 }}>
                 {submitting
                   ? <><ILoader />{lb(lang, 'sending')}</>
@@ -330,9 +350,10 @@ function FormSection({ t }: { t: ContactT }) {
 
       <style>{`
         @keyframes wm-contact-spin { to { transform: rotate(360deg); } }
+        .won-inp:focus { border-color: #00A98F !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(0,169,143,0.12) !important; }
         @media (max-width: 768px) {
           .won-form-wrap { grid-template-columns: 1fr !important; }
-          .won-form-body { padding: 32px 24px !important; }
+          .won-form-body { padding: 36px 24px !important; }
           .won-form-row  { grid-template-columns: 1fr !important; }
           .won-contact-banner { padding-block: 48px !important; }
         }
@@ -345,8 +366,8 @@ export function ContactClient({ t }: { t: ContactT }) {
   return (
     <>
       <BannerSection t={t} />
-      <InfoSection   t={t} />
       <FormSection   t={t} />
+      <InfoSection   t={t} />
     </>
   )
 }

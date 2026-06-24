@@ -56,7 +56,7 @@ export async function Footer({ lang }: { lang: LocaleKey }) {
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '48px 40px', paddingBottom: 56 }} className="footer-grid">
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <img src="/logo.png" alt="WON Media" style={{ width: 110, height: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.95 }} />
+            <img src="/logo.png" alt="WON Media" style={{ width: 160, height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.4)) brightness(1.05)', opacity: 0.95 }} />
 
             <p style={{ fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.55)', maxWidth: 280, margin: 0 }}>
               {f('brandDesc') || 'Đơn vị tiên phong trong phân phối âm nhạc số và quản lý bản quyền tại Việt Nam.'}

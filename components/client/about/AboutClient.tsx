@@ -22,7 +22,7 @@ export interface AboutT {
   }
   services: {
     heading: string
-    items: { title: string; desc: string }[]
+    items: { title: string; desc: string; link?: string }[]
   }
 }
 
@@ -100,7 +100,7 @@ function BannerSection({ t }: { t: AboutT['banner'] }) {
         <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={VP} transition={{ duration: 0.7, delay: 0.1 }}
           style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <span style={{ width: 40, height: 3, background: 'var(--color-teal)', borderRadius: 2, display: 'block' }} />
-          <span className="type-tag" style={{ color: '#00A98F', letterSpacing: '2px' }}>{t.subtitle}</span>
+          <span className="type-tag" style={{ color: '#00A98F', letterSpacing: '2px', fontSize: 13 }}>{t.subtitle}</span>
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }} whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} viewport={VP}
@@ -139,7 +139,7 @@ function AboutSection({ t, lang }: { t: AboutT['about']; lang: string }) {
             style={{ paddingBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
               <span style={{ height: 2, width: 32, background: 'var(--color-teal)', borderRadius: 2, display: 'block' }} />
-              <span className="type-tag" style={{ color: 'var(--color-teal-dark)', letterSpacing: '2px' }}>{t.label}</span>
+              <span className="type-tag" style={{ color: 'var(--color-teal-dark)', letterSpacing: '2px', fontSize: 16 }}>{t.label}</span>
             </div>
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, color: 'var(--color-navy-deep)', lineHeight: 1.15, letterSpacing: '-0.5px', marginBottom: 28, fontFamily: 'var(--font-primary)' }}>
               {t.titleLine1}<br />
@@ -175,7 +175,7 @@ function TimelineSection({ t, eyebrow }: { t: AboutT['timeline']; eyebrow: strin
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
-            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
+            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 16, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>
         </motion.div>
@@ -243,7 +243,7 @@ function WhyUsSection({ t, eyebrow }: { t: AboutT['whyUs']; eyebrow: string }) {
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
-            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
+            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 16, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>
         </motion.div>
@@ -273,7 +273,7 @@ function WhyUsSection({ t, eyebrow }: { t: AboutT['whyUs']; eyebrow: string }) {
   )
 }
 
-function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: string }) {
+function ServicesSection({ t, eyebrow, lang }: { t: AboutT['services']; eyebrow: string; lang: string }) {
   if (!t.items.length) return null
   return (
     <section style={{ background: 'var(--color-gray-light)', paddingBlock: 'var(--space-20)' }}>
@@ -281,7 +281,7 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
         <motion.div initial="hidden" whileInView="visible" viewport={VP} variants={fadeUp}
           className="qp-sechead" style={{ justifyContent: 'flex-start', textAlign: 'left' }}>
           <div className="qp-sechead__titles" style={{ alignItems: 'flex-start' }}>
-            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 15, letterSpacing: '1.5px' }}>{eyebrow}</span>
+            <span className="qp-sechead__eyebrow type-tag" style={{ fontSize: 16, letterSpacing: '1.5px' }}>{eyebrow}</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>{t.heading}</h2>
           </div>
         </motion.div>
@@ -289,12 +289,19 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginTop: 48 }}>
           {t.items.map((svc, i) => {
             const sc = SVC_COLORS[i % SVC_COLORS.length]
-            return (
-              <motion.div key={i}
+            const isExternal = svc.link?.startsWith('http')
+            const href = svc.link
+              ? isExternal
+                ? svc.link
+                : `/${lang}/${svc.link.replace(/^\//, '')}`
+              : undefined
+
+            const card = (
+              <motion.div
                 initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={VP}
                 transition={{ duration: 0.6, delay: i * 0.07 }}
                 whileHover={{ y: -8, transition: { duration: 0.25 } }}
-                style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 4px 20px rgba(6,35,64,0.07)', border: '1px solid var(--color-gray-border)', cursor: 'default' }}>
+                style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 4px 20px rgba(6,35,64,0.07)', border: '1px solid var(--color-gray-border)', cursor: href ? 'pointer' : 'default', height: '100%' }}>
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative', background: sc.bg }}>
                   <motion.img whileHover={{ scale: 1.06 }} transition={{ duration: 0.5 }}
                     src={SVC_IMAGES[i % SVC_IMAGES.length]} alt={svc.title}
@@ -306,9 +313,28 @@ function ServicesSection({ t, eyebrow }: { t: AboutT['services']; eyebrow: strin
                 <div style={{ padding: '22px 22px 26px', textAlign: 'center' }}>
                   <h3 style={{ fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.3px', color: 'var(--color-navy-deep)', marginBottom: 10, fontFamily: 'var(--font-primary)' }}>{svc.title}</h3>
                   <p style={{ fontSize: 13, color: 'var(--color-gray-text)', lineHeight: 1.75, fontFamily: 'var(--font-primary)', margin: '0 0 16px' }}>{svc.desc}</p>
-                  <div style={{ width: 32, height: 3, background: sc.line, borderRadius: 2, margin: '0 auto', transition: 'width 0.3s ease' }} className="won-svc-line" />
+                  {href ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, color: sc.icon, fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-primary)' }}>
+                      <div style={{ width: 32, height: 3, background: sc.line, borderRadius: 2, transition: 'width 0.3s ease' }} className="won-svc-line" />
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                      </svg>
+                    </div>
+                  ) : (
+                    <div style={{ width: 32, height: 3, background: sc.line, borderRadius: 2, margin: '0 auto', transition: 'width 0.3s ease' }} className="won-svc-line" />
+                  )}
                 </div>
               </motion.div>
+            )
+
+            return href ? (
+              <a key={i} href={href} target={isExternal ? '_blank' : '_self'}
+                rel={isExternal ? 'noopener noreferrer' : undefined}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                {card}
+              </a>
+            ) : (
+              <div key={i}>{card}</div>
             )
           })}
         </div>
@@ -342,7 +368,7 @@ export function AboutClient({ t, lang = 'vi' }: { t: AboutT; lang?: string }) {
       <AboutSection    t={t.about}    lang={lang} />
       <TimelineSection t={t.timeline} eyebrow={e.timeline} />
       <WhyUsSection    t={t.whyUs}    eyebrow={e.whyUs}    />
-      <ServicesSection t={t.services} eyebrow={e.services} />
+      <ServicesSection t={t.services} eyebrow={e.services} lang={lang} />
     </>
   )
 }

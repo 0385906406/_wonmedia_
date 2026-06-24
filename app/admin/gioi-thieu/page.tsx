@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
   ImageIcon, InfoIcon, ClockIcon, HeartIcon, BriefcaseIcon,
-  SaveIcon, Loader2Icon, PlusIcon, Trash2Icon,
+  SaveIcon, Loader2Icon, PlusIcon, Trash2Icon, Link2Icon, CheckCircle2Icon, PencilIcon,
 } from 'lucide-react'
 import { useToast } from '@/components/admin/toast-provider'
 import { ADMIN_LOCALES, LOCALE_META, type LocaleKey, type MultiLang, emptyMultiLang } from '@/types/multilang'
@@ -21,7 +21,7 @@ interface AboutForm {
   whyUsHeading: ML
   whyUsReasons: { title: ML; desc: ML }[]
   servicesHeading: ML
-  servicesItems: { title: ML; desc: ML }[]
+  servicesItems: { title: ML; desc: ML; link: string }[]
 }
 
 const DEFAULT_MILESTONES = [
@@ -41,10 +41,10 @@ const DEFAULT_WHY = [
 ]
 
 const DEFAULT_SERVICES = [
-  { title: emptyMultiLang(), desc: emptyMultiLang() },
-  { title: emptyMultiLang(), desc: emptyMultiLang() },
-  { title: emptyMultiLang(), desc: emptyMultiLang() },
-  { title: emptyMultiLang(), desc: emptyMultiLang() },
+  { title: emptyMultiLang(), desc: emptyMultiLang(), link: '' },
+  { title: emptyMultiLang(), desc: emptyMultiLang(), link: '' },
+  { title: emptyMultiLang(), desc: emptyMultiLang(), link: '' },
+  { title: emptyMultiLang(), desc: emptyMultiLang(), link: '' },
 ]
 
 function defaultForm(): AboutForm {
@@ -275,36 +275,161 @@ function WhyUsTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
 }
 
 function ServicesTab({ form, setForm, lang, setLang, saving, onSave }: TabProps) {
-  function updateService(idx: number, field: 'title' | 'desc', v: ML) {
+  type Draft = { title: ML; desc: ML; link: string }
+  const [editIdx, setEditIdx] = useState<number | null>(null)
+  const [draft, setDraft] = useState<Draft | null>(null)
+  const [isNew, setIsNew] = useState(false)
+  const [linkMode, setLinkMode] = useState<'post' | 'external'>('external')
+  const [posts, setPosts] = useState<{ _id: string; slug: string; type: string; title: MultiLang }[]>([])
+  const [postsLoaded, setPostsLoaded] = useState(false)
+  const [postSearch, setPostSearch] = useState('')
+
+  async function loadPosts() {
+    if (postsLoaded) return
+    const res = await fetch('/api/posts')
+    const data = await res.json()
+    if (data.data) setPosts(data.data)
+    setPostsLoaded(true)
+  }
+
+  function openEdit(idx: number) {
+    const s = form.servicesItems[idx]
+    setEditIdx(idx); setIsNew(false)
+    setDraft({ title: { ...s.title }, desc: { ...s.desc }, link: s.link || '' })
+    const lk = s.link || ''
+    setLinkMode(lk && !lk.startsWith('http') ? 'post' : 'external')
+    if (lk && !lk.startsWith('http')) loadPosts()
+  }
+
+  function openNew() {
+    setEditIdx(form.servicesItems.length); setIsNew(true)
+    setDraft({ title: emptyMultiLang(), desc: emptyMultiLang(), link: '' })
+    setLinkMode('external')
+    setPostSearch('')
+  }
+
+  function closeModal() { setEditIdx(null); setDraft(null) }
+
+  function applyDraft() {
+    if (!draft || editIdx === null) return
     setForm(f => {
       const ss = [...f.servicesItems]
-      ss[idx] = { ...ss[idx], [field]: v }
+      if (isNew) ss.push({ title: draft.title, desc: draft.desc, link: draft.link })
+      else ss[editIdx] = { title: draft.title, desc: draft.desc, link: draft.link }
       return { ...f, servicesItems: ss }
     })
+    closeModal()
+  }
+
+  function removeService(idx: number) {
+    if (!confirm('Xóa dịch vụ này?')) return
+    setForm(f => ({ ...f, servicesItems: f.servicesItems.filter((_, i) => i !== idx) }))
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div>
-        <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Dịch vụ của chúng tôi</h3>
-        <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>4 dịch vụ hiển thị dạng card 2 cột với hình ảnh</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h3 style={{ fontWeight: 600, color: 'var(--color-navy-deep)', fontSize: 14 }}>Dịch vụ của chúng tôi</h3>
+          <p style={{ fontSize: 12, color: 'var(--color-gray-text)', marginTop: 2 }}>Hiển thị dạng card có hình ảnh · {form.servicesItems.length} dịch vụ</p>
+        </div>
+        <button onClick={openNew} className="dh-btn dh-btn-primary dh-btn-sm gap-2"><PlusIcon size={14} />Thêm dịch vụ</button>
       </div>
+
       <LangTabs active={lang} onChange={setLang} />
       <Field label="Tiêu đề section" value={form.servicesHeading} onChange={v => setForm(f => ({ ...f, servicesHeading: v }))} lang={lang} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {form.servicesItems.map((s, i) => (
-          <div key={i} style={{ borderRadius: 10, border: '1px solid var(--color-gray-border)', padding: 16, background: 'white', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-gray-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Dịch vụ {i + 1}</span>
-            <Field label="Tên dịch vụ" value={s.title} onChange={v => updateService(i, 'title', v)} lang={lang} />
-            <Field label="Mô tả" value={s.desc} onChange={v => updateService(i, 'desc', v)} lang={lang} multi rows={4} />
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: '1px solid var(--color-gray-border)', borderRadius: 10, background: 'white' }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-navy-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'monospace', color: 'var(--color-navy)', fontWeight: 700 }}>{i + 1}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-navy-deep)', margin: 0 }}>{s.title.vi || '(Chưa có tiêu đề)'}</p>
+              <p style={{ fontSize: 11, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{s.title.en || s.desc.vi || ''}</p>
+            </div>
+            {s.link && <Link2Icon size={13} style={{ color: 'var(--color-teal-dark)', flexShrink: 0 }} />}
+            <button className="dh-btn-icon" onClick={() => openEdit(i)}><PencilIcon size={14} /></button>
+            <button className="dh-btn-icon" onClick={() => removeService(i)} style={{ color: '#ef4444' }}><Trash2Icon size={14} /></button>
           </div>
         ))}
+        {form.servicesItems.length === 0 && (
+          <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', padding: '32px 0' }}>Chưa có dịch vụ nào. Nhấn &ldquo;Thêm dịch vụ&rdquo; để bắt đầu.</p>
+        )}
       </div>
+
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button onClick={onSave} disabled={saving} className="dh-btn dh-btn-primary gap-2">
           {saving ? <Loader2Icon size={14} className="animate-spin" /> : <SaveIcon size={14} />}Lưu Dịch vụ
         </button>
       </div>
+
+      {draft && editIdx !== null && (
+        <div className="dh-modal-overlay" onClick={e => { if (e.target === e.currentTarget) closeModal() }}>
+          <div className="dh-modal" style={{ maxWidth: 600 }}>
+            <div className="dh-modal-header">
+              <h3 className="dh-modal-title">{isNew ? 'Thêm dịch vụ mới' : `Chỉnh sửa dịch vụ #${editIdx + 1}`}</h3>
+            </div>
+            <div className="dh-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto' }}>
+              <LangTabs active={lang} onChange={setLang} />
+              <Field label="Tên dịch vụ" value={draft.title} onChange={v => setDraft(d => d ? { ...d, title: v } : d)} lang={lang} />
+              <Field label="Mô tả" value={draft.desc} onChange={v => setDraft(d => d ? { ...d, desc: v } : d)} lang={lang} multi rows={4} />
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <label className="dh-label">Link khi bấm vào (tùy chọn)</label>
+                <div style={{ display: 'flex', gap: 4, padding: 4, background: 'var(--color-gray-light)', borderRadius: 8, width: 'fit-content' }}>
+                  {([['post', 'Bài viết'], ['external', 'Link ngoài']] as const).map(([mode, label]) => (
+                    <button key={mode} type="button"
+                      onClick={() => { setLinkMode(mode); setDraft(d => d ? { ...d, link: '' } : d); if (mode === 'post') loadPosts() }}
+                      style={{ padding: '5px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: linkMode === mode ? 'white' : 'transparent', color: linkMode === mode ? 'var(--color-navy-deep)' : 'var(--color-gray-text)', boxShadow: linkMode === mode ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>{label}
+                    </button>
+                  ))}
+                </div>
+
+                {linkMode === 'post' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <input value={postSearch} onChange={e => setPostSearch(e.target.value)} placeholder="Tìm kiếm bài viết..." className="dh-input" />
+                    <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid var(--color-gray-border)', borderRadius: 8, background: 'white' }}>
+                      {posts.filter(p => { const q = postSearch.toLowerCase(); return !q || (p.title.vi || '').toLowerCase().includes(q) || p.slug.includes(q) }).map(p => {
+                        const linkVal = `bai-viet/${p.slug}`
+                        const selected = draft.link === linkVal
+                        return (
+                          <div key={p._id} onClick={() => setDraft(d => d ? { ...d, link: linkVal } : d)}
+                            style={{ padding: '9px 14px', cursor: 'pointer', fontSize: 13, borderBottom: '1px solid var(--color-gray-border)', background: selected ? 'var(--color-navy-pale)' : 'white', display: 'flex', alignItems: 'center', gap: 8, transition: 'background 0.1s' }}>
+                            <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 600, flexShrink: 0, background: p.type === 'blog' ? 'var(--color-indigo-pale)' : 'var(--color-yellow-light)', color: p.type === 'blog' ? 'var(--color-indigo-dark)' : 'var(--color-yellow-dark)' }}>{p.type === 'blog' ? 'Blog' : 'Tuyển dụng'}</span>
+                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title.vi || p.slug}</span>
+                            {selected && <CheckCircle2Icon size={14} style={{ color: 'var(--color-navy)', flexShrink: 0 }} />}
+                          </div>
+                        )
+                      })}
+                      {posts.length === 0 && <p style={{ padding: 16, fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>{postsLoaded ? 'Không có bài viết nào' : 'Đang tải...'}</p>}
+                    </div>
+                    {draft.link && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--color-teal-dark)' }}>
+                        <Link2Icon size={12} /><span style={{ fontFamily: 'monospace' }}>/{draft.link}</span>
+                        <button type="button" onClick={() => setDraft(d => d ? { ...d, link: '' } : d)} style={{ marginLeft: 'auto', fontSize: 11, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer' }}>✕ Xóa</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {linkMode === 'external' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <input value={draft.link || ''} onChange={e => setDraft(d => d ? { ...d, link: e.target.value } : d)} placeholder="https://..." className="dh-input" style={{ flex: 1 }} />
+                      {draft.link && <button type="button" onClick={() => setDraft(d => d ? { ...d, link: '' } : d)} style={{ fontSize: 12, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px' }}>✕</button>}
+                    </div>
+                    <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>Link mở trong tab mới. Để trống nếu không cần link.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="dh-modal-footer">
+              <button onClick={closeModal} className="dh-btn dh-btn-secondary">Hủy</button>
+              <button onClick={applyDraft} className="dh-btn dh-btn-primary gap-2"><SaveIcon size={14} />Áp dụng</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -343,8 +468,8 @@ function GioiThieuAdminInner() {
               ? r.data.whyUsReasons
               : DEFAULT_WHY.map((def: typeof DEFAULT_WHY[0]) => ({ ...def })),
             servicesItems: r.data.servicesItems?.length === 4
-              ? r.data.servicesItems
-              : DEFAULT_SERVICES.map((def: typeof DEFAULT_SERVICES[0], i: number) => r.data.servicesItems?.[i] ?? def),
+              ? r.data.servicesItems.map((s: typeof DEFAULT_SERVICES[0]) => ({ ...DEFAULT_SERVICES[0], ...s }))
+              : DEFAULT_SERVICES.map((def: typeof DEFAULT_SERVICES[0], i: number) => ({ ...def, ...(r.data.servicesItems?.[i] ?? {}) })),
           }))
         }
       })

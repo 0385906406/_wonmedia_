@@ -99,9 +99,11 @@ async function fetchHomepageData(lang: LocaleKey) {
         title: (s.title as Record<string, string>)[lang] || (s.title as Record<string, string>).vi || '',
         desc: (s.desc as Record<string, string>)[lang] || (s.desc as Record<string, string>).vi || '',
         iconKey: s.iconKey,
+        link: s.link || '',
       })) : null,
       achievements: achievements.length ? achievements.map(a => ({
         value: a.value,
+        iconKey: a.iconKey || '',
         label: (a.label as Record<string, string>)[lang] || (a.label as Record<string, string>).vi || '',
       })) : null,
       partners: partners.length ? partners.map(p => ({ src: p.logo, alt: p.name })) : null,

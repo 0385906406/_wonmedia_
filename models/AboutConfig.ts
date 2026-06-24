@@ -27,11 +27,12 @@ export interface IAboutConfig extends Document {
   whyUsHeading: Record<string, string>
   whyUsReasons: { title: Record<string, string>; desc: Record<string, string> }[]
   servicesHeading: Record<string, string>
-  servicesItems: { title: Record<string, string>; desc: Record<string, string> }[]
+  servicesItems: { title: Record<string, string>; desc: Record<string, string>; link?: string }[]
 }
 
 const MLArr = { title: ML, line1: ML, line2: ML }
 const MLPair = { title: ML, desc: ML }
+const MLServiceItem = { title: ML, desc: ML, link: { type: String, default: '' } }
 
 const AboutConfigSchema = new Schema<IAboutConfig>({
   key:                 { type: String, default: 'global', unique: true },
@@ -44,7 +45,7 @@ const AboutConfigSchema = new Schema<IAboutConfig>({
   whyUsHeading:        ML,
   whyUsReasons:        [MLPair],
   servicesHeading:     ML,
-  servicesItems:       [MLPair],
+  servicesItems:       [MLServiceItem],
 }, { timestamps: true })
 
 const AboutConfig: Model<IAboutConfig> =

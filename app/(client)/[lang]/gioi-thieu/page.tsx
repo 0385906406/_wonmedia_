@@ -179,6 +179,7 @@ async function loadAbout(lang: LocaleKey): Promise<AboutT> {
 
     type MilestoneRaw = { title: Record<string,string>; line1: Record<string,string>; line2: Record<string,string> }
     type ReasonRaw    = { title: Record<string,string>; desc:  Record<string,string> }
+    type ServiceRaw   = { title: Record<string,string>; desc:  Record<string,string>; link?: string }
 
     const milestones = mlArr<MilestoneRaw>(c, 'timelineMilestones').map(m => ({
       title:   m.title?.[lang]   || m.title?.vi   || '',
@@ -193,9 +194,10 @@ async function loadAbout(lang: LocaleKey): Promise<AboutT> {
       desc:  r.desc?.[lang]  || r.desc?.vi  || '',
     }))
 
-    const services = mlArr<ReasonRaw>(c, 'servicesItems').map(s => ({
+    const services = mlArr<ServiceRaw>(c, 'servicesItems').map(s => ({
       title: s.title?.[lang] || s.title?.vi || '',
       desc:  s.desc?.[lang]  || s.desc?.vi  || '',
+      link:  s.link || '',
     }))
 
     return {

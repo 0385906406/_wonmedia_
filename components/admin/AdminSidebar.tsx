@@ -57,11 +57,10 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: Props) {
           <Image
             src="/logo.png"
             alt="WonMedia"
-            width={32}
-            height={32}
+            width={96}
+            height={96}
             style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
           />
-          <span className="dh-sidebar-brand-name" style={{ marginLeft: '10px' }}>WonMedia</span>
         </div>
 
         <nav className="dh-sidebar-nav">

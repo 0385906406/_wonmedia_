@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 
 interface ServiceItem {
   title: string
   desc: string
   iconKey?: string
+  link?: string
 }
 
 interface Props {
@@ -30,17 +31,27 @@ const SERVICE_ICONS = [
   </svg>,
 ]
 
-export function ServicesCarousel({ items, heading }: Props) {
+export function ServicesCarousel({ items, heading, lang }: Props) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' })
+  const [canScroll, setCanScroll] = useState(false)
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
 
   useEffect(() => {
     if (!emblaApi) return
+
+    const update = () => setCanScroll(emblaApi.scrollSnapList().length > 1)
+    update()
+    emblaApi.on('reInit', update)
+    return () => { emblaApi.off('reInit', update) }
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!emblaApi || !canScroll) return
     const id = setInterval(() => emblaApi.scrollNext(), 5000)
     return () => clearInterval(id)
-  }, [emblaApi])
+  }, [emblaApi, canScroll])
 
   return (
     <section
@@ -75,19 +86,25 @@ export function ServicesCarousel({ items, heading }: Props) {
         </div>
 
         <div style={{ position: 'relative' }}>
-          <button onClick={scrollPrev} className="wm-carousel-btn wm-carousel-btn--prev" aria-label="Prev">
+          {canScroll && <button onClick={scrollPrev} className="wm-carousel-btn wm-carousel-btn--prev" aria-label="Prev">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
-          </button>
+          </button>}
 
           <div ref={emblaRef} style={{ overflow: 'hidden', padding: '8px 4px 16px' }}>
             <div className="wm-carousel-track">
-              {items.map((item, i) => (
-                <div key={i} className="wm-carousel-slide wm-service-slide-4">
-                  <div className="wm-mesh-card">
-                    <span className="wm-mesh-border" />
+              {items.map((item, i) => {
+                const isExternal = item.link?.startsWith('http')
+                const href = item.link
+                  ? isExternal
+                    ? item.link
+                    : `/${lang}/${item.link.replace(/^\//, '')}`
+                  : undefined
 
+                const cardContent = (
+                  <div className="wm-mesh-card" style={href ? { cursor: 'pointer' } : undefined}>
+                    <span className="wm-mesh-border" />
                     <div className="wm-mesh-content">
                       <div style={{
                         width: '52px', height: '52px', borderRadius: '12px',
@@ -119,27 +136,44 @@ export function ServicesCarousel({ items, heading }: Props) {
                         {item.desc}
                       </p>
 
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        color: 'var(--color-teal-light)', fontSize: '13px', fontWeight: 600,
-                        marginTop: '4px', fontFamily: 'var(--font-primary)',
-                      }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                      </div>
+                      {href && (
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                          color: 'var(--color-teal-light)', fontSize: '13px', fontWeight: 600,
+                          marginTop: '4px', fontFamily: 'var(--font-primary)',
+                        }}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+
+                return (
+                  <div key={i} className="wm-carousel-slide wm-service-slide-4">
+                    {href ? (
+                      <a
+                        href={href}
+                        target={isExternal ? '_blank' : '_self'}
+                        rel={isExternal ? 'noopener noreferrer' : undefined}
+                        style={{ display: 'block', textDecoration: 'none', color: 'inherit', height: '100%' }}
+                      >
+                        {cardContent}
+                      </a>
+                    ) : cardContent}
+                  </div>
+                )
+              })}
             </div>
           </div>
 
-          <button onClick={scrollNext} className="wm-carousel-btn wm-carousel-btn--next" aria-label="Next">
+          {canScroll && <button onClick={scrollNext} className="wm-carousel-btn wm-carousel-btn--next" aria-label="Next">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
-          </button>
+          </button>}
         </div>
       </div>
     </section>

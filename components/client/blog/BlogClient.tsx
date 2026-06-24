@@ -360,21 +360,19 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
   return (
     <div style={{ fontFamily: 'var(--font-vi)' }}>
 
-      <section style={{ position: 'relative', width: '100%', minHeight: 200, display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: 'calc(-1 * var(--topbar-height))' }}>
+      <section style={{ position: 'relative', width: '100%', minHeight: 240, display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: 'calc(-1 * var(--topbar-height))' }}>
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #0F4C81 0%, #062340 100%)',
+          backgroundImage: "url('/banners/banner.png')", backgroundSize: 'cover', backgroundPosition: 'center',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(6,35,64,0.85) 0%, rgba(0,169,143,0.28) 100%)',
         }} />
         <div style={{
           position: 'absolute', inset: 0, opacity: 0.25,
           backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 0)',
           backgroundSize: '28px 28px',
-        }} />
-        <div style={{
-          position: 'absolute', top: '-60px', right: '10%', width: '400px', height: '400px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0,169,143,0.18) 0%, transparent 70%)',
-          pointerEvents: 'none',
         }} />
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '1280px', margin: '0 auto', padding: 'calc(var(--topbar-height) + 52px) 32px 44px', width: '100%' }}>
@@ -385,7 +383,7 @@ function BlogInner({ posts, lang, activeType, total, page, pages, heading, label
             style={{
               display: 'block', marginBottom: 16,
               fontFamily: 'var(--nic-font-mono-sans, var(--font-vi))',
-              fontSize: '11px', fontWeight: 700, letterSpacing: '3px',
+              fontSize: '13px', fontWeight: 700, letterSpacing: '3px',
               textTransform: 'uppercase', color: '#00A98F',
             }}
           >
